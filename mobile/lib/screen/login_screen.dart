@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/screen/profiles_screen.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key});
@@ -43,6 +44,8 @@ class _LoginState extends State<Login> {
             ElevatedButton(
               onPressed: () {
                 // 여기에 로그인 로직을 추가하세요
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Profile()));
                 // 사용자명과 비밀번호는 _usernameController.text와 _passwordController.text로 얻을 수 있습니다.
               },
               child: Text('로그인'),

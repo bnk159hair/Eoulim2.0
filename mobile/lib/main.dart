@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 
 void main() async {
   runApp(
-    MaterialApp(
-        debugShowCheckedModeBanner: false,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => Login(),
-        }),
+    MaterialApp(debugShowCheckedModeBanner: false, initialRoute: '/', routes: {
+      '/': (context) => Login(),
+    }),
   );
 }
