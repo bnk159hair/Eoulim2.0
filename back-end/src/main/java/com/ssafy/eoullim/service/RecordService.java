@@ -28,8 +28,8 @@ import com.ssafy.eoullim.model.Record;
 @RequiredArgsConstructor
 public class RecordService {
 
-    private final RecordRepository recordRepository;
-    private final ChildRepository childRepository;
+  private final RecordRepository recordRepository;
+  private final ChildRepository childRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;

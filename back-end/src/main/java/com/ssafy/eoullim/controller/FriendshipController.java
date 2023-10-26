@@ -21,8 +21,8 @@ public class FriendshipController {
     private final FriendshipService friendshipService;
 
     @PostMapping
-    public Response<Void> regist(@RequestBody FriendshipRequest request) {
-        friendshipService.regist(request.getMyId(), request.getFriendId());
+    public Response<Void> create(@RequestBody FriendshipRequest request) {
+        friendshipService.create(request.getMyId(), request.getFriendId());
         return Response.success();
     }
 

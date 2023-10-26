@@ -7,31 +7,30 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-    // 400 Bad Request
-    DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "Duplicated user name"),
-    DUPLICATED_FRIEND(HttpStatus.BAD_REQUEST, "이미 등록된 친구입니다."),
-    INVALID_DATA(HttpStatus.BAD_REQUEST, "Invalid data"),
-    // 401 Unauthorized
-    INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "Invalid token"),
-    // 403 Forbidden
-    FORBIDDEN_INVALID_PASSWORD(HttpStatus.FORBIDDEN, "Invalid password"),
-    FORBIDDEN_NO_PERMISSION(HttpStatus.FORBIDDEN, "Invalid Permission"),
-    // 404 Not Found
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "User not found"),
-    CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "Child not found"),
-    DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "Data not found"),
-    MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "Match not found"),
-    // 409 Conflict
-    MATCH_CONFLICT(HttpStatus.CONFLICT, "Match Conflict"),
 
-    // 500 Internal Server Error
-    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Database error occurs"),
-    CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "API Connection error occurs"),
-    NOTIFICATION_CONNECT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Connect to notification occurs error"),
-    OPENVIDU_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Openvidu server error occurs"),
-    OPENVIDU_HTTP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Openvidu http error occurs")
-    ;
+  // Common Error
+  UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "A-001", "유효 하지 않은 토큰 입니다."),
+  FORBIDDEN_NO_PERMISSION(HttpStatus.FORBIDDEN, "A-002", "금지된 접근 입니다."),
+  // Server Error
+  OPEN_API_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-001", "Open API Connection error occurs"),
+  NOTIFICATION_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-002", "SSE notification Connection occurs error"),
+  // Child Error
+  CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
+  CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "Child and Animon Relation not found"),
+  INVALID_SCHOOL_NAME(HttpStatus.BAD_REQUEST, "CH-003", "유효 하지 않은 학교 이름 입니다. (실제로 존재 하지 않는 학교)"),
+  // User Error
+  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U-001", "존재 하지 않는 User 입니다."),
+  DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "U-002", "이미 사용 중인 ID 입니다."),
+  INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "U-003", "유효 하지 않은 비밀 번호 입니다."),
+  // Friend Error
+  DUPLICATED_FRIEND(HttpStatus.BAD_REQUEST, "F-001", "이미 등록된 친구 입니다."),
+  // OpenVidu Error
+  MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "OV-001", "Match not found. 해당 회의 방이 존재 하지 않습니다."),
+  MATCH_CONFLICT(HttpStatus.CONFLICT, "OV-002", "Match Conflict. 이미 존재하는 회의 방입니다."),
+  OPENVIDU_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OV-003", "Openvidu server error occurs"),
+  OPENVIDU_HTTP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "OV-004", "Openvidu http error occurs");
 
-    private final HttpStatus status;
-    private final String message;
+  private final HttpStatus status;
+  private final String code; // 네이버에서 쓰는 에러 코드. 찾기 쉬움
+  private final String message; // 이건 Client에게 보여줄 message
 }
