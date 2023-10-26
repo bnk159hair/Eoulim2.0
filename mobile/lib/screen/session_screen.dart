@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/foundation.dart';
-// import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:mobile/utils/session/websocket.dart' as websocket;
 
 class Session extends StatefulWidget {
   const Session({
@@ -17,10 +15,7 @@ class Session extends StatefulWidget {
 
 class _SessionState extends State<Session> {
   final TextEditingController _controller = TextEditingController();
-  final _channel = WebSocketChannel.connect(
-    Uri.parse('wss://echo.websocket.events'),
-  );
-
+  final client = websocket.stompClient;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,12 +34,6 @@ class _SessionState extends State<Session> {
               ),
             ),
             const SizedBox(height: 24),
-            StreamBuilder(
-              stream: _channel.stream,
-              builder: (context, snapshot) {
-                return Text(snapshot.hasData ? '${snapshot.data}' : '');
-              },
-            )
           ],
         ),
       ),
@@ -56,15 +45,26 @@ class _SessionState extends State<Session> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    websocket.stompClient.activate();
+  }
+
   void _sendMessage() {
     if (_controller.text.isNotEmpty) {
-      _channel.sink.add(_controller.text);
+      final message = {
+        'childId': websocket.childId,
+        'isAnimonOn': _controller.text
+      };
+      websocket.send(websocket.sessionId, 'animon', message);
+      print(_controller.text);
     }
   }
 
   @override
   void dispose() {
-    _channel.sink.close();
+    client.deactivate();
     _controller.dispose();
     super.dispose();
   }

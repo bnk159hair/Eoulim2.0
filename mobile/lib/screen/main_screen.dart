@@ -18,7 +18,6 @@ class _MainState extends State<Main> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       home: Scaffold(
         bottomNavigationBar: _buildBottomSheet(),
         body: FadeIndexedStack(
