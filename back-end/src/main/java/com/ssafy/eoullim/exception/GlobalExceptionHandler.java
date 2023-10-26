@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         ErrorResponse.builder()
             .status(e.getErrorCode().getStatus())
             .code(e.getErrorCode().getCode())
-            .message(e.getMessage()) // 클라이언트에게는 에러 코드만.
+            .message(e.getErrorCode().name() + " : " + e.getMessage()) // 클라이언트에게는 에러 코드만.
             .build();
     // 여기서 ERROR CODE 안에 있는 status랑 message, 또한 추가로 exception으로 온 message
     log.error("Error occurs {}", e.toString()); // 서버에 exception 메시지 출력
