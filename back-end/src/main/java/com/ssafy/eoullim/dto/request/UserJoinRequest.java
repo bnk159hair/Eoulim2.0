@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 public class UserJoinRequest {
     private String name;
     private String phoneNumber;
-    private String userName;
+    private String username;
     private String password;
 }

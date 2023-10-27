@@ -1,18 +1,21 @@
 package com.ssafy.eoullim.controller;
 
-import com.ssafy.eoullim.dto.request.*;
+import com.ssafy.eoullim.dto.request.UserJoinRequest;
+import com.ssafy.eoullim.dto.request.UserLoginRequest;
+import com.ssafy.eoullim.dto.request.UserPwCheckRequest;
 import com.ssafy.eoullim.dto.response.Response;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.UserService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -20,42 +23,47 @@ public class UserController {
 
     @PostMapping("/join")
     private Response<Void> join(@RequestBody UserJoinRequest request) {
-        userService.join(request.getUserName(),
+        userService.join(
+                request.getUsername(),
                 request.getPassword(),
                 request.getName(),
-                request.getPhoneNumber());
-        return Response.success();
+                request.getPhoneNumber()
+        );
+        return Response.success(HttpStatus.OK, "account created");
     }
 
     @PostMapping("/login")
     public Response<String> login(@RequestBody UserLoginRequest request) {
-        String token = userService.login(request.getUserName(), request.getPassword());
-        return Response.success(token);
+        String accessToken = userService.login(request.getUsername(), request.getPassword());
+        return Response.success(HttpStatus.OK, "login completed", accessToken);
     }
 
     @GetMapping("/logout")
     public Response<Void> logout(Authentication authentication) {
         userService.logout(authentication.getName());
-        return Response.success();
+        return Response.success(HttpStatus.OK, "logout completed");
     }
 
-    @PutMapping
-    public Response<Void> modify(@RequestBody UserModifyRequest request, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        userService.modify(user, request.getCurPassword(), request.getNewPassword());
-        return Response.success();
+    @GetMapping("/check-username/{username}")
+    public Response<String> checkUsername(@PathVariable String username) {
+        boolean duplicate = userService.checkId(username);
+        if(duplicate) {
+            return Response.success(HttpStatus.OK, "duplicate ID", "duplicated");
+        }
+        else {
+            return Response.success(HttpStatus.OK, "available ID", "available");
+        }
     }
-    
-    @PostMapping("/id-check")    // ID 중복 체크
-    public Response<Void> checkId(@RequestBody UserIdCheckRequest request) {
-        userService.checkId(request.getUserName());
-        return Response.success();
-    }
-    
-    @PostMapping("/pw-check")    // User Password 재확인
-    public Response<Void> checkPw(@RequestBody UserPwCheckRequest request, Authentication authentication) {
+
+    @PostMapping("/check-password")
+    public Response<String> checkPassword(@RequestBody UserPwCheckRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        userService.checkPw(request.getPassword(), user.getPassword());
-        return Response.success();
+        boolean correct = userService.checkPw(request.getPassword(), user.getPassword());
+        if(correct) {
+            return Response.success(HttpStatus.OK, "correct password", "correct");
+        }
+        else {
+            return Response.success(HttpStatus.OK, "wrong password", "wrong");
+        }
     }
 }

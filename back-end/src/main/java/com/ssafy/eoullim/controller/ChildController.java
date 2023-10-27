@@ -1,11 +1,10 @@
 package com.ssafy.eoullim.controller;
 
-import com.ssafy.eoullim.dto.request.ChildSchoolRequest;
 import com.ssafy.eoullim.dto.request.ChildRequest;
+import com.ssafy.eoullim.dto.request.ChildSchoolRequest;
 import com.ssafy.eoullim.dto.response.Response;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
-import com.ssafy.eoullim.model.Friend;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.ChildService;
 import com.ssafy.eoullim.utils.ClassUtils;
@@ -31,12 +30,12 @@ public class ChildController {
     return Response.success(childrenList);
   }
 
-  @PostMapping
-  public Response<Void> create(@RequestBody ChildRequest request, Authentication authentication) {
-    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-    childService.create(user, request);
-    return Response.success();
-  }
+//  @PostMapping
+//  public Response<Void> create(@RequestBody ChildRequest request, Authentication authentication) {
+//    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+//    childService.create(user, request);
+//    return Response.success();
+//  }
 
   @PostMapping("/login/{childId}")
   public Response<Child> login(@PathVariable Integer childId) {
@@ -60,11 +59,11 @@ public class ChildController {
     return Response.success(child);
   }
 
-  @GetMapping("/participant/{participantId}")
-  public Response<Friend> getParticipantInfo(@PathVariable Integer participantId) {
-    Friend friend = childService.getParticipantInfo(participantId);
-    return Response.success(friend);
-  }
+//  @GetMapping("/participant/{participantId}")
+//  public Response<Friend> getParticipantInfo(@PathVariable Integer participantId) {
+//    Friend friend = childService.getParticipantInfo(participantId);
+//    return Response.success(friend);
+//  }
 
   @PutMapping("/{childId}")
   public Response<Void> modify(@PathVariable Integer childId, @RequestBody ChildRequest request) {
@@ -79,18 +78,18 @@ public class ChildController {
     return Response.success();
   }
 
-  @GetMapping("/{childId}/animons")
-  public Response<List<Animon>> getAnimonList(@PathVariable Integer childId) {
-    List<Animon> animonList = childService.getAnimonList(childId);
-    return Response.success(animonList);
-  }
+//  @GetMapping("/{childId}/animons")
+//  public Response<List<Animon>> getAnimonList(@PathVariable Integer childId) {
+//    List<Animon> animonList = childService.getAnimonList(childId);
+//    return Response.success(animonList);
+//  }
 
-  @GetMapping("/{childId}/animons/{animonId}")
-  public Response<Animon> selectAnimon(
-      @PathVariable Integer childId, @PathVariable Integer animonId) {
-    Animon animon = childService.setAnimon(childId, animonId);
-    return Response.success(animon);
-  }
+//  @GetMapping("/{childId}/animons/{animonId}")
+//  public Response<Animon> selectAnimon(
+//      @PathVariable Integer childId, @PathVariable Integer animonId) {
+//    Animon animon = childService.setAnimon(childId, animonId);
+//    return Response.success(animon);
+//  }
 
   @PostMapping("/school")
   public Response<String> checkSchool(@RequestBody ChildSchoolRequest request) {

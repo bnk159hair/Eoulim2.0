@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Setter
@@ -15,7 +16,7 @@ public class Child {
 
     private Integer id;
     private String name;
-    private Date birth;
+    private LocalDate birth;
     private char gender;
     private String school;
     private Integer grade;
