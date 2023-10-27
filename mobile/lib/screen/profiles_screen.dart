@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_plus/flutter_swiper_plus.dart';
-import 'package:mobile/screen/main_screen.dart';
+import 'package:mobile/screen/home_screen.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -29,7 +29,7 @@ class _ProfileState extends State<Profile> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Main(),
+                              builder: (context) => Home(),
                             ),
                           );
                         },
@@ -52,7 +52,7 @@ class _ProfileState extends State<Profile> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Main(),
+                              builder: (context) => Home(),
                             ),
                           );
                         },
