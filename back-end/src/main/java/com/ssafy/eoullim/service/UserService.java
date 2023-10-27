@@ -85,4 +85,12 @@ public class UserService {
         return encoder.matches(pwRequest, pwCorrect);
     }
 
+    public void updatePw(User user, String curPassword, String newPassword) {
+        if (!encoder.matches(curPassword, user.getPassword())) {
+            throw new EoullimApplicationException(ErrorCode.INVALID_PASSWORD);
+        }
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(UserEntity.of(user));
+        userCacheRepository.setUser(user);
+    }
 }
