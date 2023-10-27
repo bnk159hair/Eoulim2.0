@@ -2,6 +2,7 @@ package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.UserJoinRequest;
 import com.ssafy.eoullim.dto.request.UserLoginRequest;
+import com.ssafy.eoullim.dto.request.UserModifyRequest;
 import com.ssafy.eoullim.dto.request.UserPwCheckRequest;
 import com.ssafy.eoullim.dto.response.Response;
 import com.ssafy.eoullim.model.User;
@@ -13,16 +14,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+  private final UserService userService;
 
     @PostMapping("/join")
-    private Response<Void> join(@RequestBody UserJoinRequest request) {
+    private Response<Void> join(@Valid @RequestBody UserJoinRequest request) {
         userService.join(
                 request.getUsername(),
                 request.getPassword(),
@@ -33,7 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Response<String> login(@RequestBody UserLoginRequest request) {
+    public Response<String> login(@Valid @RequestBody UserLoginRequest request) {
         String accessToken = userService.login(request.getUsername(), request.getPassword());
         return Response.success(HttpStatus.OK, "login completed", accessToken);
     }
@@ -45,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/check-username/{username}")
-    public Response<String> checkUsername(@PathVariable String username) {
+    public Response<String> checkUsername(@PathVariable @NotBlank String username) {
         boolean duplicate = userService.checkId(username);
         if(duplicate) {
             return Response.success(HttpStatus.OK, "duplicate ID", "duplicated");
@@ -56,7 +60,7 @@ public class UserController {
     }
 
     @PostMapping("/check-password")
-    public Response<String> checkPassword(@RequestBody UserPwCheckRequest request, Authentication authentication) {
+    public Response<String> checkPassword(@Valid @RequestBody UserPwCheckRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
         boolean correct = userService.checkPw(request.getPassword(), user.getPassword());
         if(correct) {
@@ -66,4 +70,12 @@ public class UserController {
             return Response.success(HttpStatus.OK, "wrong password", "wrong");
         }
     }
+
+//    @PutMapping
+//    public Response<Void> modify(
+//            @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
+//        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+//        userService.modify(user, request.getCurPassword(), request.getNewPassword());
+//        return Response.success();
+//    }
 }

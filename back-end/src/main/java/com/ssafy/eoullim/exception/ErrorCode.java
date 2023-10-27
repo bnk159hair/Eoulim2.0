@@ -11,9 +11,11 @@ public enum ErrorCode {
   // Common Error
   UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "A-001", "유효 하지 않은 토큰 입니다."),
   FORBIDDEN_NO_PERMISSION(HttpStatus.FORBIDDEN, "A-002", "금지된 접근 입니다."),
+  DB_NOT_FOUND(HttpStatus.NOT_FOUND, "A-003", "DB에 없는 데이터."),
   // Server Error
   OPEN_API_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-001", "Open API Connection error occurs"),
   NOTIFICATION_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-002", "SSE notification Connection occurs error"),
+
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
   CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "Child and Animon Relation not found"),

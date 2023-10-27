@@ -41,14 +41,14 @@ public class UserEntity {
         this.role = role;
     }
 
-//    public static UserEntity of(User user) {
-//        return UserEntity.builder()
-//                .id(user.getId())
-//                .name(user.getName())
-//                .phoneNumber(user.getPhoneNumber())
-//                .username(user.getUsername())
-//                .password(user.getPassword())
-//                .role(user.getRole())
-//                .build();
-//    }
+    public static UserEntity of(User user) {
+        return UserEntity.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .build();
+    }
 }

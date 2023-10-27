@@ -4,7 +4,11 @@ import com.ssafy.eoullim.dto.request.ChildRequest;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Child;
+import com.ssafy.eoullim.model.OtherChild;
+import com.ssafy.eoullim.model.User;
+import com.ssafy.eoullim.model.entity.AnimonEntity;
 import com.ssafy.eoullim.model.entity.ChildEntity;
+import com.ssafy.eoullim.model.entity.UserEntity;
 import com.ssafy.eoullim.repository.AnimonRepository;
 import com.ssafy.eoullim.repository.ChildCacheRepository;
 import com.ssafy.eoullim.repository.ChildRepository;
@@ -40,18 +44,21 @@ public class ChildService {
 
 
 
-//  @Transactional
-//  public void create(User user, ChildRequest request) {
-//    ChildEntity childEntity = ChildEntity.of(UserEntity.of(user), Child.of(request));
-//    childRepository.save(childEntity);
-//
-//    // 기본 애니몬 4종을 해당 Child에 부여
+  @Transactional
+  public void create(User user, ChildRequest request) {
+    ChildEntity childEntity = ChildEntity.of(UserEntity.of(user), Child.of(request));
+    AnimonEntity animonEntity =
+        animonRepository.findById(1).orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND));
+    childEntity.setAnimon(animonEntity);
+    childRepository.save(childEntity);
+
+    // 기본 애니몬 4종을 해당 Child에 부여
 //    List<AnimonEntity> animons = animonRepository.getDefaultAnimon();
 //    for (AnimonEntity animonEntity : animons) {
 //      if (animonEntity.getId() == 1) childEntity.setAnimon(animonEntity); // 4종 중 1번 애니몬을 선택
 //      childAnimonRepository.save(ChildAnimonEntity.of(childEntity, animonEntity));
 //    }
-//  }
+  }
 
   @Transactional
   public Child login(Integer childId) {
@@ -93,12 +100,14 @@ public class ChildService {
     childRepository.delete(childEntity);
   }
 
+  // TODO:  DB에 Child가 만든 애 + Default 1234
 //  public List<Animon> getAnimonList(Integer childId) {
 //    return childAnimonRepository.findAnimonsByChildId(childId).stream()
 //        .map(Animon::fromEntity)
 //        .collect(Collectors.toList());
 //  }
 
+  // TODO: fix
 //  @Transactional
 //  public Animon setAnimon(Integer childId, Integer animonId) {
 //    ChildAnimonEntity childAnimonEntity =
@@ -124,13 +133,13 @@ public class ChildService {
             .collect(Collectors.toList());
   }
 
-//  public Friend getParticipantInfo(Integer participantId) {
-//    ChildEntity participant =
-//        childRepository
-//            .findById(participantId)
-//            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
-//    return Friend.fromEntity(participant);
-//  }
+  public OtherChild getParticipantInfo(Integer participantId) {
+    ChildEntity participant =
+        childRepository
+            .findById(participantId)
+            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
+    return OtherChild.fromEntity(participant);
+  }
 
   public void checkSchool(String keyword) {
     try {
