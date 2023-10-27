@@ -37,6 +37,7 @@ const Login = () => {
     axios
       .post(`${API_BASE_URL}/users/login`, { userName, password })
       .then((response) => {
+        console.log(response)
         setToken(response.data.result);
         navigate('/profile');
       })

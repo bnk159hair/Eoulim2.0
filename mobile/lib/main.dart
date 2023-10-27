@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/screen/login_screen.dart';
+import 'package:mobile/screen/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       title: 'Eoullim',
-      home: Login(),
+      home: Splash(),
     );
   }
 }
