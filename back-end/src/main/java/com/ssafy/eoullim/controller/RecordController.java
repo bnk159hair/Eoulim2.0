@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ssafy.eoullim.model.Record;
 
+import javax.validation.constraints.NotBlank;
 import java.util.*;
 
 @Slf4j
@@ -22,7 +23,7 @@ public class RecordController {
     private final RecordService recordService;
 
     @GetMapping("/{childId}")
-    public ResponseEntity<?> getRecording(@PathVariable Integer childId
+    public ResponseEntity<?> getRecording(@NotBlank @PathVariable Integer childId
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         List<Record> list = recordService.getRecordList(childId);
 

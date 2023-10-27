@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,30 +16,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class RecordEntity {
     @Id
-    @Column(name="record_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="create_time")
-    @CreationTimestamp
-    private LocalDateTime createTime;
+    @CreatedDate
+    private LocalDateTime createdAt;
 
-    @Column(name="video_path")
+    @Column(nullable = false)
     private String videoPath;
 
+    @Column(nullable = false)
+    private String guideSeq;
+
+    @Column(nullable = false)
+    private String timeline;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="master_id", nullable = false, referencedColumnName = "child_id")
+    @JoinColumn(name="master_id", nullable = false)
     private ChildEntity master;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="participant_id", nullable = false, referencedColumnName = "child_id")
+    @JoinColumn(name="participant_id", nullable = false)
     private ChildEntity participant;
-
-    @Column(name="guide_seq")
-    private String guideSeq;
-
-    @Column(name="timeline")
-    private String timeline;
 
     public RecordEntity(Integer id, String videoPath, ChildEntity master, ChildEntity participant, String guideSeq, String timeline) {
         this.id = id;

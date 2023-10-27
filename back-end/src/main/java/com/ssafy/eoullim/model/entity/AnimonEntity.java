@@ -13,16 +13,19 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class AnimonEntity {
     @Id
-    @Column(name = "animon_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "head_image_path", nullable = false)
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String headImagePath;
 
-    @Column(name = "body_image_path", nullable = false)
+    @Column(nullable = false)
     private String bodyImagePath;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "child_id")
+    private ChildEntity childEntity;
 }

@@ -31,7 +31,7 @@ public class User implements UserDetails {
                 entity.getId(),
                 entity.getName(),
                 entity.getPhoneNumber(),
-                entity.getUserName(),
+                entity.getUsername(),
                 entity.getPassword(),
                 entity.getRole()
         );

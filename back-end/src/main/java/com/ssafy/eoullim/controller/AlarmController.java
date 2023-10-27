@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import javax.validation.constraints.NotBlank;
+
 @RestController
 @RequestMapping("/api/v1/alarms")
 @RequiredArgsConstructor
@@ -18,7 +20,7 @@ public class AlarmController {
     private final AlarmService alarmService;
 
     @GetMapping(value = "/subscribe/{childId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable Integer childId) {
+    public SseEmitter subscribe(@PathVariable @NotBlank Integer childId) {
         return alarmService.subscribe(childId);
     }
 }

@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/meetings")
@@ -33,7 +35,7 @@ public class MatchController {
     @PostMapping("/random/start")
     @Transactional
     public synchronized ResponseEntity<?> startRandom(
-            @RequestBody MatchRequest matchRequest
+            @Valid @RequestBody MatchRequest matchRequest
     ) {
         Match result = null;
         try{
@@ -84,7 +86,7 @@ public class MatchController {
     /* 친구 만나기 */
     @PostMapping("/friend/start")
     public ResponseEntity<?> startFrined(
-            @RequestBody MatchFriendRequest matchFriendRequest
+            @Valid @RequestBody MatchFriendRequest matchFriendRequest
     ) {
 
         String existSessionId = matchFriendRequest.getSessionId();

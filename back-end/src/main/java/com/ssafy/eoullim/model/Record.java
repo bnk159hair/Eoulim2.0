@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Record {
     private Integer id;
-    private String create_time;
+    private LocalDateTime createdAt;
     private String video_path;
     private String name;
     private String school;
@@ -24,7 +25,7 @@ public class Record {
     public static Record fromEntity(RecordEntity entity) {
         return new Record(
                 entity.getId(),
-                entity.getCreateTime().toString(),
+                entity.getCreatedAt(),
                 entity.getVideoPath(),
                 entity.getParticipant().getName(),
                 entity.getParticipant().getSchool(),
