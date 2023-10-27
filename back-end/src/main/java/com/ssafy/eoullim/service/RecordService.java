@@ -8,6 +8,7 @@ import com.ssafy.eoullim.repository.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -27,8 +28,11 @@ import com.ssafy.eoullim.model.Record;
 @RequiredArgsConstructor
 public class RecordService {
 
-    private final RecordRepository recordRepository;
-    private final ChildRepository childRepository;
+  private final RecordRepository recordRepository;
+  private final ChildRepository childRepository;
+
+    @Value("${OPENVIDU_URL}")
+    private String OPENVIDU_URL;
 
     public void writeVideoToDB(String recordingId, Room room) throws IOException, ParseException {
 
@@ -69,7 +73,7 @@ public class RecordService {
 
         JSONArray files = (JSONArray) jsonObject.get("files");
 
-        String downDir = "https://i9c207.p.ssafy.io/openvidu/recordings/";
+        String downDir = OPENVIDU_URL+"/openvidu/recordings/";
         String downFolder = downDir+recordingId+"/";
         for(int i=0; i< files.size(); i++){
             JSONObject element = (JSONObject) files.get(i);

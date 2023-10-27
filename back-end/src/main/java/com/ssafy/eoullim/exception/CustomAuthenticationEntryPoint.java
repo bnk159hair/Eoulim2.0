@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.exception;
 
+import com.ssafy.eoullim.dto.response.ErrorResponse;
 import com.ssafy.eoullim.dto.response.Response;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -10,10 +11,26 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.setContentType("application/json");
-        response.setStatus(ErrorCode.INVALID_TOKEN.getStatus().value());
-        response.getWriter().write(Response.error(ErrorCode.INVALID_TOKEN.name()).toStream());
-    }
+  @Override
+  public void commence(
+      HttpServletRequest request,
+      HttpServletResponse response,
+      AuthenticationException authException)
+      throws IOException, ServletException {
+    final var errorResponse =
+        ErrorResponse.builder()
+            .status(ErrorCode.UNAUTHORIZED_TOKEN.getStatus())
+            .code(ErrorCode.UNAUTHORIZED_TOKEN.getCode())
+            .message(
+                ErrorCode.UNAUTHORIZED_TOKEN.name()
+                    + " : "
+                    + ErrorCode.UNAUTHORIZED_TOKEN.getMessage())
+            .build();
+    response.setCharacterEncoding("UTF-8");
+    response.setContentType("application/json; charset=UTF-8");
+    response.setStatus(ErrorCode.UNAUTHORIZED_TOKEN.getStatus().value());
+    response.getWriter().write(errorResponse.toString());
+    //
+    // response.getWriter().write(Response.error(ErrorCode.UNAUTHORIZED_TOKEN.name()).toStream());
+  }
 }
