@@ -1,8 +1,73 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:mobile/screen/join_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
+
+var backButtonPressedOnce = false;
+
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        // 첫 번째 뒤로가기 버튼 누를 때
+        if (backButtonPressedOnce) {
+          SystemNavigator.pop();
+          return true; // 앱 종료
+        }
+
+        // 두 번째 뒤로가기 버튼 누를 때
+        backButtonPressedOnce = true;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('뒤로가기 버튼을 한 번 더 누르면 종료합니다.')),
+        );
+
+        // 2초 내에 두 번째 뒤로가기 버튼을 누르지 않으면 초기화
+        Future.delayed(Duration(seconds: 2), () {
+          backButtonPressedOnce = false;
+        });
+
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.notifications,
+            ),
+            iconSize: 40.0,
+          ),
+          actions: [
+            MaterialButton(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30.0),
+              ),
+              onPressed: () {
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Hello There!'),
+                    duration: Duration(milliseconds: 1500),
+                  ),
+                );
+              },
+              child: Image.asset('assets/bear.png'),
+            )
+          ],
+          // backgroundColor: Colors.black,
+          elevation: 6.0,
+          toolbarHeight: 100.0,
+        ),
+        body: HomeBottomNavBar(),
+      ),
+    );
+  }
+}
 
 PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
@@ -24,42 +89,27 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
     ),
     PersistentBottomNavBarItem(
       icon: Icon(Icons.people),
-      title: ("내 친구"),
+      title: "내 친구",
       activeColorPrimary: Colors.blue,
       inactiveColorPrimary: Colors.grey,
     ),
     PersistentBottomNavBarItem(
       icon: Icon(Icons.settings_outlined),
-      title: ("설정"),
+      title: "설정",
       activeColorPrimary: Colors.blue,
       inactiveColorPrimary: Colors.grey,
     ),
   ];
 }
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class HomeBottomNavBar extends StatelessWidget {
+  const HomeBottomNavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications,
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.account_circle,
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: PersistentTabView(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: PersistentTabView(
         context,
         controller: _controller,
         screens: _buildScreens(),
@@ -95,60 +145,3 @@ class Home extends StatelessWidget {
     );
   }
 }
-
-// class Main extends StatefulWidget {
-//   const Main({super.key});
-
-//   @override
-//   State<Main> createState() => _MainState();
-// }
-
-// class _MainState extends State<Main> {
-//   // this is used to control the current index of the bottom navigation bar, and the current index of the FadeIndexedStack
-//   int currentIndex = 0;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       bottomNavigationBar: _buildBottomSheet(),
-//       body: FadeIndexedStack(
-//         sizing: StackFit.expand,
-//         beginOpacity: 0.5,
-//         endOpacity: 1.0,
-//         curve: Curves.easeInOut,
-//         duration: const Duration(milliseconds: 250),
-//         index: currentIndex,
-//         children: <Widget>[
-//           Join(),
-//           Friends(),
-//           Settings(),
-//         ],
-//       ),
-//     );
-//   }
-
-//   Widget _buildBottomSheet() {
-//     return BottomNavigationBar(
-//       currentIndex: currentIndex,
-//       onTap: (index) {
-//         setState(() {
-//           currentIndex = index;
-//         });
-//       },
-//       items: const <BottomNavigationBarItem>[
-//         BottomNavigationBarItem(
-//           icon: Icon(Icons.home),
-//           label: 'New',
-//         ),
-//         BottomNavigationBarItem(
-//           icon: Icon(Icons.people),
-//           label: 'Friends',
-//         ),
-//         BottomNavigationBarItem(
-//           icon: Icon(Icons.settings),
-//           label: 'Settings',
-//         ),
-//       ],
-//     );
-//   }
-// }
