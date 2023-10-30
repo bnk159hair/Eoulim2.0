@@ -5,6 +5,8 @@ import 'package:stomp_dart_client/stomp.dart';
 import 'package:stomp_dart_client/stomp_config.dart';
 import 'package:stomp_dart_client/stomp_frame.dart';
 
+import 'package:audioplayers/audioplayers.dart';
+
 void onConnect(StompFrame frame) {
   print("연결시도");
   subscribe(sessionId, "animon");
@@ -12,8 +14,15 @@ void onConnect(StompFrame frame) {
   subscribe(sessionId, "leave-session");
 }
 
+final String sessionId = "1_20231030064104";
 final int childId = 2;
-final String sessionId = "1_20231026071532";
+int? opId = 1;
+bool? myGuideStatus = false;
+bool? opGuideStatus = false;
+
+int index = 1;
+
+AudioPlayer player = AudioPlayer();
 
 final stompClient = StompClient(
   config: StompConfig(
@@ -39,6 +48,17 @@ void subscribe(String sessionId, String topic) {
           print(result);
         } else if (topic == "guide") {
           print("guide");
+          if (result['childId'] == childId.toString()) {
+            myGuideStatus = result['isNextGuideOn'];
+          } else {
+            opGuideStatus = result['isNextGuideOn'];
+          }
+          if (myGuideStatus == true && opGuideStatus == true) {
+            myGuideStatus = false;
+            opGuideStatus = false;
+            playGuide();
+            index++;
+          }
           print(result);
         } else if (topic == "leave-session") {
           print("leave-session");
@@ -59,4 +79,8 @@ void send(
       body: json.encode(message),
       headers: {});
   print("successfully send message");
+}
+
+void playGuide() async {
+  await player.play(AssetSource('$index.mp3'));
 }

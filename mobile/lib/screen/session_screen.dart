@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/utils/session/websocket.dart' as websocket;
+import 'package:mobile/utils/websocket.dart' as websocket;
+import 'package:mobile/widgets/session/guide_button.dart';
 
 class Session extends StatefulWidget {
   const Session({
@@ -34,6 +35,7 @@ class _SessionState extends State<Session> {
               ),
             ),
             const SizedBox(height: 24),
+            const GuideButton(),
           ],
         ),
       ),
