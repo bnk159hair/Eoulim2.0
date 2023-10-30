@@ -66,23 +66,6 @@ public class GlobalExceptionHandler {
     return errorResponse;
   }
 
-  // TODO : LocalDate 올바르게 처리하기
-  @ExceptionHandler(HttpMessageNotReadableException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  @ResponseBody
-  public ErrorResponse serializerHandler(
-      HttpMessageNotReadableException e) { // LocalDate를 역직렬화 할 때 패턴 안맞으면
-    final var errorResponse =
-        ErrorResponse.builder()
-            .status(HttpStatus.BAD_REQUEST)
-            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
-            .message("Failed Validation of Request Body. 생년월일은 'yyyy-MM-dd' 형식이어야 합니다.")
-            .build();
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
-    return errorResponse;
-  }
-
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ErrorResponse> badRequestHandler(IllegalArgumentException e) {
     final var errorResponse =
