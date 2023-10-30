@@ -19,7 +19,6 @@ public enum ErrorCode {
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
   CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "Child and Animon Relation not found"),
-  INVALID_SCHOOL_NAME(HttpStatus.BAD_REQUEST, "CH-003", "유효 하지 않은 학교 이름 입니다. (실제로 존재 하지 않는 학교)"),
   // User Error
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U-001", "존재 하지 않는 User 입니다."),
   DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "U-002", "이미 사용 중인 ID 입니다."),

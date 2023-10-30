@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Setter
@@ -17,7 +18,7 @@ public class Child {
     private Integer id;
     private String name;
     private LocalDate birth;
-    private char gender;
+    private String gender;
     private String school;
     private Integer grade;
     private Status status;
@@ -37,10 +38,11 @@ public class Child {
     }
 
     public static Child of(ChildRequest request) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // 원하는 날짜 형식 지정
         return new Child(
                 null,
                 request.getName(),
-                request.getBirth(),
+                LocalDate.parse(request.getBirth(), formatter),
                 request.getGender(),
                 request.getSchool(),
                 request.getGrade(),

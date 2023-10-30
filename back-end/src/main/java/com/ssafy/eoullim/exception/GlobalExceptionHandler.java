@@ -7,6 +7,7 @@ import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.ssafy.eoullim.exception.ErrorCode.*;
@@ -44,21 +46,38 @@ public class GlobalExceptionHandler {
   @ResponseBody
   public ErrorResponse requestValidationHandler(MethodArgumentNotValidException e) {
     StringBuilder errorMsg = new StringBuilder();
-    errorMsg.append("Failed Validation of Request Body.").append("\n");
+    errorMsg.append("Failed Validation of Request Body. ").append("\n");
 
     List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
-    for (FieldError fieldError : fieldErrors) {   // 별도로 메시지가 있는 경우만 추가
-      if (fieldError.getDefaultMessage() == null) {
-        errorMsg.append(fieldError.getCode());
-      }
+    for (FieldError fieldError : fieldErrors) { // 별도로 메시지가 있는 경우만 추가
+      errorMsg.append(fieldError.getDefaultMessage()).append("\n");
+      //        errorMsg.append(fieldError.getField()).append(" 은(는)
+      // ").append(fieldError.getDefaultMessage()).append("\n");
     }
 
     final var errorResponse =
-            ErrorResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST)
-                    .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
-                    .message(errorMsg.toString())
-                    .build();
+        ErrorResponse.builder()
+            .status(HttpStatus.BAD_REQUEST)
+            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+            .message(errorMsg.toString())
+            .build();
+    log.error("Error occurs {}", e.toString());
+    log.error("Error occurs in method: " + e.getStackTrace()[0]);
+    return errorResponse;
+  }
+
+  // TODO : LocalDate 올바르게 처리하기
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseBody
+  public ErrorResponse serializerHandler(
+      HttpMessageNotReadableException e) { // LocalDate를 역직렬화 할 때 패턴 안맞으면
+    final var errorResponse =
+        ErrorResponse.builder()
+            .status(HttpStatus.BAD_REQUEST)
+            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+            .message("Failed Validation of Request Body. 생년월일은 'yyyy-MM-dd' 형식이어야 합니다.")
+            .build();
     log.error("Error occurs {}", e.toString());
     log.error("Error occurs in method: " + e.getStackTrace()[0]);
     return errorResponse;
@@ -86,7 +105,7 @@ public class GlobalExceptionHandler {
             .message(e.getMessage())
             .build();
     log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
+    log.error("Error occurs in method: " + Arrays.toString(e.getStackTrace()));
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 

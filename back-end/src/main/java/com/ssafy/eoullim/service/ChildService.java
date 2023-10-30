@@ -45,10 +45,10 @@ public class ChildService {
 
 
   @Transactional
-  public void create(User user, ChildRequest request) {
-    ChildEntity childEntity = ChildEntity.of(UserEntity.of(user), Child.of(request));
+  public void create(User user, Child child) {
+    ChildEntity childEntity = ChildEntity.of(UserEntity.of(user), child);
     AnimonEntity animonEntity =
-        animonRepository.findById(1).orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND));
+        animonRepository.findById(1).orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "));
     childEntity.setAnimon(animonEntity);
     childRepository.save(childEntity);
 
@@ -82,13 +82,13 @@ public class ChildService {
   }
 
   @Transactional
-  public void modify(Integer childId, ChildRequest request) {
+  public void modify(Integer childId, Child child) {
     final var childEntity = getChildEntity(childId);
-    childEntity.setName(request.getName());
-    childEntity.setBirth(request.getBirth());
-    childEntity.setGender(request.getGender());
-    childEntity.setSchool(request.getSchool());
-    childEntity.setGrade(request.getGrade());
+    childEntity.setName(child.getName());
+    childEntity.setBirth(child.getBirth());
+    childEntity.setGender(child.getGender());
+    childEntity.setSchool(child.getSchool());
+    childEntity.setGrade(child.getGrade());
   }
 
   @Transactional
@@ -141,7 +141,7 @@ public class ChildService {
     return OtherChild.fromEntity(participant);
   }
 
-  public void checkSchool(String keyword) {
+  public Boolean isValidSchoolName(String keyword) {
     try {
       // API URL Build
       StringBuilder urlBuilder = new StringBuilder(schoolApiUrl);
@@ -194,12 +194,7 @@ public class ChildService {
       }
       rd.close();
       conn.disconnect();
-      // ERROR : 일치하는 초등학교가 없는 경우
-      if (outputStringBuilder.toString().contains("NODATA_ERROR")) {
-        throw new EoullimApplicationException(ErrorCode.INVALID_SCHOOL_NAME);
-      } else { // 나온 결과물을 가지고 갈 수도 있음!! 지금은 쓸모 없으니 그냥 있나 없나만 확인
-        return; // 일치하는 초등학교 있는 경우
-      }
+      return !outputStringBuilder.toString().contains("NODATA_ERROR");  // 있는 학교면 True, No Data면 False
     } catch (IOException e) { // ERROR : Http Connection (api 호출 과정에서 error)
       throw new EoullimApplicationException(ErrorCode.OPEN_API_CONNECTION_ERROR);
     }

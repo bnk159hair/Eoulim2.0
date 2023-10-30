@@ -29,7 +29,7 @@ public class ChildEntity {
     private LocalDate birth;
 
     @Column(nullable = false, length = 1)
-    private char gender;
+    private String gender;
 
     @Column(nullable = false, length = 20)
     private String school;
@@ -41,7 +41,7 @@ public class ChildEntity {
     private Status status = Status.OFF;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
