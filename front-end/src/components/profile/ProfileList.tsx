@@ -50,7 +50,7 @@ const ProfileList = () => {
         },
       })
       .then((response) => {
-        const data = response.data.result;
+        const data = response.data.data;
         setProfiles(data); // profiles 상태 업데이트
         console.log(data);
       })

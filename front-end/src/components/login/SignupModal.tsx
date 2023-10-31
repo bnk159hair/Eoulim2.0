@@ -26,7 +26,7 @@ interface SignupModalProps {
 }
 
 const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
-  const [userName, setUserName] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -48,7 +48,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
     }
 
     if (
-      !userName.trim() ||
+      !username.trim() ||
       !password.trim() ||
       !passwordConfirmation ||
       !name.trim() ||
@@ -92,9 +92,9 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
     }
 
     try {
-      const signUpData = { userName, password, name, phoneNumber };
+      const signUpData = { username, password, name, phoneNumber };
       const response = await axios.post(
-        `${API_BASE_URL}/users/join`,
+        `${API_BASE_URL}/join`,
         signUpData
       );
       Swal.fire({
@@ -111,7 +111,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
 
   const handleIdCheck = async (event: any) => {
     event.preventDefault();
-    if (!userName.trim()) {
+    if (!username.trim()) {
       Swal.fire({
         text: '아이디를 입력해주세요!',
         icon: 'error',
@@ -121,9 +121,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/users/id-check`, {
-        userName: userName,
-      });
+      const response = await axios.get(`${API_BASE_URL}/check-username/${username}`);
       setIsIdUnique(response.data.resultCode);
       console.log('아이디 중복 확인 결과:', response);
       if (response.data.resultCode) {
@@ -174,9 +172,9 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
                 label='아이디'
                 variant='outlined'
                 margin='dense'
-                value={userName}
+                value={username}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                  setUserName(event.target.value)
+                  setUsername(event.target.value)
                 }
                 sx={{ width: '75%', marginTop: '0' }}
                 helperText={isIdUnique && '중복 확인이 완료되었습니다.'}

@@ -29,7 +29,7 @@ const ProfilePage = () => {
 
   const logoutClick = () => {
     axios
-      .get(`${API_BASE_URL}/users/logout`, {
+      .get(`${API_BASE_URL}/logout`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

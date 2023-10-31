@@ -17,7 +17,7 @@ import SignupModal from './SignupModal';
 import Swal from 'sweetalert2';
 
 const Login = () => {
-  const [userName, setUsername] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const Login = () => {
 
   const handleLogin = (event: any) => {
     event.preventDefault();
-    if (!userName.trim() || !password.trim()) {
+    if (!username.trim() || !password.trim()) {
       Swal.fire({
         text: '아이디와 비밀번호를 확인해주세요!',
         icon: 'error',
@@ -35,9 +35,10 @@ const Login = () => {
     }
 
     axios
-      .post(`${API_BASE_URL}/users/login`, { userName, password })
+      .post(`${API_BASE_URL}/login`, { username, password })
       .then((response) => {
-        setToken(response.data.result);
+        console.log(response);
+        setToken(response.data.data);
         navigate('/profile');
       })
       .catch((error) => {
@@ -65,7 +66,7 @@ const Login = () => {
           variant='filled'
           color='success'
           margin='dense'
-          value={userName}
+          value={username}
           sx={{
             bgcolor: '#F5EBC9',
             borderRadius: '5px',

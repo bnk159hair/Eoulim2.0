@@ -29,7 +29,7 @@ const ToRecordModal: React.FC<ToRecordModalProps> = ({ onClose, childId }) => {
     event.preventDefault();
     axios
       .post(
-        `${API_BASE_URL}/users/pw-check`,
+        `${API_BASE_URL}/check-password`,
         { password },
         {
           headers: {
