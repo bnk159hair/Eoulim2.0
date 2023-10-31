@@ -145,6 +145,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  custom_radio_grouped_button:
+    dependency: "direct main"
+    description:
+      name: custom_radio_grouped_button
+      sha256: b07bd6dec2c1c5d64776a354eb2c01c67a77e4a5700098ae6fbde18cc94ad33d
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1"
+  dart_webrtc:
+    dependency: transitive
+    description:
+      name: dart_webrtc
+      sha256: "5897a3bdd6c7fded07e80e250260ca4c9cd61f9080911aa308b516e1206745a9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.3"
   fake_async:
     dependency: transitive
     description:
@@ -256,6 +272,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_webrtc:
+    dependency: transitive
+    description:
+      name: flutter_webrtc
+      sha256: "8522e9f347aed9f03ec591d05fc286a698c1b11a1a6d3e994e92727d24c6f352"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.46"
   html:
     dependency: transitive
     description:
@@ -304,6 +328,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
+  logger:
+    dependency: transitive
+    description:
+      name: logger
+      sha256: "7ad7215c15420a102ec687bb320a7312afd449bac63bfb1c60d9787c27b9767f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   lottie:
     dependency: "direct main"
     description:
@@ -344,6 +376,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  openvidu_client:
+    dependency: "direct main"
+    description:
+      name: openvidu_client
+      sha256: "42f286927034b6fafabcbf4407653e0fa182e58b5e77b349d050c85f80743cd9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   page_transition:
     dependency: "direct main"
     description:
@@ -432,6 +472,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.3"
+  platform_detect:
+    dependency: transitive
+    description:
+      name: platform_detect
+      sha256: "08f4ee79c0e1c4858d37e06b22352a3ebdef5466b613749a3adb03e703d4f5b0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.11"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -456,6 +504,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.5"
+  pub_semver:
+    dependency: transitive
+    description:
+      name: pub_semver
+      sha256: "40d3ab1bbd474c4c2328c91e3a7df8c6dd629b79ece4c4bd04bee496a224fb0c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -589,6 +645,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
+  webrtc_interface:
+    dependency: transitive
+    description:
+      name: webrtc_interface
+      sha256: "2efbd3e4e5ebeb2914253bcc51dafd3053c4b87b43f3076c74835a9deecbae3a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.2"
   win32:
     dependency: transitive
     description:
