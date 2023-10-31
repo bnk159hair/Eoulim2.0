@@ -25,90 +25,79 @@ import static com.ssafy.eoullim.exception.ErrorCode.*;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
   // Custom Exception
   @ExceptionHandler(EoullimApplicationException.class)
   public ResponseEntity<ErrorResponse> customExceptionHandler(EoullimApplicationException e) {
-    final var errorResponse =
-        ErrorResponse.builder()
-            .status(e.getErrorCode().getStatus().toString())
-            .code(e.getErrorCode().getCode())
-            .message(e.getErrorCode().name() + " : " + e.getMessage()) // 클라이언트에게는 에러 코드만.
-            .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
-            .build();
-    // 여기서 ERROR CODE 안에 있는 status랑 message, 또한 추가로 exception으로 온 message
-    log.error("Error occurs {}", e.toString()); // 서버에 exception 메시지 출력
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
+    final var errorResponse = getErrorResponse(e);
+    printLog(e);
     return ResponseEntity.status(e.getErrorCode().getStatus()).body(errorResponse);
   }
 
-  // Validation Exception
-  @ExceptionHandler(MethodArgumentNotValidException.class)
+  // Validation Exception, 부적절한 request 요청일 때.
+  @ExceptionHandler({MethodArgumentNotValidException.class, IllegalArgumentException.class})
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ResponseBody
-  public ErrorResponse requestValidationHandler(MethodArgumentNotValidException e) {
-    StringBuilder errorMsg = new StringBuilder();
-    errorMsg.append("Failed Validation of Request Body. ").append("\n");
-
-    List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
-    for (FieldError fieldError : fieldErrors) { // 별도로 메시지가 있는 경우만 추가
-      errorMsg.append(fieldError.getDefaultMessage()).append("\n");
-    }
-
-    final var errorResponse =
-        ErrorResponse.builder()
-            .status(HttpStatus.BAD_REQUEST.toString())
-            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
-            .message(errorMsg.toString())
-            .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
-            .build();
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
+  public ErrorResponse badRequestExceptionHandler(Exception e) {
+    final var errorResponse = getErrorResponse(e);
+    printLog(e);
     return errorResponse;
   }
 
   // ETC Exception
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ErrorResponse> etcExceptionHandler(Exception e) {
-    final var errorResponse =
-            ErrorResponse.builder()
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
-                    .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-                    .message(e.getMessage())
-                    .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
-                    .build();
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + Arrays.toString(e.getStackTrace()));
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseBody
+  public ErrorResponse etcExceptionHandler(Exception e) {
+    final var errorResponse = getErrorResponse(e);
+    printLog(e);
+    return errorResponse;
   }
 
-//  @ExceptionHandler(IllegalArgumentException.class)
-//  public ResponseEntity<ErrorResponse> badRequestHandler(IllegalArgumentException e) {
-//    final var errorResponse =
-//        ErrorResponse.builder()
-//            .status(HttpStatus.BAD_REQUEST.toString())
-//            .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
-//            .message(e.getMessage())
-//            .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
-//            .build();
-//    log.error("Error occurs {}", e.toString());
-//    log.error("Error occurs in method: " + e.getStackTrace()[0]);
-//    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-//  }
+  private void printLog(Exception e) {
+    log.error("Error occurs {}", e.toString());
+    log.error("Error occurs in method: " + Arrays.toString(e.getStackTrace()));
+  }
 
+  private ErrorResponse getErrorResponse(Exception e) {
+    String status = "", code  = "", message = "";
+    HttpStatus httpStatus = null;
 
-  @ExceptionHandler(IOException.class)
-  public ResponseEntity<ErrorResponse> serverErrorHandler(IOException e) {
-    final var errorResponse =
-        ErrorResponse.builder()
-            .status(HttpStatus.INTERNAL_SERVER_ERROR.toString())
-            .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-            .message(e.getMessage())
+    if (e instanceof EoullimApplicationException) {
+      final var exception = (EoullimApplicationException) e;
+      status = exception.getErrorCode().getStatus().toString();
+      code = exception.getErrorCode().getCode();
+      message = exception.getErrorCode().name() + " : " + e.getMessage();
+    }
+    else if (e instanceof MethodArgumentNotValidException) {
+      final var exception = (MethodArgumentNotValidException) e;
+      httpStatus = HttpStatus.BAD_REQUEST;
+
+      StringBuilder eMsg = new StringBuilder();
+      eMsg.append("FAILED VALIDATION of Request Body : ").append("\n");
+      // 어떤 유효성 검사를 실패 했는 지 나열
+      List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+      for (FieldError fieldError : fieldErrors) {
+        eMsg.append(fieldError.getDefaultMessage()).append("\n");
+      }
+      message = eMsg.toString();
+    }
+    else if (e instanceof IllegalArgumentException) {
+      httpStatus = HttpStatus.BAD_REQUEST;
+    }
+    else {    // 나머지 전체 Exception
+      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+    }
+
+    if(status.isBlank()) status = httpStatus.toString();
+    if(code.isBlank()) code = String.valueOf(httpStatus.value());
+    if(message.isBlank()) message = e.getMessage();
+
+    return ErrorResponse.builder()
+            .status(status)
+            .code(code)
+            .message(message) // 클라이언트에게는 에러 코드만.
             .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
             .build();
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
   }
 
   @ExceptionHandler({
