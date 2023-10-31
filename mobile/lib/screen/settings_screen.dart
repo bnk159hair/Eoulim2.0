@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/screen/login_screen.dart';
+
 
 class Settings extends StatefulWidget {
   const Settings({Key? key});
@@ -8,6 +11,17 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  void Logout() async {
+    final storage = new FlutterSecureStorage();
+    await storage.delete(key: 'Authkey');
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => Login(),
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +32,14 @@ class _SettingsState extends State<Settings> {
         padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [],
+          children: [
+            ElevatedButton(onPressed: (){
+              Logout();
+            },
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.red)),
+             child:  Text('로그아웃', style: TextStyle(color: Colors.white)))
+          ],
         ),
       ),
     );

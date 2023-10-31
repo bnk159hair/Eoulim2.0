@@ -9,22 +9,20 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiLogin {
   Future<generalResponse> login(LoginRequestModel requestModel) async {
-    String url = "https://k9c103.p.ssafy.io/api/v1/users/login";
+    String url = "https://k9c103.p.ssafy.io/api/v1/login";
 
     final response = await http.post(Uri.parse(url), headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
     }, body: jsonEncode(requestModel.toJson()));
-      
+      print(response.body);
       loginPost loginInfo = loginPost.fromJson(json.decode(response.body));
       print(loginPost.fromJson(json.decode(response.body)));
       final storage = new FlutterSecureStorage();
-      
-      await storage.write(key: 'Authkey', value: loginInfo.result);
+      await storage.write(key: 'Authkey', value: loginInfo.content);
       print("++++++++++++++++++++++++++++++++++++++++");
-      print(response.body);
-      print(loginInfo);
+      print(loginInfo.content);
       String? authKey = await storage.read(key: 'Authkey');
       print("${authKey}");
-      return generalResponse(loginInfo.resultCode);
+      return generalResponse(loginInfo.status, loginInfo.message);
   }
 }

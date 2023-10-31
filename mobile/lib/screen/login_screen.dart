@@ -3,6 +3,7 @@ import 'package:mobile/api/api_login.dart';
 import 'package:mobile/model/request_models/put_login.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/home_screen.dart';
+import 'package:mobile/screen/signup_screen.dart';
 
 
 
@@ -93,7 +94,7 @@ class _LoginScreenState extends State<Login> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                           child: Form(
                             child: TextFormField(
                               obscuringCharacter: '*',
@@ -111,7 +112,7 @@ class _LoginScreenState extends State<Login> {
                                   borderRadius: BorderRadius.all(Radius.circular(10)),
                                 ),
                                 prefixIcon: Icon(
-                                  Icons.person,
+                                  Icons.lock,
                                   color: Colors.green,
                                 ),
                                 filled: true,
@@ -145,15 +146,26 @@ class _LoginScreenState extends State<Login> {
                       if (id!.isEmpty || pw!.isEmpty) {
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return Dialog(
-                              child: Text("아이디와 비밀번호를 입력해주세요."),
-                            );
-                          });
+                          barrierDismissible: false,
+                          builder: (BuildContext ctx){
+                          return AlertDialog(
+                          content: Text('아이디와 비밀번호를 입력해 주세요'),
+                          actions: [
+                            Center(
+                              child: TextButton(
+                              child: Text('확인'),
+                              onPressed: (){
+                                Navigator.of(context).pop();
+                                }
+                              )
+                            )
+                          ],
+                        );
+                      });
                       } else {
                         loginFormKey.currentState?.save();
                         loginAuth = await apiLogin.login(LoginRequestModel(id: id, password: pw));
-                        if (loginAuth?.statusCode == 'SUCCESS') {
+                        if (loginAuth?.status == 'OK') {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -163,11 +175,22 @@ class _LoginScreenState extends State<Login> {
                         } else {
                           showDialog(
                             context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                child: Text('알 수 없는 오류'),
-                              );
-                            });
+                            barrierDismissible: false,
+                            builder: (BuildContext ctx){
+                            return AlertDialog(
+                            content: Text('아이디와 비밀번호를 다시 입력해주세요'),
+                            actions: [
+                              Center(
+                                child: TextButton(
+                                child: Text('확인'),
+                                onPressed: (){
+                                  Navigator.of(context).pop();
+                                  }
+                                )
+                              )
+                            ],
+                          );
+                        });
                         }
                       }
                     },
@@ -186,7 +209,14 @@ class _LoginScreenState extends State<Login> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                           Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Signup(),
+                            )
+                           );
+                        },
                         child: Text(
                           '회원가입',
                           style: TextStyle(
