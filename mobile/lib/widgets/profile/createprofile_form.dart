@@ -1,30 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/api/api_signup.dart';
-import 'package:mobile/model/request_models/put_signup.dart';
+import 'package:mobile/api/api_createprofile.dart';
+import 'package:mobile/model/request_models/put_createprofile.dart';
 import 'package:mobile/model/response_models/general_response.dart';
-import 'package:mobile/screen/login_screen.dart';
+import 'package:mobile/screen/profiles/profiles_screen.dart';
+import 'package:flutter/cupertino.dart';
 
-class SginupForm extends StatefulWidget {
-  const SginupForm({super.key});
+
+class CreateprofileForm extends StatefulWidget {
+  const CreateprofileForm({super.key});
 
   @override
-  State<SginupForm> createState() => _SginupFromState();
+  State<CreateprofileForm> createState() => _CreateprofileFormState();
 }
 
-class _SginupFromState extends State<SginupForm> {
-  final SignupFormKey = GlobalKey<FormState>();
+class _CreateprofileFormState extends State<CreateprofileForm> {
+  final CreateprofileFormkey = GlobalKey<FormState>();
 
-  String id = '';
-  String pw = '';
   String name = '';
-  String phonenumber = '';
-  generalResponse? signupAuth;
-  ApiSignup apiSignup = ApiSignup();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  String birth = '';
+  String gender = 'M';
+  String school = '';
+  int? grade = 1;
+  generalResponse? profileCreate;
+  ApiCreateprofile apiProfile = ApiCreateprofile();
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +34,7 @@ class _SginupFromState extends State<SginupForm> {
             color: Colors.white.withOpacity(0.3),
             borderRadius: BorderRadius.circular(20),
           ),
-          key: this.SignupFormKey,
+          key: this.CreateprofileFormkey,
           child: Column(
             children: [
               Padding(
@@ -46,57 +44,6 @@ class _SginupFromState extends State<SginupForm> {
                   bottom: 20,
                   top: 20,
                 ),
-                child: TextFormField(
-                  onChanged: (val) {
-                    id = val;
-                  },
-                  decoration: const InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: Colors.green,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: "아이디",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-                child: TextFormField(
-                  onChanged: (val) {
-                    pw = val;
-                  },
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide.none,
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.lock,
-                      color: Colors.green,
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    labelText: "비밀번호",
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 child: TextFormField(
                   onChanged: (val) {
                     name = val;
@@ -122,11 +69,61 @@ class _SginupFromState extends State<SginupForm> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: 
+                TextFormField(
+                  onChanged: (val) {
+                    birth = val;
+                  },
+                  decoration: const InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.lock,
+                      color: Colors.green,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: "생년월일",
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                 child: TextFormField(
                   onChanged: (val) {
-                    phonenumber = val;
+                    gender = val;
                   },
-                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide.none,
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: Colors.green,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    labelText: "성별",
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: TextFormField(
+                  onChanged: (val) {
+                    school = val;
+                  },
                   decoration: const InputDecoration(
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide.none,
@@ -142,9 +139,58 @@ class _SginupFromState extends State<SginupForm> {
                     ),
                     filled: true,
                     fillColor: Colors.white,
-                    labelText: "휴대폰 번호",
+                    labelText: "학교",
                   ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ListTile(
+                        title: Text('1학년'),
+                        leading: Radio<int>(
+                          value: 1,
+                          groupValue: grade,
+                          onChanged: (value) {
+                            setState(() {
+                              grade = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListTile(
+                        title: Text('2학년'),
+                        leading: Radio<int>(
+                          value: 2,
+                          groupValue: grade,
+                          onChanged: (value) {
+                            setState(() {
+                              grade = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: ListTile(
+                        title: Text('3학년'),
+                        leading: Radio<int>(
+                          value: 3,
+                          groupValue: grade,
+                          onChanged: (value) {
+                            setState(() {
+                              grade = value;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),           
               ),
             ],
           ),
@@ -163,10 +209,7 @@ class _SginupFromState extends State<SginupForm> {
               ),
             ),
             onPressed: () async {
-                print(id!);
-                print(pw!);
-
-                if (id!.isEmpty || pw!.isEmpty || phonenumber!.isEmpty || name!.isEmpty) {
+                if (name.isEmpty || birth.isEmpty || school.isEmpty) {
                   showDialog(context: context,
                      barrierDismissible: false,
                      builder: (BuildContext ctx){
@@ -177,7 +220,7 @@ class _SginupFromState extends State<SginupForm> {
                             child: TextButton(
                               child: Text('확인'),
                               onPressed: (){
-                                Navigator.of(context).pop();
+                              ;
                               }
                             )
                           )
@@ -186,14 +229,14 @@ class _SginupFromState extends State<SginupForm> {
                      });
                 } 
                 else {
-                  SignupFormKey.currentState?.save();
-                  signupAuth = await apiSignup.signup(SignupRequestModel(id: id, password: pw, name: name, phoneNumber: phonenumber));
-                  if (signupAuth?.status == 'CREATED') {
+                  CreateprofileFormkey.currentState?.save();
+                  profileCreate = await apiProfile.createprofile(CreateprofileRequestModel(name: name, birth: birth, gender: gender, school: school, grade: grade));
+                  if (profileCreate?.status == 'OK') {
                     showDialog(context: context,
                      barrierDismissible: false,
                      builder: (BuildContext ctx){
                       return AlertDialog(
-                        content: Text('회원가입이 완료되었습니다'),
+                        content: Text('프로필 생성이 완료되었습니다'),
                         actions: [
                           Center(
                             child: TextButton(
@@ -202,7 +245,7 @@ class _SginupFromState extends State<SginupForm> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>  Login(),
+                                    builder: (context) =>  Profiles(),
                                   ),
                                 );
                               }
@@ -233,40 +276,13 @@ class _SginupFromState extends State<SginupForm> {
                 }
               },
             child: Text(
-              '회원가입',
+              '프로필 생성',
               style: TextStyle(fontSize: 17),
             ),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              '이미 회원이신가요?',
-              style: TextStyle(
-                color: Colors.black.withOpacity(0.6),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Login(),
-                  )
-                );
-              },
-              child: Text(
-                '로그인하러 가기',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            )
-          ],
-        ),
       ],
     );
   }
+  
 }

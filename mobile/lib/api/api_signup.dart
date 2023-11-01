@@ -15,6 +15,6 @@ class ApiSignup {
       generalResponse signupInfo= generalResponse.fromJson(json.decode(response.body));
       print(response.body);
       print("++++++++++++++++++++++++++++++++++++++++");
-      return generalResponse(signupInfo.status, signupInfo.message);
+      return generalResponse(signupInfo.code, signupInfo.status);
   }
 }

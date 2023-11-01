@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/screen/login_screen.dart';
+import 'package:get/get.dart';
 
 
 class Settings extends StatefulWidget {
@@ -14,11 +15,12 @@ class _SettingsState extends State<Settings> {
   void Logout() async {
     final storage = new FlutterSecureStorage();
     await storage.delete(key: 'Authkey');
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => Login(),
-      ),
-    );
+    Get.offAll(() => Login());
+    // Navigator.of(context).pushReplacement(
+    //   MaterialPageRoute(
+    //     builder: (context) => Login(),
+    //   ),
+    // );
   }
 
 

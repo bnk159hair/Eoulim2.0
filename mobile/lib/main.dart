@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile/screen/splash_screen.dart';
-
+import 'package:get/get.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return const MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       title: 'Eoullim',

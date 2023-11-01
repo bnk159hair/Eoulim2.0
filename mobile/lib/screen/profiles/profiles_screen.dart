@@ -1,14 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_plus/flutter_swiper_plus.dart';
+// import 'package:flutter_swiper_plus/flutter_swiper_plus.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class Profiles extends StatelessWidget {
   const Profiles({super.key});
+   @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Flutter Carousel Slider',
+      home: CarouselWidget(),
+    );
+  }
+}
+
+class CarouselWidget extends StatefulWidget {
+  const CarouselWidget({super.key});
+
+  @override
+  State<CarouselWidget> createState() => _CarouselWidgetState();
+}
+
+class _CarouselWidgetState extends State<CarouselWidget> {
+  CarouselController carouselController = CarouselController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+   return Scaffold(
       appBar: AppBar(
           elevation: 0,
           backgroundColor: const Color(0xffffffff),
@@ -47,87 +72,60 @@ class Profiles extends StatelessWidget {
             ),
           ]),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(
-            height: 500,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 2.0),
-              child: Swiper(
-                itemCount: 3,
-                fade: 0.3,
-                itemWidth: MediaQuery.of(context).size.width - 2 * 64,
-                layout: SwiperLayout.STACK,
-                pagination: const SwiperPagination(
-                  builder: DotSwiperPaginationBuilder(
-                    color: Color.fromRGBO(177, 239, 188, 1),
-                    activeSize: 20,
-                    activeColor: Colors.green,
-                    space: 25,
-                  ),
-                ),
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Home(),
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CarouselSlider(
+            carouselController: carouselController,
+            items: [1, 2, 3, 4, 5].map((i) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                      decoration: const BoxDecoration(color: Colors.amber),
+                      child: Center(
+                        child: Text(
+                          'text $i',
+                          style: const TextStyle(fontSize: 16.0),
                         ),
-                      );
-                    },
-                    child: Stack(
-                      children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            const SizedBox(
-                              height: 150,
-                            ),
-                            Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              elevation: 8,
-                              color: const Color.fromRGBO(177, 239, 188, 1),
-                              child: const Padding(
-                                padding: EdgeInsets.all(52.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      height: 50,
-                                    ),
-                                    Text(
-                                      // planets[index].name.toString(),
-                                      '이름',
-                                      style: TextStyle(
-                                        fontSize: 40,
-                                        color: Color(0xff47455f),
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                        Hero(
-                          tag: index,
-                          child: Image.asset(
-                            'assets/bear.png',
-                            width: 100,
-                            height: 300,
-                          ),
-                        )
-                      ],
-                    ),
-                  );
+                      ));
                 },
-              ),
+              );
+            }).toList(),
+            options: CarouselOptions(
+
+              // Set the height of each carousel item
+              height: 350,
+
+              // Set the size of each carousel item
+              // if height is not specified
+              aspectRatio: 16 / 9,
+
+              // Set how much space current item widget
+              // will occupy from current page view
+              viewportFraction: 0.8,
+
+              // Set the initial page
+              initialPage: 0,
+
+              // Set carousel to repeat when reaching the end
+              enableInfiniteScroll: false,
+
+              reverse: false,
+
+              // Set carousel to display next page automatically
+              autoPlay: false,
+
+              enlargeCenterPage: true,
+
+              // Do actions for each page change
+              onPageChanged: (index, reason) {},
+
+              // Set the scroll direction
+              scrollDirection: Axis.horizontal,
             ),
-          )
+          ),
+        
         ],
       ),
       floatingActionButton: FloatingActionButton(

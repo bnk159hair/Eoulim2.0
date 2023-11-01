@@ -3,7 +3,7 @@ import 'package:mobile/model/response_models/general_response.dart';
 class GuideResponse extends generalResponse {
   Response? response;
 
-  GuideResponse(String status, String message, Response response) : super(status, message) {
+  GuideResponse(String code, String status, Response response) : super(code ,status) {
     this.response = response;
   }
 }
