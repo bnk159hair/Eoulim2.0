@@ -8,18 +8,19 @@ import javax.persistence.*;
 
 @Setter
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "user")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserEntity {
+public class UserEntity extends BaseEntity {
     @Id
+    @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(unique = true, nullable = false, length = 20)
     private String username;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false, length = 60)
     private String password;
 
     @Column(nullable = false, length = 4)
@@ -32,7 +33,7 @@ public class UserEntity {
     private UserRole role = UserRole.USER;
 
     @Builder
-    private UserEntity(Integer id, String username, String password, String name, String phoneNumber, UserRole role) {
+    private UserEntity(Long id, String username, String password, String name, String phoneNumber, UserRole role) {
         this.id = id;
         this.username = username;
         this.password = password;

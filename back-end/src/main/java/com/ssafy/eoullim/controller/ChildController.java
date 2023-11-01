@@ -25,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChildController {
 
-
   private final ChildService childService;
 
   @PostMapping("/login/{childId}")
@@ -41,13 +40,14 @@ public class ChildController {
   }
 
   @PostMapping
-  public ResponseEntity<?> create(
+  @ResponseStatus(HttpStatus.CREATED)
+  @ResponseBody
+  public SuccessResponse<?> create(
       @Valid @RequestBody ChildRequest request, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     childService.create(user, Child.of(request));
 
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(new SuccessResponse<>(HttpStatus.CREATED.name(), HttpStatus.CREATED.value(), null));
+    return new SuccessResponse<>(HttpStatus.CREATED, null);
   }
 
   @PutMapping("/{childId}")
@@ -58,19 +58,17 @@ public class ChildController {
   }
 
   @DeleteMapping("/{childId}")
-  public ResponseEntity<?> delete(
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseBody
+  public SuccessResponse<?> delete(
       @PathVariable @NotBlank Integer childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     childService.delete(childId, user.getId());
-    return ResponseEntity.status(HttpStatus.NO_CONTENT)
-        .body(
-            new SuccessResponse<>(
-                HttpStatus.NO_CONTENT.name(), HttpStatus.NO_CONTENT.value(), null));
+    return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
   }
 
   @GetMapping
-  public ResponseEntity<SuccessResponse<List<Child>>> getChildren(
-          Authentication authentication) {
+  public ResponseEntity<SuccessResponse<List<Child>>> getChildren(Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     List<Child> childrenList = childService.getChildren(user.getId());
     return ResponseEntity.ok(new SuccessResponse<>(childrenList));
@@ -78,7 +76,7 @@ public class ChildController {
 
   @GetMapping("/{childId}")
   public ResponseEntity<SuccessResponse<Child>> getChild(
-          @PathVariable @NotBlank Integer childId, Authentication authentication) {
+      @PathVariable @NotBlank Integer childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     Child child = childService.getChild(childId, user.getId());
     return ResponseEntity.ok(new SuccessResponse<>(child));
@@ -87,14 +85,14 @@ public class ChildController {
   // TODO  : api url refactoring
   @GetMapping("/participant/{participantId}")
   public ResponseEntity<SuccessResponse<OtherChild>> getOtherChild(
-          @PathVariable @NotBlank Integer participantId) {
+      @PathVariable @NotBlank Integer participantId) {
     OtherChild friend = childService.getOtherChild(participantId);
     return ResponseEntity.ok(new SuccessResponse<>(friend));
   }
 
   @PostMapping("/school")
   public ResponseEntity<SuccessResponse<?>> isValidSchool(
-          @Valid @RequestBody ChildSchoolRequest request) {
+      @Valid @RequestBody ChildSchoolRequest request) {
     String result = childService.isValidSchool(request.getKeyword()) ? "학교 확인 성공" : "학교 확인 실패";
     return ResponseEntity.ok(new SuccessResponse<>(result));
   }

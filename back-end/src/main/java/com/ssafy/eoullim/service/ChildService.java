@@ -92,7 +92,7 @@ public class ChildService {
   }
 
   @Transactional
-  public void delete(Integer childId, Integer userId) {
+  public void delete(Integer childId, Long userId) {
     final var childEntity =
         childRepository
             .findByIdAndUserId(childId, userId)
@@ -122,7 +122,7 @@ public class ChildService {
   //    return Animon.fromEntity(animonEntity);
   //  }
 
-  public List<Child> getChildren(Integer userId) {
+  public List<Child> getChildren(Long userId) {
     return childRepository
         .findAllByUserId(userId)
         .orElseThrow(() -> new EoullimApplicationException(ErrorCode.USER_NOT_FOUND))
@@ -131,7 +131,7 @@ public class ChildService {
         .collect(Collectors.toList());
   }
 
-  public Child getChild(Integer childId, Integer userId) {
+  public Child getChild(Integer childId, Long userId) {
     final var childEntity = getChildEntity(childId); // 일단 실제 있는 Child인지 조회
     if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
       throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);

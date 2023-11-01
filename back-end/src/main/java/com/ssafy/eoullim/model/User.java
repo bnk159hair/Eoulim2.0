@@ -19,7 +19,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails {
 
-    private Integer id;
+    private Long id;
     private String name;
     private String phoneNumber;
     private String username;

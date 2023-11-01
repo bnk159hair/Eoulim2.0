@@ -28,14 +28,16 @@ public class UserController {
   private final UserService userService;
 
     @PostMapping("/join")
-    private Response<Void> join(@Valid @RequestBody UserJoinRequest request) {
-        userService.join(
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    private SuccessResponse<User> join(@Valid @RequestBody UserJoinRequest request) {
+        final var user = userService.join(
                 request.getUsername(),
                 request.getPassword(),
                 request.getName(),
                 request.getPhoneNumber()
         );
-        return Response.success(HttpStatus.OK, "account created");
+        return new SuccessResponse<>(HttpStatus.CREATED, user);
     }
 
     @PostMapping("/login")

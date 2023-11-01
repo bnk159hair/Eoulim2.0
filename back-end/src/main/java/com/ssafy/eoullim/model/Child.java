@@ -33,7 +33,8 @@ public class Child {
                 entity.getSchool(),
                 entity.getGrade(),
                 entity.getStatus(),
-                Animon.fromEntity(entity.getAnimon())
+//                Animon.fromEntity(entity.getAnimon())
+                null
         );
     }
 

@@ -47,7 +47,7 @@ public class FollowService {
     followRepository.save(FollowEntity.of(child, friend));
   }
 
-  public List<Child> getFriends(Integer childId, Integer userId) {
+  public List<Child> getFriends(Integer childId, Long userId) {
 
     ChildEntity childEntity =
         childRepository

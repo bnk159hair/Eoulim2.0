@@ -13,9 +13,9 @@ import java.util.Optional;
 
 @Repository
 public interface ChildRepository  extends JpaRepository<ChildEntity, Integer> {
-    Optional<List<ChildEntity>> findAllByUserId(Integer userId);
+    Optional<List<ChildEntity>> findAllByUserId(Long userId);
 
-    Optional<ChildEntity> findByIdAndUserId(Integer childId, Integer userId);
+    Optional<ChildEntity> findByIdAndUserId(Integer childId, Long userId);
 
     // 사용 가능
 //    Optional<ChildEntity> findByNameAndUser_Id(String name, Integer user_id); // User가 동일한 Child 이름을 가지고 있는지

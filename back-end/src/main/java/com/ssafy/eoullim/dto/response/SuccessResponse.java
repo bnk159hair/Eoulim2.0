@@ -15,8 +15,8 @@ public class SuccessResponse<T> extends CommonResponse {
   private T data;
 
   // status, code, data로 생성자
-  public SuccessResponse(String status, Integer code, T data) {
-    super(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()), status, String.valueOf(code));
+  public SuccessResponse(HttpStatus httpStatus, T data) {
+    super(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()), httpStatus.name(), String.valueOf(httpStatus.value()));
     this.data = data;
   }
 
