@@ -1,73 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/api/api_profile.dart';
-import 'package:mobile/model/response_models/get_profilelist.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 
-class Profiles extends StatefulWidget {
-  List<Profile> profiles = List.empty();
-  Apiprofile apiProfile = Apiprofile();
-
-  Profiles({super.key});
-
-  @override
-  _ProfilesState createState() => _ProfilesState();
-}
-
-class _ProfilesState extends State<Profiles> {
-  @override
-  void initState() {
-    super.initState();
-    _getProfiles();
-  }
-
-  Future<void> _getProfiles() async {
-    getProfiles result = await widget.apiProfile.getprofilesAPI();
-    if (result.code == '200') {
-      setState(() {
-        widget.profiles = result.profiles!;
-      });
-    } else if (result.code == '401') {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: const Text('로그인을 해주세요'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text('${result.status}'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    }
-  }
-
+class Profiles extends StatelessWidget {
+  const Profiles({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

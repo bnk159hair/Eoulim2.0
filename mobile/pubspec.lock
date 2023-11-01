@@ -161,14 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
-  dbus:
+  dart_webrtc:
     dependency: transitive
     description:
-      name: dbus
-      sha256: "6f07cba3f7b3448d42d015bfd3d53fe12e5b36da2423f23838efc1d5fb31a263"
+      name: dart_webrtc
+      sha256: "5897a3bdd6c7fded07e80e250260ca4c9cd61f9080911aa308b516e1206745a9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.7.8"
+    version: "1.1.3"
   fake_async:
     dependency: transitive
     description:
@@ -334,14 +334,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
-  flutter_swiper_plus:
-    dependency: "direct main"
-    description:
-      name: flutter_swiper_plus
-      sha256: cf2e39b230c570f6bdb87f8a19d1c94be47441ffacb09ddc371c7a628e0dbe6a
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.4"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -448,6 +440,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  openvidu_client:
+    dependency: "direct main"
+    description:
+      name: openvidu_client
+      sha256: "42f286927034b6fafabcbf4407653e0fa182e58b5e77b349d050c85f80743cd9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   page_transition:
     dependency: "direct main"
     description:
@@ -560,6 +560,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.5"
+  pub_semver:
+    dependency: transitive
+    description:
+      name: pub_semver
+      sha256: "40d3ab1bbd474c4c2328c91e3a7df8c6dd629b79ece4c4bd04bee496a224fb0c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.4"
   sky_engine:
     dependency: transitive
     description: flutter
