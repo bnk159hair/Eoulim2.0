@@ -49,7 +49,7 @@ public class MatchService {
     this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
   }
 
-  public synchronized Match startRandom(Integer childId)
+  public synchronized Match startRandom(Long childId)
       throws OpenViduJavaClientException, OpenViduHttpException, InterruptedException {
     Map<String, Object> params = new HashMap<>(); // 빈 파일
 
@@ -120,6 +120,7 @@ public class MatchService {
 
   public Recording stopRandom(String sessionId, String guideSeq, String timeline, RecordService recordService)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
+
     if (mapSessions.get(sessionId) != null && mapRooms.get(sessionId) != null) {
 
       Session session = mapSessions.get(sessionId);
@@ -188,7 +189,7 @@ public class MatchService {
 
         mapSessions.put(sessionId, session);
         Match result = new Match(sessionId, token, null);
-        newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
+//        newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
         mapRooms.put(sessionId, newRoom);
 
         /*
@@ -220,7 +221,7 @@ public class MatchService {
 
           sessionRecordings.put(sessionId, recording.getId());
           existingRoom.setRecordingId(recording.getId());
-          existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+//          existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
 
           return result;
         } else {

@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MatchRequest {
-    private Integer childId;
+public class MatchStartRequest {
+    private Long childId;
     private String name;
     private char gender;
     private String school;

@@ -1,7 +1,9 @@
 package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.MatchFriendRequest;
-import com.ssafy.eoullim.dto.request.MatchRequest;
+import com.ssafy.eoullim.dto.request.MatchStartRequest;
+import com.ssafy.eoullim.dto.request.MatchStopRequest;
+import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.service.AlarmService;
 import com.ssafy.eoullim.service.MatchService;
@@ -35,11 +37,11 @@ public class MatchController {
     @PostMapping("/random/start")
     @Transactional
     public synchronized ResponseEntity<?> startRandom(
-            @Valid @RequestBody MatchRequest matchRequest
+            @Valid @RequestBody MatchStartRequest matchStartRequest
     ) {
         Match result = null;
         try{
-            result = matchService.startRandom(matchRequest.getChildId());
+            result = matchService.startRandom(matchStartRequest.getChildId());
 
         } catch (OpenViduJavaClientException e) {
             log.info(e.getMessage());
@@ -51,22 +53,22 @@ public class MatchController {
             log.info(e.getMessage());
             throw new RuntimeException(e);
         }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return ResponseEntity.ok(new SuccessResponse<>(result));
     }
     @PostMapping("/random/stop")
     public ResponseEntity<?> stopRandom(
-            @RequestBody Map<String, Object> params
-    ) throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException, org.json.simple.parser.ParseException {
+            @RequestBody MatchStopRequest matchStopRequest
+            ) throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException, org.json.simple.parser.ParseException {
 
-        String sessionId = (String) params.get("sessionId");
-        String guideSeq = (String) params.get("guideSeq");
-        String timeline = (String) params.get("timeline");
+        String sessionId = matchStopRequest.getSessionId();
+        List<Integer> guideSeq = matchStopRequest.getGuideSeq();
+        List<String> timeline = matchStopRequest.getTimeline();
         log.info("Random Stop Called " + sessionId);
 
         Recording recording = null;
 
         try{
-            recording = matchService.stopRandom(sessionId, guideSeq, timeline, recordService);
+            recording = matchService.stopRandom(sessionId, "guideSeq", "timeline", recordService);
         } catch (OpenViduJavaClientException e) {
             log.info(e.getMessage());
             throw new RuntimeException(e);
