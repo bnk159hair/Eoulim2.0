@@ -124,7 +124,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
       const response = await axios.get(`${API_BASE_URL}/check-username/${username}`);
       setIsIdUnique(response.data.resultCode);
       console.log('아이디 중복 확인 결과:', response);
-      if (response.data.resultCode) {
+      if (response.data.data) {
         Swal.fire({
           text: '사용 가능한 아이디입니다!',
           icon: 'success',

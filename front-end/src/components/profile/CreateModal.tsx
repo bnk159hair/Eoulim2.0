@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {
-  ModalOverlay,
-  ModalContent,
-  FlexContainer,
-  HeaderContainer,
-} from './CreateModalStyles';
+import { ModalOverlay, ModalContent, FlexContainer, HeaderContainer } from './CreateModalStyles';
 import { tokenState } from '../../atoms/Auth';
 import { useRecoilValue } from 'recoil';
 import { API_BASE_URL } from '../../apis/urls';
@@ -79,15 +74,11 @@ const CreateModal: React.FC<CreateModalProps> = ({ onClose, resetList }) => {
 
     try {
       const profileData = { name, birth, gender, school, grade };
-      const response = await axios.post(
-        `${API_BASE_URL}/children`,
-        profileData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/children`, profileData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       console.log('프로필 생성 성공:', response);
       console.log(profileData);
       Swal.fire({
@@ -115,10 +106,10 @@ const CreateModal: React.FC<CreateModalProps> = ({ onClose, resetList }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      setIsSchoolCorrect(response.data.resultCode);
-      if (response.data.resultCode) {
+      setIsSchoolCorrect(response.data.data);
+      if (response.data.data) {
         Swal.fire({
           text: '올바른 학교정보입니다!',
           icon: 'success',
@@ -149,14 +140,14 @@ const CreateModal: React.FC<CreateModalProps> = ({ onClose, resetList }) => {
             <HeaderContainer>
               <h2>아이 프로필 생성</h2>
               <IconButton onClick={onClose}>
-                <CloseIcon fontSize='large' />
+                <CloseIcon fontSize="large" />
               </IconButton>
             </HeaderContainer>
             <FlexContainer>
               <TextField
-                label='아이 이름'
-                variant='outlined'
-                placeholder='홍길동'
+                label="아이 이름"
+                variant="outlined"
+                placeholder="홍길동"
                 value={name}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setChildName(event.target.value)
@@ -164,73 +155,75 @@ const CreateModal: React.FC<CreateModalProps> = ({ onClose, resetList }) => {
                 sx={{ width: '65%', marginBottom: '1rem' }}
               />
               <ToggleButtonGroup
-                color='primary'
+                color="primary"
                 value={gender}
                 exclusive
                 sx={{ marginLeft: 'auto' }}
-                size='large'
-                onChange={(_, newGender) => setChildGender(newGender)}>
-                <ToggleButton value='M'>남성</ToggleButton>
-                <ToggleButton value='W'>여성</ToggleButton>
+                size="large"
+                onChange={(_, newGender) => setChildGender(newGender)}
+              >
+                <ToggleButton value="M">남성</ToggleButton>
+                <ToggleButton value="W">여성</ToggleButton>
               </ToggleButtonGroup>
             </FlexContainer>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label='생년월일'
+                label="생년월일"
                 onChange={(newDate: dayjs.Dayjs | null) => {
                   if (newDate) {
                     setChildBirth(newDate.format('YYYY-MM-DD'));
                   }
                 }}
-                format='YYYY-MM-DD'
+                format="YYYY-MM-DD"
                 sx={{ marginBottom: '1rem' }}
               />
             </LocalizationProvider>
             <FlexContainer>
               <TextField
-                label='학교 이름'
-                variant='outlined'
+                label="학교 이름"
+                variant="outlined"
                 value={school}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setChildSchool(event.target.value)
                 }
                 sx={{ width: '65%', marginBottom: '1rem' }}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>초등학교</InputAdornment>
-                  ),
+                  endAdornment: <InputAdornment position="end">초등학교</InputAdornment>,
                 }}
                 helperText={isSchoolCorrect && '학교 등록이 완료되었습니다.'}
                 disabled={isSchoolCorrect && true}
               />
               <Button
-                variant='contained'
-                size='large'
+                variant="contained"
+                size="large"
                 sx={{
                   width: '25%',
                   padding: '0.7rem',
                   marginLeft: 'auto',
                   fontSize: '18px',
                 }}
-                onClick={handleSchoolCheck}>
+                onClick={handleSchoolCheck}
+              >
                 학교확인
               </Button>
             </FlexContainer>
             <ToggleButtonGroup
-              color='primary'
+              color="primary"
               value={grade}
               exclusive
               fullWidth
-              onChange={(_, newGrade) => setChildGrade(newGrade)}>
-              <ToggleButton value='1'>1학년</ToggleButton>
-              <ToggleButton value='2'>2학년</ToggleButton>
-              <ToggleButton value='3'>3학년</ToggleButton>
+              onChange={(_, newGrade) => setChildGrade(newGrade)}
+            >
+              <ToggleButton value="1">1학년</ToggleButton>
+              <ToggleButton value="2">2학년</ToggleButton>
+              <ToggleButton value="3">3학년</ToggleButton>
             </ToggleButtonGroup>
             <Button
-              variant='contained'
-              size='large'
+              variant="contained"
+              size="large"
               sx={{ padding: '0.4rem', marginTop: '1rem', fontSize: '20px' }}
-              onClick={handleCreateProfile}>
+              onClick={handleCreateProfile}
+            >
               생성하기
             </Button>
           </FormContainer>

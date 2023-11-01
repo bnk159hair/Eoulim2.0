@@ -41,11 +41,7 @@ interface ModifyModalProps {
   resetList: () => void;
 }
 
-const ModifyModal: React.FC<ModifyModalProps> = ({
-  onClose,
-  childId,
-  resetList,
-}) => {
+const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }) => {
   const [childProfile, setChildProfile] = useState<ChildProfile>({
     id: 0,
     name: '',
@@ -74,11 +70,11 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {
+      .then(response => {
         console.log(response);
         setChildProfile(response.data.result);
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('아이 프로필을 불러오는데 실패했습니다:', error);
       });
   };
@@ -93,16 +89,16 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
-      .then((response) => {
+      .then(response => {
         Swal.fire({
           text: '비밀번호가 확인되었습니다!',
           icon: 'success',
           confirmButtonText: '닫기',
         }).then(() => setIsPasswordCorrect(true));
       })
-      .catch((error) => {
+      .catch(error => {
         Swal.fire({
           text: '비밀번호를 확인해주세요!',
           icon: 'error',
@@ -154,7 +150,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       console.log('프로필 수정 성공:', response);
@@ -187,10 +183,10 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      setIsSchoolCorrect(response.data.resultCode);
-      if (response.data.resultCode) {
+      setIsSchoolCorrect(response.data.data);
+      if (response.data.data) {
         Swal.fire({
           text: '올바른 학교정보입니다!',
           icon: 'success',
@@ -221,7 +217,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
       showCancelButton: true,
       confirmButtonText: '삭제',
       cancelButtonText: '취소',
-    }).then((result) => {
+    }).then(result => {
       if (result.isConfirmed) {
         axios
           .delete(`${API_BASE_URL}/children/${childId}`, {
@@ -229,7 +225,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
               Authorization: `Bearer ${token}`,
             },
           })
-          .then((response) => {
+          .then(response => {
             Swal.fire({
               text: '삭제되었습니다!',
               icon: 'success',
@@ -237,7 +233,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
             }).then(() => resetList());
             console.log('삭제완료');
           })
-          .catch((error) => console.log('실패'));
+          .catch(error => console.log('실패'));
       }
     });
   };
@@ -249,10 +245,10 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
           <FormContainer onSubmit={passwordCheck}>
             <h2>비밀번호 확인</h2>
             <TextField
-              label='비밀번호 확인'
-              variant='outlined'
-              margin='dense'
-              type='password'
+              label="비밀번호 확인"
+              variant="outlined"
+              margin="dense"
+              type="password"
               value={password}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(event.target.value)
@@ -260,19 +256,21 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
             />
             <ButtonContainer>
               <Button
-                variant='contained'
-                size='small'
+                variant="contained"
+                size="small"
                 sx={{ fontSize: '18px', margin: '0.5rem' }}
                 onClick={passwordCheck}
-                fullWidth>
+                fullWidth
+              >
                 확인
               </Button>
               <Button
-                variant='contained'
-                size='small'
+                variant="contained"
+                size="small"
                 sx={{ fontSize: '18px', margin: '0.5rem' }}
                 onClick={onClose}
-                fullWidth>
+                fullWidth
+              >
                 닫기
               </Button>
             </ButtonContainer>
@@ -282,17 +280,17 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
             <HeaderContainer>
               <h2>프로필 수정</h2>
               <IconButton onClick={onClose}>
-                <CloseIcon fontSize='large' />
+                <CloseIcon fontSize="large" />
               </IconButton>
             </HeaderContainer>
             <FlexContainer>
               <TextField
-                label='이름'
-                variant='outlined'
-                placeholder='홍길동'
+                label="이름"
+                variant="outlined"
+                placeholder="홍길동"
                 value={childProfile.name}
-                onChange={(event) => {
-                  setChildProfile((prevProfile) => ({
+                onChange={event => {
+                  setChildProfile(prevProfile => ({
                     ...prevProfile,
                     name: event.target.value,
                   }));
@@ -300,24 +298,25 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
                 sx={{ width: '65%', marginBottom: '1rem' }}
               />
               <ToggleButtonGroup
-                color='primary'
+                color="primary"
                 value={childProfile.gender}
                 exclusive
                 sx={{ marginLeft: 'auto' }}
-                size='large'
+                size="large"
                 onChange={(_, newGender) => {
-                  setChildProfile((prevProfile) => ({
+                  setChildProfile(prevProfile => ({
                     ...prevProfile,
                     gender: newGender,
                   }));
-                }}>
-                <ToggleButton value='M'>남성</ToggleButton>
-                <ToggleButton value='W'>여성</ToggleButton>
+                }}
+              >
+                <ToggleButton value="M">남성</ToggleButton>
+                <ToggleButton value="W">여성</ToggleButton>
               </ToggleButtonGroup>
             </FlexContainer>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
-                label='생년월일'
+                label="생년월일"
                 value={dayjs(childProfile.birth)}
                 onChange={(newDate: dayjs.Dayjs | null) => {
                   if (newDate) {
@@ -327,17 +326,17 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
                     }));
                   }
                 }}
-                format='YYYY-MM-DD'
+                format="YYYY-MM-DD"
                 sx={{ marginBottom: '1rem' }}
               />
             </LocalizationProvider>
             <FlexContainer>
               <TextField
-                label='학교 이름'
-                variant='outlined'
+                label="학교 이름"
+                variant="outlined"
                 value={childProfile.school}
-                onChange={(event) => {
-                  setChildProfile((prevProfile) => ({
+                onChange={event => {
+                  setChildProfile(prevProfile => ({
                     ...prevProfile,
                     school: event.target.value,
                   }));
@@ -345,65 +344,67 @@ const ModifyModal: React.FC<ModifyModalProps> = ({
                 }}
                 sx={{ width: '65%', marginBottom: '1rem' }}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position='end'>초등학교</InputAdornment>
-                  ),
+                  endAdornment: <InputAdornment position="end">초등학교</InputAdornment>,
                 }}
                 helperText={isSchoolCorrect && '학교 등록이 완료되었습니다.'}
                 disabled={isSchoolCorrect && true}
               />
               <Button
-                variant='contained'
-                size='large'
+                variant="contained"
+                size="large"
                 sx={{
                   width: '25%',
                   padding: '0.7rem',
                   marginLeft: 'auto',
                   fontSize: '18px',
                 }}
-                onClick={handleSchoolCheck}>
+                onClick={handleSchoolCheck}
+              >
                 학교확인
               </Button>
             </FlexContainer>
             <ToggleButtonGroup
-              color='primary'
+              color="primary"
               value={String(childProfile.grade)}
               exclusive
               fullWidth
               onChange={(_, newGrade) => {
-                setChildProfile((prevProfile) => ({
+                setChildProfile(prevProfile => ({
                   ...prevProfile,
                   grade: newGrade,
                 }));
-              }}>
-              <ToggleButton value='1'>1학년</ToggleButton>
-              <ToggleButton value='2'>2학년</ToggleButton>
-              <ToggleButton value='3'>3학년</ToggleButton>
+              }}
+            >
+              <ToggleButton value="1">1학년</ToggleButton>
+              <ToggleButton value="2">2학년</ToggleButton>
+              <ToggleButton value="3">3학년</ToggleButton>
             </ToggleButtonGroup>
             <ButtonContainer>
               <Button
-                variant='contained'
-                size='small'
+                variant="contained"
+                size="small"
                 sx={{
                   width: '47%',
                   padding: '0.6rem',
                   marginTop: '1rem',
                   fontSize: '18px',
                 }}
-                onClick={handleUpdateProfile}>
+                onClick={handleUpdateProfile}
+              >
                 수정
               </Button>
               <Button
-                variant='contained'
-                color='error'
-                size='small'
+                variant="contained"
+                color="error"
+                size="small"
                 sx={{
                   width: '47%',
                   padding: '0.6rem',
                   marginTop: '1rem',
                   fontSize: '18px',
                 }}
-                onClick={deleteProfile}>
+                onClick={deleteProfile}
+              >
                 삭제
               </Button>
             </ButtonContainer>

@@ -5,12 +5,7 @@ import axios from 'axios';
 import { tokenState } from '../../atoms/Auth';
 import { API_BASE_URL } from '../../apis/urls';
 import { Profilekey } from '../../atoms/Profile';
-import {
-  ModalOverlay,
-  ModalContent,
-  FormContainer,
-  ButtonContainer,
-} from './ToRecordModalStyles';
+import { ModalOverlay, ModalContent, FormContainer, ButtonContainer } from './ToRecordModalStyles';
 import { Button, TextField } from '@mui/material';
 import Swal from 'sweetalert2';
 
@@ -35,22 +30,26 @@ const ToRecordModal: React.FC<ToRecordModalProps> = ({ onClose, childId }) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
-      .then((response) => {
-        setProfileKey(childId);
-        Swal.fire({
-          text: '비밀번호가 확인되었습니다!',
-          icon: 'success',
-          confirmButtonText: '닫기',
-        }).then(() => navigate('/record'));
+      .then(response => {
+        if (response.data.data) {
+          setProfileKey(childId);
+          Swal.fire({
+            text: '비밀번호가 확인되었습니다!',
+            icon: 'success',
+            confirmButtonText: '닫기',
+          }).then(() => navigate('/record'));
+        } else {
+          Swal.fire({
+            text: '비밀번호를 확인해주세요!',
+            icon: 'error',
+            confirmButtonText: '닫기',
+          });
+        }
       })
-      .catch((error) => {
-        Swal.fire({
-          text: '비밀번호를 확인해주세요!',
-          icon: 'error',
-          confirmButtonText: '닫기',
-        });
+      .catch(error => {
+        console.log(error);
       });
   };
 
@@ -60,10 +59,10 @@ const ToRecordModal: React.FC<ToRecordModalProps> = ({ onClose, childId }) => {
         <FormContainer onSubmit={passwordCheck}>
           <h2>비밀번호 확인</h2>
           <TextField
-            label='비밀번호 확인'
-            variant='outlined'
-            margin='dense'
-            type='password'
+            label="비밀번호 확인"
+            variant="outlined"
+            margin="dense"
+            type="password"
             value={password}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               setPassword(event.target.value)
@@ -71,19 +70,21 @@ const ToRecordModal: React.FC<ToRecordModalProps> = ({ onClose, childId }) => {
           />
           <ButtonContainer>
             <Button
-              variant='contained'
-              size='small'
+              variant="contained"
+              size="small"
               sx={{ fontSize: '18px', margin: '0.5rem' }}
               onClick={passwordCheck}
-              fullWidth>
+              fullWidth
+            >
               확인
             </Button>
             <Button
-              variant='contained'
-              size='small'
+              variant="contained"
+              size="small"
               sx={{ fontSize: '18px', margin: '0.5rem' }}
               onClick={onClose}
-              fullWidth>
+              fullWidth
+            >
               닫기
             </Button>
           </ButtonContainer>
