@@ -28,8 +28,8 @@ import com.ssafy.eoullim.model.Record;
 @RequiredArgsConstructor
 public class RecordService {
 
-  private final RecordRepository recordRepository;
-  private final ChildRepository childRepository;
+    private final RecordRepository recordRepository;
+    private final ChildRepository childRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -43,20 +43,21 @@ public class RecordService {
 //        String dir = "C:\\Users\\ssafy\\Downloads\\";
         String dir = "/var/lib/recordings/";
 
-        String recordFolder = dir+recordingId+"/";
+        String recordFolder = dir + recordingId + "/";
         File recordZip = new File(recordFolder, "VideoInfo.zip");
 
-        try(BufferedInputStream in = new BufferedInputStream(new FileInputStream(recordZip))){
-            try(ZipInputStream zipInputStream = new ZipInputStream(in)){
+        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(recordZip))) {
+            try (ZipInputStream zipInputStream = new ZipInputStream(in)) {
                 ZipEntry zipEntry = null;
 
-                while((zipEntry = zipInputStream.getNextEntry()) != null){
+                while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                     int length = 0;
-                    try(BufferedOutputStream out = new BufferedOutputStream((new FileOutputStream(recordFolder + zipEntry.getName())))){
-                        while((length = zipInputStream.read()) != -1){
+                    try (BufferedOutputStream out = new BufferedOutputStream((new FileOutputStream(recordFolder + zipEntry.getName())))) {
+                        while ((length = zipInputStream.read()) != -1) {
                             out.write(length);
                         }
-                        zipInputStream.closeEntry();;
+                        zipInputStream.closeEntry();
+                        ;
                     }
                 }
             } catch (IOException e) {
@@ -68,36 +69,35 @@ public class RecordService {
         /* JSON Parse 시작 */
         JSONParser parser = new JSONParser();
 
-        Reader reader = new FileReader(recordFolder+"VideoInfo.json");
+        Reader reader = new FileReader(recordFolder + "VideoInfo.json");
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
 
         JSONArray files = (JSONArray) jsonObject.get("files");
 
-        String downDir = OPENVIDU_URL+"/openvidu/recordings/";
-        String downFolder = downDir+recordingId+"/";
-        for(int i=0; i< files.size(); i++){
+        String downDir = OPENVIDU_URL + "/openvidu/recordings/";
+        String downFolder = downDir + recordingId + "/";
+        for (int i = 0; i < files.size(); i++) {
             JSONObject element = (JSONObject) files.get(i);
             String name = String.valueOf(element.get("name"));
-            JSONObject clientData = (JSONObject) parser.parse((String)element.get("clientData"));
-            int userId = Integer.parseInt((String)clientData.get("childId"));
-            ChildEntity user = childRepository.findById(userId).orElseThrow();
+            JSONObject clientData = (JSONObject) parser.parse((String) element.get("clientData"));
+            int masterId = Integer.parseInt((String) clientData.get("childId"));
+            ChildEntity master = childRepository.findById(masterId).orElseThrow();
 
-            if(room.getChildOne().intValue() == userId){ // 영상의 주인이 첫번째 사람
+            if (room.getChildOne().intValue() == masterId) { // 영상의 주인이 첫번째 사람
                 ChildEntity participant = childRepository.findById(room.getChildTwo()).orElseThrow();
-                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
+                recordRepository.save(RecordEntity.of(downFolder + name, master, participant, room.getGuideSeq(), room.getTimeline()));
             }
-            if(room.getChildTwo().intValue() == userId){ // 영상의 주인이 두번째 사람
+            if (room.getChildTwo().intValue() == masterId) { // 영상의 주인이 두번째 사람
                 ChildEntity participant = childRepository.findById(room.getChildOne()).orElseThrow();
-                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
+                recordRepository.save(RecordEntity.of(downFolder + name, master, participant, room.getGuideSeq(), room.getTimeline()));
             }
 
         }
         /* JSON Parse 종료 */
     }
 
-    public List<Record> getRecordList(Integer masterId){
-        List<Record> recordList = recordRepository.findRecordEntitiesByMasterId(masterId)
+    public List<Record> getRecordList(Integer masterId) {
+        return recordRepository.findRecordEntitiesByMasterId(masterId)
                 .stream().map(Record::fromEntity).collect(Collectors.toList());
-        return recordList;
     }
 }
