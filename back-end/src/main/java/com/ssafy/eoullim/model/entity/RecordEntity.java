@@ -3,19 +3,17 @@ package com.ssafy.eoullim.model.entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Entity
-@Table(name="record_info")
+@Table(name="record")
 @NoArgsConstructor
 public class RecordEntity extends BaseEntity {
     @Id
+    @Column(name = "record_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

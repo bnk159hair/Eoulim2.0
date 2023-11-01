@@ -12,6 +12,7 @@ import javax.persistence.*;
 public class RecordGuideEntity {
 
     @Id
+    @Column(name = "record_guide_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
