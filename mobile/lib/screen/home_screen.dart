@@ -77,9 +77,9 @@ PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
 List<Widget> _buildScreens() {
   return [
-    const Join(),
-    const Friends(),
-    const Settings(),
+    Join(),
+    Friends(),
+    Settings(),
   ];
 }
 

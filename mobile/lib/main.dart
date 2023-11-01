@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'firebase_options.dart';
+import 'package:get/get.dart';
 
 import 'package:mobile/screen/splash_screen.dart';
 
@@ -84,8 +84,6 @@ Future<void> main() async {
   initializeNotification();
 
   getMyDeviceToken();
-
-  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -100,7 +98,7 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return const MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       title: 'Eoullim',

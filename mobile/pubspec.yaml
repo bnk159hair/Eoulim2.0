@@ -34,8 +34,6 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  web_socket_channel: ^2.4.0
-  stomp_dart_client: ^1.0.0
   flutter_swiper_plus: ^2.0.4
   persistent_bottom_nav_bar: ^5.0.2
   flutter_secure_storage: ^9.0.0
@@ -47,13 +45,13 @@ dependencies:
   provider: ^6.0.5
   audioplayers: ^5.2.0
   custom_radio_grouped_button: ^2.2.1
-  openvidu_client: ^0.0.2
   webview_flutter: ^4.2.2
   webview_flutter_android: ^3.12.0
   webview_flutter_wkwebview: ^3.9.2
   firebase_core: ^2.21.0
   firebase_messaging: ^14.7.3
   flutter_local_notifications: ^16.1.0
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
