@@ -50,7 +50,11 @@ export const getToken = async (userInfo: User, userToken: string) => {
   }
 };
 
-export const getFriendSessionToken = async (childId: any, userToken: string, sessionId: string) => {
+export const getFriendSessionToken = async (
+  childId: string,
+  userToken: string,
+  sessionId: string,
+) => {
   console.log('초대 토큰 가져오기');
 
   try {
@@ -108,7 +112,7 @@ export const destroySession = async (
   }
 };
 
-export const destroyFriendSession = async (sessionId: string, userToken: any) => {
+export const destroyFriendSession = async (sessionId: string, userToken: string) => {
   console.log('친구 세션 녹화 종료');
 
   try {

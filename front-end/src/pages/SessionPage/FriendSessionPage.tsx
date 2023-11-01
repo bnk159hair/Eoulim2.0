@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { Client } from '@stomp/stompjs';
+import axios from 'axios';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -12,10 +18,6 @@ import {
   NavContainer,
   SessionPageContainer,
 } from './SessionPageStyles';
-import { Button } from '@mui/material';
-import MicIcon from '@mui/icons-material/Mic';
-import MicOffIcon from '@mui/icons-material/MicOff';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { invitationToken, invitationSessionId } from '../../atoms/Ivitation';
 import { tokenState } from '../../atoms/Auth';
@@ -28,11 +30,8 @@ import {
   SubscriberAnimonURL,
   IsAnimonLoaded,
 } from '../../atoms/Session';
-import { Client } from '@stomp/stompjs';
-import { WS_BASE_URL } from '../../apis/urls';
+import { WS_BASE_URL, API_BASE_URL } from '../../apis/urls';
 import { WebSocketApis } from '../../apis/webSocketApis';
-import axios from 'axios';
-import { API_BASE_URL } from '../../apis/urls';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
 
@@ -55,18 +54,13 @@ const FriendSessionPage = () => {
   const [isFriend, setFriend] = useState(false);
   const [publisherId, setPublisherId] = useRecoilState(PublisherId);
   const [subscriberId, setSubscriberId] = useRecoilState(SubscriberId);
-  const [publisherVideoStatus, setPublisherVideoStatus] =
-    useRecoilState(PublisherVideoStatus);
-  const [subscriberVideoStatus, setSubscriberVideoStatus] = useRecoilState(
-    SubscriberVideoStatus
-  );
-  const [publisherAnimonURL, setPublisherAnimonURL] =
-    useRecoilState(PublisherAnimonURL);
-  const [subscriberAnimonURL, setSubscriberAnimonURL] =
-    useRecoilState(SubscriberAnimonURL);
+  const [publisherVideoStatus, setPublisherVideoStatus] = useRecoilState(PublisherVideoStatus);
+  const [subscriberVideoStatus, setSubscriberVideoStatus] = useRecoilState(SubscriberVideoStatus);
+  const [publisherAnimonURL, setPublisherAnimonURL] = useRecoilState(PublisherAnimonURL);
+  const [subscriberAnimonURL, setSubscriberAnimonURL] = useRecoilState(SubscriberAnimonURL);
 
-  const [sessionId, setSessionId] = useRecoilState(invitationSessionId);
-  const [sessionToken, setSessionToken] = useRecoilState(invitationToken);
+  const sessionId = useRecoilValue(invitationSessionId);
+  const sessionToken = useRecoilValue(invitationToken);
 
   const profileId = useRecoilValue(Profilekey);
   const userToken = useRecoilValue(tokenState);
@@ -78,8 +72,11 @@ const FriendSessionPage = () => {
   console.log('오픈비두 시작');
 
   console.log(profileId, sessionId, sessionToken);
-  const { publisher, streamList, session, isOpen, onChangeMicStatus } =
-    useOpenVidu(profileId, sessionId, sessionToken);
+  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
+    profileId,
+    sessionId,
+    sessionToken,
+  );
 
   const sessionOver = () => {
     setOpen(isTrue);
@@ -97,7 +94,7 @@ const FriendSessionPage = () => {
     setPublisherVideoStatus(isFalse);
     setSubscriberVideoStatus(isFalse);
     setPublisherId(profileId);
-    setPublisherAnimonURL(profile.animon.name + 'mask.png');
+    setPublisherAnimonURL(`${profile.animon.name}mask.png`);
     console.log('친구불러오기 시작');
     getFriends();
   }, []);
@@ -123,7 +120,7 @@ const FriendSessionPage = () => {
     for (const user of streamList) {
       if (Number(user.userId) !== Number(publisherId)) {
         setSubscriberId(Number(user.userId));
-        friends.forEach((user: any) => {
+        friends.forEach(user => {
           console.log(user.id, subscriberId);
           console.log(Number(user.id) === Number(subscriberId));
           if (String(user.id) === String(subscriberId)) {
@@ -148,7 +145,7 @@ const FriendSessionPage = () => {
         connectHeaders: WebSocketApis.getInstance().header,
         brokerURL: WS_BASE_URL,
         reconnectDelay: 5000,
-        debug: (str) => console.log(str),
+        debug: str => console.log(str),
       });
 
       client.onConnect = () => {
@@ -156,7 +153,7 @@ const FriendSessionPage = () => {
         setConnected(isTrue);
         setStompClient(client);
 
-        client.subscribe(`/topic/${session.sessionId}/animon`, (response) => {
+        client.subscribe(`/topic/${session.sessionId}/animon`, response => {
           console.log('메시지 수신:', response.body);
           const message = JSON.parse(response.body);
           if (String(message.childId) !== String(publisherId)) {
@@ -166,22 +163,19 @@ const FriendSessionPage = () => {
             setSubscriberVideoStatus(message.isAnimonOn);
           }
         });
-        client.subscribe(
-          `/topic/${session.sessionId}/leave-session`,
-          (response) => {
-            const message = JSON.parse(response.body);
-            console.log(message);
-            if (message.childId !== String(publisherId)) {
-              if (message.isLeft === true) {
-                setOpen(isTrue);
-              } else if (message.isLeft === false) {
-                console.log('초대를 거절했습니다.');
-                setRefuse(isTrue);
-                setOpen(isTrue);
-              }
+        client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
+          const message = JSON.parse(response.body);
+          console.log(message);
+          if (message.childId !== String(publisherId)) {
+            if (message.isLeft === true) {
+              setOpen(isTrue);
+            } else if (message.isLeft === false) {
+              console.log('초대를 거절했습니다.');
+              setRefuse(isTrue);
+              setOpen(isTrue);
             }
           }
-        );
+        });
       };
 
       client.onDisconnect = () => {
@@ -205,12 +199,12 @@ const FriendSessionPage = () => {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then((response) => {
+      .then(response => {
         const data = response.data.result;
         setFriends(data);
         console.log(data);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response && error.response.status === 401) {
           navigate('/login');
         } else {
@@ -221,18 +215,15 @@ const FriendSessionPage = () => {
 
   const getAnimon = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/children/participant/${subscriberId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_BASE_URL}/children/participant/${subscriberId}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
 
       console.log('유저 정보 가져오기 성공!');
       console.log(response);
-      setSubscriberAnimonURL(response.data.result.animon.name + 'mask.png');
+      setSubscriberAnimonURL(`${response.data.result.animon.name}mask.png`);
       setSubscriberName(response.data.result.name);
       return response.data.result;
     } catch (error) {
@@ -273,13 +264,13 @@ const FriendSessionPage = () => {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-        }
+        },
       )
-      .then((response) => {
+      .then(response => {
         console.log(response);
         leaveSession();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response.data.resultCode === 'INVALID_DATA') {
           leaveSession();
         } else console.log(error);
@@ -293,7 +284,7 @@ const FriendSessionPage = () => {
       setPublisherVideoStatus(isAnimonOn);
       const jsonMessage = {
         childId: String(publisherId),
-        isAnimonOn: isAnimonOn,
+        isAnimonOn,
       };
       const message = JSON.stringify(jsonMessage);
       stompClient.publish({
@@ -305,7 +296,7 @@ const FriendSessionPage = () => {
   };
 
   const changeAudioStatus = () => {
-    setMicStatus((prev) => !prev);
+    setMicStatus(prev => !prev);
   };
 
   const isTrue = () => {
@@ -317,6 +308,7 @@ const FriendSessionPage = () => {
   };
 
   return (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {!open ? (
         <SessionPageContainer>
@@ -337,7 +329,7 @@ const FriendSessionPage = () => {
               )}
             </MyVideo>
             <CharacterContainer>
-              <Character isPlaying={false}></Character>
+              <Character isPlaying={false} />
             </CharacterContainer>
             <MyVideo>
               {streamList.length > 1 && streamList[0].streamManager ? (
@@ -357,31 +349,19 @@ const FriendSessionPage = () => {
           </Container>
           <NavContainer>
             <Buttons>
-              <Button
-                variant="contained"
-                onClick={changeVideoStatus}
-                sx={{ fontSize: '30px' }}
-              >
-                {publisherVideoStatus
-                  ? profile.gender === 'W'
-                    ? '👩'
-                    : '🧑'
-                  : '🙈'}
+              <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '30px' }}>
+                {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
               </Button>
-              <Button variant="contained" onClick={changeAudioStatus}>
-                {micStatus ? (
-                  <MicIcon fontSize="large"></MicIcon>
-                ) : (
-                  <MicOffIcon fontSize="large"></MicOffIcon>
-                )}
+              <Button variant={'contained'} onClick={changeAudioStatus}>
+                {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
               </Button>
               <Button
-                variant="contained"
-                color="error"
+                variant={'contained'}
+                color={'error'}
                 onClick={sessionOver}
                 sx={{ fontSize: '30px' }}
               >
-                나가기
+                {'나가기'}
               </Button>
             </Buttons>
           </NavContainer>
@@ -392,22 +372,22 @@ const FriendSessionPage = () => {
         ) : (
           <EndModal
             onClose={leaveSession}
-            message="친구가 지금 바쁜 상태입니다."
-            isFriend={true}
+            message={'친구가 지금 바쁜 상태입니다.'}
+            isFriend
             addFriend={addFriend}
           />
         )
       ) : !isFriend ? (
         <EndModal
           onClose={leaveSession}
-          message="친구 조아?"
+          message={'친구 조아?'}
           isFriend={isFriend}
           addFriend={addFriend}
         />
       ) : (
         <EndModal
           onClose={leaveSession}
-          message="통화가 끝났습니다."
+          message={'통화가 끝났습니다.'}
           isFriend={isFriend}
           addFriend={addFriend}
         />

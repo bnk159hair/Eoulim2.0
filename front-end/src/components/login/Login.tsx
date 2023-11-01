@@ -2,26 +2,21 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { tokenState } from '../../atoms/Auth';
-import {
-  FormContainer,
-  LoginButton,
-  SignupContainer,
-  SignupAnchor,
-} from './LoginStyles';
-import { API_BASE_URL } from '../../apis/urls';
 import { TextField, InputAdornment } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import SignupModal from './SignupModal';
 import Swal from 'sweetalert2';
+import { tokenState } from '../../atoms/Auth';
+import { FormContainer, LoginButton, SignupContainer, SignupAnchor } from './LoginStyles';
+import { API_BASE_URL } from '../../apis/urls';
+import SignupModal from './SignupModal';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isModalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
-  const [token, setToken] = useRecoilState(tokenState);
+  const [, setToken] = useRecoilState(tokenState);
 
   const handleLogin = (event: any) => {
     event.preventDefault();
@@ -36,12 +31,12 @@ const Login = () => {
 
     axios
       .post(`${API_BASE_URL}/login`, { username, password })
-      .then((response) => {
+      .then(response => {
         console.log(response);
         setToken(response.data.data);
         navigate('/profile');
       })
-      .catch((error) => {
+      .catch(() => {
         Swal.fire({
           text: '아이디와 비밀번호를 확인해주세요!',
           icon: 'error',
@@ -62,55 +57,51 @@ const Login = () => {
     <>
       <FormContainer onSubmit={handleLogin}>
         <TextField
-          label='아이디'
-          variant='filled'
-          color='success'
-          margin='dense'
+          label={'아이디'}
+          variant={'filled'}
+          color={'success'}
+          margin={'dense'}
           value={username}
           sx={{
             bgcolor: '#F5EBC9',
             borderRadius: '5px',
             width: '80%',
           }}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setUsername(event.target.value)
-          }
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setUsername(event.target.value)}
           InputProps={{
             startAdornment: (
-              <InputAdornment position='start'>
+              <InputAdornment position={'start'}>
                 <AccountCircle />
               </InputAdornment>
             ),
           }}
         />
         <TextField
-          label='비밀번호'
-          variant='filled'
-          color='success'
-          margin='dense'
-          type='password'
+          label={'비밀번호'}
+          variant={'filled'}
+          color={'success'}
+          margin={'dense'}
+          type={'password'}
           value={password}
           sx={{
             bgcolor: '#F5EBC9',
             borderRadius: '5px',
             width: '80%',
           }}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            setPassword(event.target.value)
-          }
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
           InputProps={{
             startAdornment: (
-              <InputAdornment position='start'>
+              <InputAdornment position={'start'}>
                 <KeyIcon />
               </InputAdornment>
             ),
           }}
         />
-        <LoginButton type='submit'>로그인</LoginButton>
+        <LoginButton type={'submit'}>{'로그인'}</LoginButton>
       </FormContainer>
       <SignupContainer>
-        <span>아직 회원이 아니신가요?</span>
-        <SignupAnchor onClick={handleModalOpen}>회원가입</SignupAnchor>
+        <span>{'아직 회원이 아니신가요?'}</span>
+        <SignupAnchor onClick={handleModalOpen}>{'회원가입'}</SignupAnchor>
         {isModalOpen && <SignupModal onClose={handleModalClose} />}
       </SignupContainer>
     </>

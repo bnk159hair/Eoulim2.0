@@ -21,8 +21,8 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
   animon,
   status,
 }) => {
-  const [sessionToken, setSessionToken] = useRecoilState(invitationToken);
-  const [invitationId, setInvitationId] = useRecoilState(invitationSessionId);
+  const [, setSessionToken] = useRecoilState(invitationToken);
+  const [, setInvitationId] = useRecoilState(invitationSessionId);
 
   const IMGURL = `/${animon}.png`;
   const navigate = useNavigate();

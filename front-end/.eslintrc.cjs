@@ -13,6 +13,10 @@ module.exports = {
     'prettier',
   ],
   rules: {
+    // button type 명시
+    'react/button-has-type': 'off',
+    // any 허용
+    '@typescript-eslint/no-explicit-any': 'off',
     // var 금지
     'no-var': 'warn',
     // 일치 연산자 사용 필수
@@ -54,7 +58,7 @@ module.exports = {
     // [error] Curly braces are unnecessary here
     'react/jsx-curly-brace-presence': ['warn', { props: 'always', children: 'always' }],
     // 파일의 경로가 틀렸는지 확인하는 옵션 false
-    'import/no-unresolved': ['error', { caseSensitive: false }],
+    'import/no-unresolved': 'off',
     // props spreading 허용하지 않는 경고 표시
     'react/jsx-props-no-spreading': [1, { custom: 'ignore' }],
     'linebreak-style': 0,
@@ -64,11 +68,15 @@ module.exports = {
     'import/no-extraneous-dependencies': 0,
     'no-shadow': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,
-    // 파일 확장자 명시적 요구 비활성화
+
+    'no-restricted-syntax': 'off',
+    'consistent-return': 'off',
   },
   settings: {
     'import/resolver': {
       node: {
+        paths: ['src'],
+        moduleDirectory: ['node_modules', 'src/'],
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
       },
     },
