@@ -41,45 +41,45 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<SuccessResponse<?>> login(@Valid @RequestBody UserLoginRequest request) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public SuccessResponse<?> login(@Valid @RequestBody UserLoginRequest request) {
         String accessToken = userService.login(request.getUsername(), request.getPassword());
-        return ResponseEntity.ok(new SuccessResponse<>(accessToken));
+        return new SuccessResponse<>(accessToken);
     }
 
     @GetMapping("/logout")
-    public Response<Void> logout(Authentication authentication) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public SuccessResponse<?> logout(Authentication authentication) {
         userService.logout(authentication.getName());
-        return Response.success(HttpStatus.OK, "logout completed");
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT,"로그아웃 성공!");
     }
 
     @GetMapping("/check-username/{username}")
-    public Response<String> checkUsername(@PathVariable @NotBlank String username) {
-        boolean duplicate = userService.checkId(username);
-        if(duplicate) {
-            return Response.success(HttpStatus.OK, "duplicate ID", "duplicated");
-        }
-        else {
-            return Response.success(HttpStatus.OK, "available ID", "available");
-        }
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public SuccessResponse<?> isAvailableUsername(@PathVariable @NotBlank String username) {
+        final var isAvailable = userService.isAvailableUsername(username);
+        return new SuccessResponse<>(isAvailable);
     }
 
     @PostMapping("/check-password")
-    public Response<String> checkPassword(@Valid @RequestBody UserPwCheckRequest request, Authentication authentication) {
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public SuccessResponse<?> isCorrectPassword(@Valid @RequestBody UserPwCheckRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        boolean correct = userService.checkPw(request.getPassword(), user.getPassword());
-        if(correct) {
-            return Response.success(HttpStatus.OK, "correct password", "correct");
-        }
-        else {
-            return Response.success(HttpStatus.OK, "wrong password", "wrong");
-        }
+        final var isCorrect = userService.isCorrectPassword(request.getPassword(), user.getPassword());
+        return new SuccessResponse<>(isCorrect);
     }
 
     @PatchMapping("/password")
-    public Response<Void> updatePassword(
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public SuccessResponse<?> updatePassword(
             @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
         userService.updatePw(user, request.getCurPassword(), request.getNewPassword());
-        return Response.success(HttpStatus.OK, "password changed");
+        return new SuccessResponse<>("password changed");
     }
 }

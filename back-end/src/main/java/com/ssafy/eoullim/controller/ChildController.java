@@ -91,10 +91,11 @@ public class ChildController {
   }
 
   @PostMapping("/school")
-  public ResponseEntity<SuccessResponse<?>> isValidSchool(
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<?> isValidSchool(
       @Valid @RequestBody ChildSchoolRequest request) {
-    String result = childService.isValidSchool(request.getKeyword()) ? "학교 확인 성공" : "학교 확인 실패";
-    return ResponseEntity.ok(new SuccessResponse<>(result));
+    final var isValidSchool = childService.isValidSchool(request.getKeyword());
+    return new SuccessResponse<>(isValidSchool);
   }
 
   //  @GetMapping("/{childId}/animons")

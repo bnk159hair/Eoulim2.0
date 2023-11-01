@@ -78,11 +78,11 @@ public class UserService {
         return "BlackList:" + username;
     }
 
-    public boolean checkId(String username) {
-        return userRepository.findByUsername(username).isPresent();
+    public Boolean isAvailableUsername(String username) {
+        return userRepository.findByUsername(username).isEmpty();
     }
 
-    public boolean checkPw(String pwRequest, String pwCorrect) {
+    public Boolean isCorrectPassword(String pwRequest, String pwCorrect) {
         return encoder.matches(pwRequest, pwCorrect);
     }
 
