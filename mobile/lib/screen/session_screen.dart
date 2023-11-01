@@ -1,73 +1,59 @@
+// Copyright 2013 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// ignore_for_file: public_member_api_docs
+
 import 'package:flutter/material.dart';
-import 'package:mobile/utils/websocket.dart' as websocket;
-import 'package:mobile/widgets/session/guide_button.dart';
+import 'package:flutter/services.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class Session extends StatefulWidget {
-  const Session({
-    super.key,
-    required this.title,
-  });
-
-  final String title;
+  const Session({super.key});
 
   @override
   State<Session> createState() => _SessionState();
 }
 
 class _SessionState extends State<Session> {
-  final TextEditingController _controller = TextEditingController();
-  final client = websocket.stompClient;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Form(
-              child: TextFormField(
-                controller: _controller,
-                decoration: const InputDecoration(labelText: 'Send a message'),
-              ),
-            ),
-            const SizedBox(height: 24),
-            const GuideButton(),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _sendMessage,
-        tooltip: 'Send message',
-        child: const Icon(Icons.send),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+  late final WebViewController controller;
 
   @override
   void initState() {
     super.initState();
-    websocket.stompClient.activate();
+
+    // #docregion webview_controller
+    controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse('https://k9c103.p.ssafy.io/profile'));
+    // #enddocregion webview_controller
   }
 
-  void _sendMessage() {
-    if (_controller.text.isNotEmpty) {
-      final message = {
-        'childId': websocket.childId,
-        'isAnimonOn': _controller.text
-      };
-      websocket.send(websocket.sessionId, 'animon', message);
-      print(_controller.text);
-    }
-  }
-
+  // #docregion webview_widget
   @override
-  void dispose() {
-    client.deactivate();
-    _controller.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Flutter Simple Example')),
+      body: WebViewWidget(controller: controller),
+    );
   }
+  // #enddocregion webview_widget
 }

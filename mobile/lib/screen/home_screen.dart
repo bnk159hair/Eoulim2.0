@@ -23,11 +23,11 @@ class Home extends StatelessWidget {
         // 두 번째 뒤로가기 버튼 누를 때
         backButtonPressedOnce = true;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('뒤로가기 버튼을 한 번 더 누르면 종료합니다.')),
+          const SnackBar(content: Text('뒤로가기 버튼을 한 번 더 누르면 종료합니다.')),
         );
 
         // 2초 내에 두 번째 뒤로가기 버튼을 누르지 않으면 초기화
-        Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(const Duration(seconds: 2), () {
           backButtonPressedOnce = false;
         });
 
@@ -37,7 +37,7 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.notifications,
             ),
             iconSize: 40.0,
@@ -63,7 +63,7 @@ class Home extends StatelessWidget {
           elevation: 6.0,
           toolbarHeight: 100.0,
         ),
-        body: HomeBottomNavBar(),
+        body: const HomeBottomNavBar(),
       ),
     );
   }
@@ -82,19 +82,19 @@ List<Widget> _buildScreens() {
 List<PersistentBottomNavBarItem> _navBarsItems() {
   return [
     PersistentBottomNavBarItem(
-      icon: Icon(Icons.home),
+      icon: const Icon(Icons.home),
       title: "새 친구",
       activeColorPrimary: Colors.blue,
       inactiveColorPrimary: Colors.grey,
     ),
     PersistentBottomNavBarItem(
-      icon: Icon(Icons.people),
+      icon: const Icon(Icons.people),
       title: "내 친구",
       activeColorPrimary: Colors.blue,
       inactiveColorPrimary: Colors.grey,
     ),
     PersistentBottomNavBarItem(
-      icon: Icon(Icons.settings_outlined),
+      icon: const Icon(Icons.settings_outlined),
       title: "설정",
       activeColorPrimary: Colors.blue,
       inactiveColorPrimary: Colors.grey,
@@ -128,12 +128,12 @@ class HomeBottomNavBar extends StatelessWidget {
         ),
         popAllScreensOnTapOfSelectedTab: true,
         popActionScreens: PopActionScreensType.all,
-        itemAnimationProperties: ItemAnimationProperties(
+        itemAnimationProperties: const ItemAnimationProperties(
           // Navigation Bar's items animation properties.
           duration: Duration(milliseconds: 50),
           curve: Curves.easeInOut,
         ),
-        screenTransitionAnimation: ScreenTransitionAnimation(
+        screenTransitionAnimation: const ScreenTransitionAnimation(
           // Screen transition animation on change of selected tab.
           animateTabTransition: true,
           curve: Curves.easeInOut,
