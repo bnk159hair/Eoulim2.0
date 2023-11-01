@@ -1,12 +1,12 @@
 package com.ssafy.eoullim.model.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
 @Entity
 @Table(name="record")
@@ -28,6 +28,7 @@ public class RecordEntity extends BaseEntity {
     @JoinColumn(name="participant_id", nullable = false)
     private ChildEntity participant;
 
+    @Builder
     public RecordEntity(Long id, String videoPath, ChildEntity master, ChildEntity participant) {
         this.id = id;
         this.videoPath = videoPath;

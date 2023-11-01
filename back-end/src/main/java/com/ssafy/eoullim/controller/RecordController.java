@@ -24,7 +24,7 @@ public class RecordController {
     private final RecordService recordService;
 
     @GetMapping("/{childId}")
-    public ResponseEntity<SuccessResponse<List<Record>>> getRecordList(@NotBlank @PathVariable Integer childId) {
+    public ResponseEntity<SuccessResponse<List<Record>>> getRecordList(@NotBlank @PathVariable Long childId) {
         List<Record> recordList = recordService.getRecordList(childId);
         return ResponseEntity.ok(new SuccessResponse<>(recordList));
     }

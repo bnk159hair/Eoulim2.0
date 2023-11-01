@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.model.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,4 +30,13 @@ public class RecordGuideEntity {
 
     @Column(nullable = false)
     private String timeline;
+
+    @Builder
+    public RecordGuideEntity(Long id, RecordEntity record, GuideEntity guide, Integer sequence, String timeline) {
+        this.id = id;
+        this.record = record;
+        this.guide = guide;
+        this.sequence = sequence;
+        this.timeline = timeline;
+    }
 }
