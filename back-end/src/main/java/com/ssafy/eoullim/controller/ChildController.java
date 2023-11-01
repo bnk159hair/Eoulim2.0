@@ -45,9 +45,10 @@ public class ChildController {
   public SuccessResponse<?> create(
       @Valid @RequestBody ChildRequest request, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-    childService.create(user, Child.of(request));
+    log.error(user.toString());
+    final var child = childService.create(user, Child.of(request));
 
-    return new SuccessResponse<>(HttpStatus.CREATED, null);
+    return new SuccessResponse<>(HttpStatus.CREATED, child);
   }
 
   @PutMapping("/{childId}")

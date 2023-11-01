@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FollowRepository extends JpaRepository<FollowEntity, Integer> {
+public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
 
     Optional<FollowEntity> findByChildAndFollowingChild(ChildEntity child, ChildEntity followingChild);
 

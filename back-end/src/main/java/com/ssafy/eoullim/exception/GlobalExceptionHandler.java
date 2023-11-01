@@ -50,6 +50,7 @@ public class GlobalExceptionHandler {
   public ErrorResponse etcExceptionHandler(Exception e) {
     final var errorResponse = getErrorResponse(e);
     printLog(e);
+    e.printStackTrace();
     return errorResponse;
   }
 

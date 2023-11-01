@@ -14,5 +14,4 @@ public class MatchFriendRequest {
     String name;  
     String sessionId;
     Long friendId;
-
 }

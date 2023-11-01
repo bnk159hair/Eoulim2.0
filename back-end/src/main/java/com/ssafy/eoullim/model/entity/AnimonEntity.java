@@ -26,7 +26,7 @@ public class AnimonEntity extends BaseEntity {
     @Column
     private String bodyImagePath;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id")
-    private ChildEntity childEntity;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "child_id")
+//    private ChildEntity childEntity;
 }
