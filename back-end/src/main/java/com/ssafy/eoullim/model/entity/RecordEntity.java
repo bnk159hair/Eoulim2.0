@@ -35,7 +35,7 @@ public class RecordEntity extends BaseEntity {
         this.participant = participant;
     }
 
-    public static RecordEntity of(String videoPath, ChildEntity master, ChildEntity participant, String guideSeq, String timeline){
+    public static RecordEntity of(String videoPath, ChildEntity master, ChildEntity participant){
         return new RecordEntity(
                 null,
                 videoPath,

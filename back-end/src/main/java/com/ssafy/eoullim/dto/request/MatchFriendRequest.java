@@ -10,9 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchFriendRequest {
-    Integer childId;
+    Long childId;
     String name;  
     String sessionId;
-    Integer friendId;
+    Long friendId;
 
 }

@@ -20,7 +20,7 @@ public class AlarmService {
     private final EmitterRepository emitterRepository;
     private static final Long DEFAULT_TIMEOUT = 60L * 1000 * 60;
 
-    public void send(Integer receiverId, Alarm alarm) {
+    public void send(Long receiverId, Alarm alarm) {
         emitterRepository.get(receiverId).ifPresentOrElse(it -> {
                     try {
                         it.send(SseEmitter.event()
@@ -38,7 +38,7 @@ public class AlarmService {
         );
     }
 
-    public SseEmitter subscribe(Integer childId) {
+    public SseEmitter subscribe(Long childId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         emitterRepository.save(childId, emitter);
         emitter.onCompletion(() -> emitterRepository.delete(childId));

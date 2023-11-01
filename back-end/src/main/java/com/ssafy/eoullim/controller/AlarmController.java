@@ -20,7 +20,7 @@ public class AlarmController {
     private final AlarmService alarmService;
 
     @GetMapping(value = "/subscribe/{childId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable @NotBlank Integer childId) {
+    public SseEmitter subscribe(@PathVariable @NotBlank Long childId) {
         return alarmService.subscribe(childId);
     }
 }

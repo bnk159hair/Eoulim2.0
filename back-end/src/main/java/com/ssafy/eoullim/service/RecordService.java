@@ -2,9 +2,10 @@ package com.ssafy.eoullim.service;
 
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.model.entity.ChildEntity;
-import com.ssafy.eoullim.model.entity.RecordEntity;
 import com.ssafy.eoullim.repository.ChildRepository;
-import com.ssafy.eoullim.repository.RecordRepository;
+import com.ssafy.eoullim.repository.JPA.GuideRepository;
+import com.ssafy.eoullim.repository.JPA.RecordGuideRepository;
+import com.ssafy.eoullim.repository.JPA.RecordRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -29,6 +29,8 @@ import com.ssafy.eoullim.model.Record;
 public class RecordService {
 
     private final RecordRepository recordRepository;
+    private final GuideRepository guideRepository;
+    private final RecordGuideRepository recordGuideRepository;
     private final ChildRepository childRepository;
 
     @Value("${OPENVIDU_URL}")
@@ -83,14 +85,14 @@ public class RecordService {
             Long masterId = Long.parseLong((String) clientData.get("childId"));
             ChildEntity master = childRepository.findById(masterId).orElseThrow();
 
-//            if(room.getChildOne().intValue() == userId){ // 영상의 주인이 첫번째 사람
-//                ChildEntity participant = childRepository.findById(room.getChildTwo()).orElseThrow();
-//                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
-//            }
-//            if(room.getChildTwo().intValue() == userId){ // 영상의 주인이 두번째 사람
-//                ChildEntity participant = childRepository.findById(room.getChildOne()).orElseThrow();
-//                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
-//            }
+            if(room.getChildOne().intValue() == userId){ // 영상의 주인이 첫번째 사람
+                ChildEntity participant = childRepository.findById(room.getChildTwo()).orElseThrow();
+                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
+            }
+            if(room.getChildTwo().intValue() == userId){ // 영상의 주인이 두번째 사람
+                ChildEntity participant = childRepository.findById(room.getChildOne()).orElseThrow();
+                recordRepository.save(RecordEntity.of(downFolder+name, user, participant, room.getGuideSeq(), room.getTimeline()));
+            }
 
         }
         /* JSON Parse 종료 */

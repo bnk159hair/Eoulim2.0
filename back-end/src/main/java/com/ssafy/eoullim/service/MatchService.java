@@ -51,12 +51,14 @@ public class MatchService {
 
   public synchronized Match startRandom(Long childId)
       throws OpenViduJavaClientException, OpenViduHttpException, InterruptedException {
-    Map<String, Object> params = new HashMap<>(); // 빈 파일
+//    Map<String, Object> params = new HashMap<>(); // 빈 파일
+//    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
+    /* 비어있는 설정을 통한 설정파일 지정 */
+    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(new HashMap<String, Object>()).build();
 
-    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
 
-    LocalDateTime now = LocalDateTime.now();
-    String formatNow = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+//    LocalDateTime now = LocalDateTime.now();
+    String formatNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     String sessionId = childId.toString() + "_" + formatNow; // sessionId 결정
 
     if (this.mapSessions.get(sessionId) != null) { // 만드려는 세션 Id가 이미 존재하는지
@@ -101,8 +103,8 @@ public class MatchService {
         RecordingProperties recordingProperties =
             new RecordingProperties.Builder() // 녹화 설정
                 .outputMode(Recording.OutputMode.INDIVIDUAL)
-                .resolution("640x480")
-                .frameRate(24)
+                .resolution("1280x960")
+                .frameRate(30)
                 .name("VideoInfo")
                 .build();
         Thread.sleep(3000);
@@ -118,7 +120,8 @@ public class MatchService {
     }
   }
 
-  public Recording stopRandom(String sessionId, String guideSeq, String timeline, RecordService recordService)
+  public Recording stopRandom(
+      String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
 
     if (mapSessions.get(sessionId) != null && mapRooms.get(sessionId) != null) {
@@ -155,18 +158,20 @@ public class MatchService {
   }
 
   public synchronized Match startFriend(
-      Integer childId,
+      Long childId,
       String childName,
-      Integer friendId,
+      Long friendId,
       String existSessionId,
       AlarmService alarmService)
       throws OpenViduJavaClientException, OpenViduHttpException {
-    Map<String, Object> params = new HashMap<>(); // 빈 파일
-    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
+//    Map<String, Object> params = new HashMap<>(); // 빈 파일
+//    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
+
+    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(new HashMap<String, Object>()).build();
 
     if (existSessionId == null) { // 존재하는 방이 없을 때
-      LocalDateTime now = LocalDateTime.now();
-      String formatNow = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+//      LocalDateTime now = LocalDateTime.now();
+      String formatNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
       String sessionId = childId.toString() + "_" + formatNow; // sessionId 결정
 
       if (this.mapSessions.get(sessionId) != null) { // 만드려는 세션 Id가 이미 존재하는지
@@ -189,7 +194,7 @@ public class MatchService {
 
         mapSessions.put(sessionId, session);
         Match result = new Match(sessionId, token, null);
-//        newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
+        newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
         mapRooms.put(sessionId, newRoom);
 
         /*
@@ -213,15 +218,15 @@ public class MatchService {
           RecordingProperties recordingProperties =
               new RecordingProperties.Builder() // 녹화 설정
                   .outputMode(Recording.OutputMode.INDIVIDUAL)
-                  .resolution("640x480")
-                  .frameRate(24)
+                  .resolution("1280x960")
+                  .frameRate(30)
                   .name("VideoInfo")
                   .build();
           Recording recording = openvidu.startRecording(sessionId, recordingProperties); // 녹화 시작
 
           sessionRecordings.put(sessionId, recording.getId());
           existingRoom.setRecordingId(recording.getId());
-//          existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+          existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
 
           return result;
         } else {

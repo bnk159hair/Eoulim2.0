@@ -68,7 +68,7 @@ public class MatchController {
         Recording recording = null;
 
         try{
-            recording = matchService.stopRandom(sessionId, "guideSeq", "timeline", recordService);
+            recording = matchService.stopRandom(sessionId, guideSeq, timeline, recordService);
         } catch (OpenViduJavaClientException e) {
             log.info(e.getMessage());
             throw new RuntimeException(e);
@@ -92,9 +92,9 @@ public class MatchController {
     ) {
 
         String existSessionId = matchFriendRequest.getSessionId();
-        Integer childId = matchFriendRequest.getChildId();
+        Long childId = matchFriendRequest.getChildId();
         String childName = matchFriendRequest.getName();
-        Integer friendId = matchFriendRequest.getFriendId();
+        Long friendId = matchFriendRequest.getFriendId();
 
         Match result = null;
         try{
