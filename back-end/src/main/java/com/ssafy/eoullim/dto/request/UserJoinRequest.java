@@ -30,6 +30,7 @@ public class UserJoinRequest {
   @NotBlank String name;
 
   @NotBlank
-  @Pattern(regexp = "01[0-9]-[0-9]{4}-[0-9]{4}")
+//  @Pattern(regexp = "01[0-9]-[0-9]{4}-[0-9]{4}")
+  @Pattern(regexp = "^01[0-9]{8,9}$", message = "올바른 전화번호 형식이 아닙니다. 01로 시작하고, 10자리 혹은 11자리 입니다. ex)01012345678")
   String phoneNumber;
 }
