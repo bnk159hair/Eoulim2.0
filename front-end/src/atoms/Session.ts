@@ -45,7 +45,7 @@ export const IsAnimonLoaded = atom<boolean>({
   default: false,
 });
 
-export const guideSeq = atom<Number[]>({
+export const guideSeq = atom<number[]>({
   key: 'guideSeq',
   default: [],
 });

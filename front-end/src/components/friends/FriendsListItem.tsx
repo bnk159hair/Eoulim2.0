@@ -1,12 +1,12 @@
 import React from 'react';
-import { FriendCard, FriendImg, FrinedInfo,InviteButton } from './FriendsListItemStyles';
 import axios from 'axios';
 import { useRecoilValue, useRecoilState } from 'recoil';
+import { useNavigate } from 'react-router-dom';
+import { FriendCard, FriendImg, FrinedInfo, InviteButton } from './FriendsListItemStyles';
 import { tokenState, userState } from '../../atoms/Auth';
 import { invitationToken, invitationSessionId } from '../../atoms/Ivitation';
 import { Profilekey } from '../../atoms/Profile';
 import { API_BASE_URL } from '../../apis/urls';
-import { useNavigate } from 'react-router-dom';
 
 interface FriendsListItemProps {
   friendId: number;
@@ -19,7 +19,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
   friendId,
   friendName,
   animon,
-  status
+  status,
 }) => {
   const [sessionToken, setSessionToken] = useRecoilState(invitationToken);
   const [invitationId, setInvitationId] = useRecoilState(invitationSessionId);
@@ -38,16 +38,16 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
         `${API_BASE_URL}/meetings/friend/start`,
         {
           childId: profileKey,
-          friendId: friendId, // 친구 아이디
+          friendId, // 친구 아이디
           name: myName, // 내 이름
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
-      .then((response) => {
+      .then(response => {
         const { sessionId, token } = response.data;
         setInvitationId(sessionId);
         setSessionToken(token);
@@ -55,14 +55,17 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
 
         navigate(`/friendsession`);
       })
-      .catch((error) => console.log(error));
+      .catch(error => console.log(error));
   };
 
   return (
     <FriendCard>
       <FriendImg style={{ backgroundImage: `url(${IMGURL})` }} />
       <FrinedInfo>
-        <div>친구 이름 : {friendName}</div>
+        <div>
+          {'친구 이름 : '}
+          {friendName}
+        </div>
         {status === 'ON' && <InviteButton onClick={handleInvite} />}
       </FrinedInfo>
     </FriendCard>
