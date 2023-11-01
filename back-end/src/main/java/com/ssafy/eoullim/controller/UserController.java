@@ -4,7 +4,6 @@ import com.ssafy.eoullim.dto.request.UserJoinRequest;
 import com.ssafy.eoullim.dto.request.UserLoginRequest;
 import com.ssafy.eoullim.dto.request.UserModifyRequest;
 import com.ssafy.eoullim.dto.request.UserPwCheckRequest;
-import com.ssafy.eoullim.dto.response.Response;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.UserService;
@@ -12,7 +11,6 @@ import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +18,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 @Slf4j
-@RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
+@RestController
 public class UserController {
 
   private final UserService userService;

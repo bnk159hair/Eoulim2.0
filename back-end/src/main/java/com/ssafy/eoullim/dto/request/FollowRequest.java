@@ -4,10 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class FollowRequest {
-    private Integer myId;
-    private Integer friendId;
+    @NotBlank
+    private Long childId;
+    @NotBlank
+    private Long followingChildId;
 }

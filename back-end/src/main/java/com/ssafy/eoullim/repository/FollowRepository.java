@@ -13,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface FollowRepository extends JpaRepository<FollowEntity, Integer> {
 
-    Optional<FollowEntity> findByChildAndFollowing(ChildEntity child, ChildEntity following);
+    Optional<FollowEntity> findByChildAndFollowingChild(ChildEntity child, ChildEntity followingChild);
 
-    @Query(value = "select l.following from FollowEntity l where l.child = :child")
+    @Query(value = "select l.followingChild from FollowEntity l where l.child = :child")
     List<ChildEntity> findFollowingsByChild(@Param("child") ChildEntity child);
 
 }

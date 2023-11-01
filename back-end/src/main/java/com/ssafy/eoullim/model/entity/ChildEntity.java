@@ -5,35 +5,38 @@ import com.ssafy.eoullim.model.Status;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Setter
 @Getter
+@NoArgsConstructor
 @Entity
 @Table(name = "child")
-@NoArgsConstructor
-public class ChildEntity {
+public class ChildEntity extends BaseEntity {
     @Id
+    @Column(name = "child_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false, length = 4)
+    @Column(nullable = false, length = 17)
     private String name;
 
     @Column(nullable = false)
 //    @Temporal(TemporalType.DATE)
     private LocalDate birth;
 
-    @Column(nullable = false, length = 1)
+    @Column(columnDefinition = "CHAR(1)", nullable = false)
     private String gender;
 
     @Column(nullable = false, length = 20)
     private String school;
 
-    @Column(nullable = false)
-    private Integer grade;
+    @Column(nullable = false, columnDefinition = "TINYINT(1) UNSIGNED")
+    @Range(min = 1, max = 6)
+    private Short grade;
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.OFF;

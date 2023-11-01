@@ -15,7 +15,7 @@ import javax.validation.constraints.Pattern;
 public class ChildRequest {
   // 자녀 정보
   @NotBlank
-  @Length(max = 4, message = "이름은 4자 이하여야 합니다.")
+  @Length(max = 17, message = "이름은 17자 이하여야 합니다.")
   private String name; // front 단에서 비동기 처리
 
   @NotBlank
@@ -31,5 +31,5 @@ public class ChildRequest {
   private String school;
 
   @Range(min = 1, max = 6, message = "학년은 1에서 6 사이여야 합니다.")
-  private Integer grade;
+  private Short grade;
 }

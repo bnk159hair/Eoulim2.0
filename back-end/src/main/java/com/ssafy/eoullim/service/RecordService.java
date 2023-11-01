@@ -80,7 +80,7 @@ public class RecordService {
             JSONObject element = (JSONObject) files.get(i);
             String name = String.valueOf(element.get("name"));
             JSONObject clientData = (JSONObject) parser.parse((String) element.get("clientData"));
-            int masterId = Integer.parseInt((String) clientData.get("childId"));
+            Long masterId = Long.parseLong((String) clientData.get("childId"));
             ChildEntity master = childRepository.findById(masterId).orElseThrow();
 
 //            if(room.getChildOne().intValue() == userId){ // 영상의 주인이 첫번째 사람

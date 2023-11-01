@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ChildRepository  extends JpaRepository<ChildEntity, Integer> {
+public interface ChildRepository  extends JpaRepository<ChildEntity, Long> {
     Optional<List<ChildEntity>> findAllByUserId(Long userId);
 
-    Optional<ChildEntity> findByIdAndUserId(Integer childId, Long userId);
+    Optional<ChildEntity> findByIdAndUserId(Long childId, Long userId);
 
     // 사용 가능
 //    Optional<ChildEntity> findByNameAndUser_Id(String name, Integer user_id); // User가 동일한 Child 이름을 가지고 있는지

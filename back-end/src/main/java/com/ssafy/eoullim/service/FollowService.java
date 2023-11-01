@@ -23,7 +23,7 @@ public class FollowService {
   private final ChildRepository childRepository;
   private final ChildCacheRepository childCacheRepository;
 
-  public void create(Integer childId, Integer friendId) {
+  public void create(Long childId, Long friendId) {
 
     if (childId.equals(friendId))
       throw new IllegalArgumentException("id가 같은 child끼리는 친구 할 수 없음."); // childId와 friendId가 같은 경우
@@ -38,7 +38,7 @@ public class FollowService {
             .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
 
     followRepository
-        .findByChildAndFollowing(child, friend) // 이미 좋아요 누른 친구인 경우
+        .findByChildAndFollowingChild(child, friend) // 이미 좋아요 누른 친구인 경우
         .ifPresent(
             it -> {
               throw new EoullimApplicationException(ErrorCode.DUPLICATED_FRIEND);
@@ -47,7 +47,7 @@ public class FollowService {
     followRepository.save(FollowEntity.of(child, friend));
   }
 
-  public List<Child> getFriends(Integer childId, Long userId) {
+  public List<Child> getFriends(Long childId, Long userId) {
 
     ChildEntity childEntity =
         childRepository

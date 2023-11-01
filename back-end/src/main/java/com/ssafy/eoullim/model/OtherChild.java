@@ -7,7 +7,7 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 public class OtherChild {
-    private Integer id;
+    private Long id;
     private String name;
     private Animon animon;
     public static OtherChild fromEntity(ChildEntity entity) {

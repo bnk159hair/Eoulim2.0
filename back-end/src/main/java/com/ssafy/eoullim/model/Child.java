@@ -15,12 +15,12 @@ import java.util.Date;
 @AllArgsConstructor
 public class Child {
 
-    private Integer id;
+    private Long id;
     private String name;
     private LocalDate birth;
     private String gender;
     private String school;
-    private Integer grade;
+    private Short grade;
     private Status status;
     private Animon animon;
 

@@ -1,37 +1,42 @@
 package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.FollowRequest;
-import com.ssafy.eoullim.dto.response.Response;
+import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.FollowService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Slf4j
-@RestController
-@RequestMapping("/api/v1/friendship")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/follows")
+@RestController
 public class FollowController {
     private final FollowService followService;
 
     @PostMapping
-    public Response<Void> create(@RequestBody FollowRequest request) {
-        followService.create(request.getMyId(), request.getFriendId());
-        return Response.success();
+    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseBody
+    public SuccessResponse<?> create(@Valid @RequestBody FollowRequest request) {
+        followService.create(request.getChildId(), request.getFollowingChildId());
+        return new SuccessResponse<>(HttpStatus.CREATED, null);
     }
 
-    @GetMapping("/{childId}")
-    public Response<List<Child>> getFriendsList(@PathVariable @NotBlank  Integer childId, Authentication authentication) {
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public SuccessResponse<List<Child>> getFriendsList(@Valid @RequestBody FollowRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        List<Child> friendList = followService.getFriends(childId, user.getId());
-        return Response.success(friendList);
+        List<Child> friendList = followService.getFriends(request.getChildId(), user.getId());
+        return new SuccessResponse<>(friendList);
     }
-
 }

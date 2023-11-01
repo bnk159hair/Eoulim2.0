@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 public class Animon {
 
-  private Integer id;
+  private Long id;
   private String headImagePath;
   private String bodyImagePath;
   private String name;

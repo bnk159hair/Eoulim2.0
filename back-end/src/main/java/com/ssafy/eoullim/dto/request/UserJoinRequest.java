@@ -27,7 +27,9 @@ public class UserJoinRequest {
   @Length(min = 3, max = 20)
   String password;
 
-  @NotBlank String name;
+  @NotBlank
+  @Length(max = 17, message = "이름은 17자 이하여야 합니다.")
+  String name;
 
   @NotBlank
 //  @Pattern(regexp = "01[0-9]-[0-9]{4}-[0-9]{4}")

@@ -47,14 +47,14 @@ public class ChildService {
   private String openApiUrl;
 
   @Transactional
-  public Child login(Integer childId) {
+  public Child login(Long childId) {
     final var childEntity = getChildEntity(childId);
     childCacheRepository.setStatus(childId);
     return Child.fromEntity(childEntity);
   }
 
   @Transactional
-  public void logout(Integer childId) {
+  public void logout(Long childId) {
     final var childEntity = getChildEntity(childId);
     childCacheRepository.delete(childId);
   }
@@ -82,7 +82,7 @@ public class ChildService {
   }
 
   @Transactional
-  public void modify(Integer childId, Child child) {
+  public void modify(Long childId, Child child) {
     final var childEntity = getChildEntity(childId);
     childEntity.setName(child.getName());
     childEntity.setBirth(child.getBirth());
@@ -92,7 +92,7 @@ public class ChildService {
   }
 
   @Transactional
-  public void delete(Integer childId, Long userId) {
+  public void delete(Long childId, Long userId) {
     final var childEntity =
         childRepository
             .findByIdAndUserId(childId, userId)
@@ -131,20 +131,20 @@ public class ChildService {
         .collect(Collectors.toList());
   }
 
-  public Child getChild(Integer childId, Long userId) {
+  public Child getChild(Long childId, Long userId) {
     final var childEntity = getChildEntity(childId); // 일단 실제 있는 Child인지 조회
     if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
       throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
     return Child.fromEntity(childEntity);
   }
 
-  public ChildEntity getChildEntity(Integer childId) {
+  public ChildEntity getChildEntity(Long childId) {
     return childRepository
         .findById(childId)
         .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
   }
 
-  public OtherChild getOtherChild(Integer participantId) {
+  public OtherChild getOtherChild(Long participantId) {
     return OtherChild.fromEntity(getChildEntity(participantId));
   }
 

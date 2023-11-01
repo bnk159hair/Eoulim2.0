@@ -11,18 +11,19 @@ import javax.persistence.*;
 @Entity
 @Table(name="animon")
 @NoArgsConstructor
-public class AnimonEntity {
+public class AnimonEntity extends BaseEntity {
     @Id
+    @Column(name = "animon_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String headImagePath;
 
-    @Column(nullable = false)
+    @Column
     private String bodyImagePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
