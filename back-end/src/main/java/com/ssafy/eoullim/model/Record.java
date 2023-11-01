@@ -1,37 +1,29 @@
 package com.ssafy.eoullim.model;
 
-import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.RecordEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
 @AllArgsConstructor
 public class Record {
-    private Integer id;
-    private LocalDateTime createdAt;
-    private String video_path;
+    private Long id;
+    private String videoPath;
     private String name;
     private String school;
     private String animonName;
-    private String guide_seq;
-    private String timeline;
 
     public static Record fromEntity(RecordEntity entity) {
         return new Record(
                 entity.getId(),
-                entity.getCreatedAt(),
                 entity.getVideoPath(),
                 entity.getParticipant().getName(),
                 entity.getParticipant().getSchool(),
-                entity.getParticipant().getAnimon().getName(),
-                entity.getGuideSeq(),
-                entity.getTimeline()
+                entity.getParticipant().getAnimon().getName()
         );
     }
 
