@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter_swiper_plus/flutter_swiper_plus.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class Profiles extends StatelessWidget {
   const Profiles({super.key});
-   @override
+  @override
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -33,7 +32,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
 
   @override
   Widget build(BuildContext context) {
-   return Scaffold(
+    return Scaffold(
       appBar: AppBar(
           elevation: 0,
           backgroundColor: const Color(0xffffffff),
@@ -93,7 +92,6 @@ class _CarouselWidgetState extends State<CarouselWidget> {
               );
             }).toList(),
             options: CarouselOptions(
-
               // Set the height of each carousel item
               height: 350,
 
@@ -125,7 +123,6 @@ class _CarouselWidgetState extends State<CarouselWidget> {
               scrollDirection: Axis.horizontal,
             ),
           ),
-        
         ],
       ),
       floatingActionButton: FloatingActionButton(
