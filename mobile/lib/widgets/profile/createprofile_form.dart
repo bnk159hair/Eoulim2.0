@@ -220,7 +220,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                             child: TextButton(
                               child: Text('확인'),
                               onPressed: (){
-                              ;
+                                 Navigator.of(ctx).pop();
                               }
                             )
                           )
@@ -240,7 +240,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                         actions: [
                           Center(
                             child: TextButton(
-                              child: Text('로그인하러 가기'),
+                              child: Text('프로필 선택창'),
                               onPressed: (){
                                 Navigator.push(
                                   context,
