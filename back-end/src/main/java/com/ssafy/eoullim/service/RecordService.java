@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.service;
 
-import com.ssafy.eoullim.dto.response.Record.RecordListResponse;
-import com.ssafy.eoullim.dto.response.Record.RecordResponse;
+import com.ssafy.eoullim.model.RecordList;
+import com.ssafy.eoullim.model.Record;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.GuideEntity;
@@ -20,14 +20,12 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import com.ssafy.eoullim.model.Record;
 
 @Slf4j
 @Service
@@ -115,12 +113,12 @@ public class RecordService {
         /* JSON Parse 종료 */
     }
 
-    public List<RecordListResponse> getRecordList(Long masterId) {
+    public List<RecordList> getRecordList(Long masterId) {
         return recordQueryRepository.findRecordsByChildId(masterId);
     }
 
-    public RecordResponse getRecord(Long recordId) {
-        RecordResponse result = recordQueryRepository.findRecordById(recordId);
+    public Record getRecord(Long recordId) {
+        Record result = recordQueryRepository.findRecordById(recordId);
         result.setGuideInfo(recordQueryRepository.findGuideInfoById(recordId));
         return result;
     }

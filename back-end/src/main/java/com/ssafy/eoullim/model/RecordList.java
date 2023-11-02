@@ -1,15 +1,14 @@
-package com.ssafy.eoullim.dto.response.Record;
+package com.ssafy.eoullim.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class RecordListResponse {
+public class RecordList {
     private Long id;
     private LocalDateTime createTime;
     private String videoPath;

@@ -2,9 +2,9 @@ package com.ssafy.eoullim.repository.query;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssafy.eoullim.dto.response.Record.GuideDTO;
-import com.ssafy.eoullim.dto.response.Record.RecordListResponse;
-import com.ssafy.eoullim.dto.response.Record.RecordResponse;
+import com.ssafy.eoullim.model.Guide;
+import com.ssafy.eoullim.model.RecordList;
+import com.ssafy.eoullim.model.Record;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,8 +20,8 @@ import java.util.List;
 public class RecordQueryRepository {
     private final JPAQueryFactory queryFactory;
 
-    public List<RecordListResponse> findRecordsByChildId(Long id){
-        return queryFactory.select(Projections.fields(RecordListResponse.class,
+    public List<RecordList> findRecordsByChildId(Long id){
+        return queryFactory.select(Projections.fields(RecordList.class,
                 recordEntity.id, recordEntity.createdAt.as("createTime"), recordEntity.videoPath,
                         recordEntity.participant.name, recordEntity.participant.school, recordEntity.participant.animon.name))
                 .from(recordEntity)
@@ -31,8 +31,8 @@ public class RecordQueryRepository {
                 .fetch();
     }
 
-    public RecordResponse findRecordById(Long id){
-        return queryFactory.select(Projections.fields(RecordResponse.class,
+    public Record findRecordById(Long id){
+        return queryFactory.select(Projections.fields(Record.class,
                         recordEntity.id, recordEntity.createdAt.as("createTime"), recordEntity.videoPath,
                         recordEntity.participant.name, recordEntity.participant.school, recordEntity.participant.animon.name))
                 .from(recordEntity)
@@ -42,8 +42,8 @@ public class RecordQueryRepository {
                 .fetchOne();
     }
 
-    public List<GuideDTO> findGuideInfoById(Long id){
-        return queryFactory.select(Projections.fields(GuideDTO.class,
+    public List<Guide> findGuideInfoById(Long id){
+        return queryFactory.select(Projections.fields(Guide.class,
                 guideEntity.content, recordGuideEntity.timeline
                 ))
                 .from(guideEntity)

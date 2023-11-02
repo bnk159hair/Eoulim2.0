@@ -68,7 +68,7 @@ public class MatchService {
       Room newRoom = new Room();
       matchingQueue.add(newRoom);
 
-      System.out.println("[EMPTY] Session created: " + sessionId);
+      log.info("[EMPTY] SessionId created: " + sessionId);
 
       SessionProperties sessionProperties =
           new SessionProperties.Builder()
@@ -77,10 +77,13 @@ public class MatchService {
               .build();
 
       Session session = openvidu.createSession(sessionProperties);
+      log.info("[EMPTY] SessionId is created: " + sessionId);
 
       String token = session.createConnection(connectionProperties).getToken();
+      log.info("[EMPTY] Token is created - sessionId : " + sessionId);
 
       List<Integer> random = RandomGeneratorUtils.generateRandomNumbers(2, 12, 4);
+      log.info("[EMPTY] randomNum is created - sessionId : " + sessionId);
 
       newRoom.setSessionId(session.getSessionId());
       newRoom.setRandom(random);
@@ -96,7 +99,7 @@ public class MatchService {
       Room existingRoom = matchingQueue.poll();
       sessionId = existingRoom.getSessionId();
       if (mapSessions.get(sessionId) != null) { // 세션이 정상적으로 존재한다면
-        System.out.println("[ALREADY] Session created: " + sessionId);
+        log.info("[ALREADY] Session created: " + sessionId);
         String token = mapSessions.get(sessionId).createConnection(connectionProperties).getToken();
 
         Match result = new Match(sessionId, token, existingRoom.getRandom());

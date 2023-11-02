@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.dto.response.Record;
+package com.ssafy.eoullim.model;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
-public class GuideDTO {
+public class Guide {
     private String content;
     private String timeline;
 }
