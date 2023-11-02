@@ -73,7 +73,7 @@ public class ChildController {
   }
 
   @PutMapping("/{childId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SuccessResponse<?> modify(
           @PathVariable @NotBlank Long childId, @Valid @RequestBody ChildRequest request) {
