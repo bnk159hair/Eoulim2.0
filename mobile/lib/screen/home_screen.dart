@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile/screen/alarm_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:mobile/screen/join_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
@@ -36,7 +37,10 @@ class Home extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const Alarm()));
+            },
             icon: const Icon(
               Icons.notifications,
             ),
