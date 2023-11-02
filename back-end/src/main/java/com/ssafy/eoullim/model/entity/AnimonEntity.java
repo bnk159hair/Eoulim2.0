@@ -1,16 +1,13 @@
 package com.ssafy.eoullim.model.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
 @Entity
 @Table(name="animon")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AnimonEntity extends BaseEntity {
     @Id
     @Column(name = "animon_id", columnDefinition = "INT UNSIGNED")
@@ -20,13 +17,16 @@ public class AnimonEntity extends BaseEntity {
     @Column(nullable = false, length = 20)
     private String name;
 
-    @Column
+    @Column(nullable = false)
     private String headImagePath;
 
-    @Column
+    @Column(nullable = false)
     private String bodyImagePath;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "child_id")
-//    private ChildEntity childEntity;
+    @Builder
+    public AnimonEntity(String name, String headImagePath, String bodyImagePath) {
+        this.name = name;
+        this.headImagePath = headImagePath;
+        this.bodyImagePath = bodyImagePath;
+    }
 }

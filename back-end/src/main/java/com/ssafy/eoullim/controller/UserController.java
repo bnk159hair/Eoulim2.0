@@ -18,12 +18,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
 @Slf4j
-@RequiredArgsConstructor
-@RequestMapping("/api/v1")
 @RestController
+@RequestMapping("/api/v1")
+@RequiredArgsConstructor
 public class UserController {
 
-  private final UserService userService;
+    private final UserService userService;
 
     @PostMapping("/join")
     @ResponseStatus(HttpStatus.CREATED)
@@ -51,7 +51,7 @@ public class UserController {
     @ResponseBody
     public SuccessResponse<?> logout(Authentication authentication) {
         userService.logout(authentication.getName());
-        return new SuccessResponse<>(HttpStatus.NO_CONTENT,"로그아웃 성공!");
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT, "로그아웃 성공!");
     }
 
     @GetMapping("/check-username/{username}")

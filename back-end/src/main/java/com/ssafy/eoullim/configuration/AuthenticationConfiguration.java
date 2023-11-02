@@ -7,32 +7,35 @@ import com.ssafy.eoullim.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
+public class AuthenticationConfiguration {
 
     private final UserService userService;
     private final RedisTemplate<String, Object> blackList;
     @Value("${jwt.secret-key}")
     private String secretKey;
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().regexMatchers("^(?!/api/).*");
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().regexMatchers("^(?!/api/).*");
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
@@ -48,5 +51,6 @@ public class AuthenticationConfiguration extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .and()
                 .addFilterBefore(new JwtTokenFilter(userService, blackList, secretKey), UsernamePasswordAuthenticationFilter.class);
+        return http.build();
     }
 }

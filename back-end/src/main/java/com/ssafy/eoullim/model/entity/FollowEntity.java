@@ -1,18 +1,13 @@
 package com.ssafy.eoullim.model.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name="follow")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FollowEntity extends BaseEntity{
     @Id
     @Column(name = "follow_id", columnDefinition = "INT UNSIGNED")
@@ -27,10 +22,16 @@ public class FollowEntity extends BaseEntity{
     @JoinColumn(name = "following_child_id", nullable = false)
     private ChildEntity followingChild;
 
-    public static FollowEntity of(ChildEntity child, ChildEntity friend) {
-        FollowEntity followEntity = new FollowEntity();
-        followEntity.setChild(child);
-        followEntity.setFollowingChild(friend);
-        return followEntity;
+    @Builder
+    public FollowEntity(ChildEntity child, ChildEntity followingChild) {
+        this.child = child;
+        this.followingChild = followingChild;
+    }
+
+    public static FollowEntity of(ChildEntity child, ChildEntity followingChild) {
+        return FollowEntity.builder()
+                .child(child)
+                .followingChild(followingChild)
+                .build();
     }
 }

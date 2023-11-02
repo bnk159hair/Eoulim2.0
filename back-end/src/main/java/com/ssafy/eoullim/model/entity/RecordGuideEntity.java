@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.model.entity;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,10 @@ import javax.persistence.*;
 @Getter
 @Entity
 @Table(name="record_guide")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RecordGuideEntity {
-
     @Id
-    @Column(name = "record_guide_id")
+    @Column(name = "record_guide_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -32,8 +32,7 @@ public class RecordGuideEntity {
     private String timeline;
 
     @Builder
-    public RecordGuideEntity(Long id, RecordEntity record, GuideEntity guide, Integer sequence, String timeline) {
-        this.id = id;
+    public RecordGuideEntity(RecordEntity record, GuideEntity guide, Integer sequence, String timeline) {
         this.record = record;
         this.guide = guide;
         this.sequence = sequence;

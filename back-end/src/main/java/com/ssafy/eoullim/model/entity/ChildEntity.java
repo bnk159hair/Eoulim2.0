@@ -2,19 +2,16 @@ package com.ssafy.eoullim.model.entity;
 
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.Status;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Setter
 @Getter
-@NoArgsConstructor
 @Entity
 @Table(name = "child")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChildEntity extends BaseEntity {
     @Id
     @Column(name = "child_id", columnDefinition = "INT UNSIGNED")
@@ -25,7 +22,6 @@ public class ChildEntity extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
-//    @Temporal(TemporalType.DATE)
     private LocalDate birth;
 
     @Column(columnDefinition = "CHAR(1)", nullable = false)
@@ -49,14 +45,39 @@ public class ChildEntity extends BaseEntity {
     @JoinColumn(name = "animon_id")
     private AnimonEntity animon;
 
+    @Builder
+    public ChildEntity(String name, LocalDate birth, String gender, String school, Short grade, Status status, UserEntity user, AnimonEntity animon) {
+        this.name = name;
+        this.birth = birth;
+        this.gender = gender;
+        this.school = school;
+        this.grade = grade;
+        this.status = status;
+        this.user = user;
+        this.animon = animon;
+    }
+
     public static ChildEntity of(UserEntity user, Child child) {
-        ChildEntity entity = new ChildEntity();
-        entity.setName(child.getName());
-        entity.setBirth(child.getBirth());
-        entity.setGender(child.getGender());
-        entity.setSchool(child.getSchool());
-        entity.setGrade(child.getGrade());
-        entity.setUser(user);
-        return entity;
+        return ChildEntity.builder()
+                .name(child.getName())
+                .birth(child.getBirth())
+                .gender(child.getGender())
+                .school(child.getSchool())
+                .grade(child.getGrade())
+                .status(child.getStatus())
+                .user(user)
+                .build();
+    }
+    public void setAnimon(AnimonEntity animon) {
+        this.animon = animon;
+    }
+
+    public void modify(Child child) {
+        this.name = child.getName();
+        this.birth = child.getBirth();
+        this.gender = child.getGender();
+        this.school = child.getSchool();
+        this.grade = child.getGrade();
+        this.status = child.getStatus();
     }
 }

@@ -6,11 +6,10 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "user")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserEntity extends BaseEntity {
     @Id
     @Column(name = "user_id", columnDefinition = "INT UNSIGNED")
@@ -33,8 +32,7 @@ public class UserEntity extends BaseEntity {
     private UserRole role = UserRole.USER;
 
     @Builder
-    private UserEntity(Long id, String username, String password, String name, String phoneNumber, UserRole role) {
-        this.id = id;
+    private UserEntity(String username, String password, String name, String phoneNumber, UserRole role) {
         this.username = username;
         this.password = password;
         this.name = name;
@@ -44,7 +42,6 @@ public class UserEntity extends BaseEntity {
 
     public static UserEntity of(User user) {
         return UserEntity.builder()
-                .id(user.getId())
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .username(user.getUsername())
