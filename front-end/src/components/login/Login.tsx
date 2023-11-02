@@ -30,7 +30,7 @@ const Login = () => {
     }
 
     axios
-      .post(`${API_BASE_URL}/login`, { username, password })
+      .post(`${API_BASE_URL}/users/login`, { username, password })
       .then(response => {
         console.log(response);
         setToken(response.data.data);

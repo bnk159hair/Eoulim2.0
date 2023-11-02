@@ -83,7 +83,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
     event.preventDefault();
     axios
       .post(
-        `${API_BASE_URL}/users/pw-check`,
+        `${API_BASE_URL}/users/check-password`,
         { password },
         {
           headers: {

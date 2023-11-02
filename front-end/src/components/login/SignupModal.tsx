@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { API_BASE_URL } from '../../apis/urls';
+import { TextField, IconButton, Button } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Swal from 'sweetalert2';
 import {
   ModalOverlay,
   ModalContent,
@@ -8,10 +11,7 @@ import {
   ModalFormContainer,
   IdContainer,
 } from './SignupModalStyles';
-import { TextField, IconButton, Button } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Swal from 'sweetalert2';
+import { API_BASE_URL } from '../../apis/urls';
 
 const theme = createTheme({
   palette: {
@@ -25,7 +25,7 @@ interface SignupModalProps {
   onClose: () => void;
 }
 
-const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
+const SignupModal = ({ onClose }: SignupModalProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -34,7 +34,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
   const [isIdUnique, setIsIdUnique] = useState(false);
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const phoneNumberPattern = /^010\d{8}$/;
-  const namePattern = /^[가-힣]{2,4}$/;
+  const namePattern = /^[가-힣]{2,17}$/;
 
   const handleSignUp = async (event: any) => {
     event.preventDefault();
@@ -93,10 +93,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
 
     try {
       const signUpData = { username, password, name, phoneNumber };
-      const response = await axios.post(
-        `${API_BASE_URL}/join`,
-        signUpData
-      );
+      const response = await axios.post(`${API_BASE_URL}/users/join`, signUpData);
       Swal.fire({
         text: '회원 가입에 성공했습니다!',
         icon: 'success',
@@ -121,8 +118,8 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
     }
 
     try {
-      const response = await axios.get(`${API_BASE_URL}/check-username/${username}`);
-      setIsIdUnique(response.data.resultCode);
+      const response = await axios.get(`${API_BASE_URL}/users/check-username/${username}`);
+      setIsIdUnique(response.data.data);
       console.log('아이디 중복 확인 결과:', response);
       if (response.data.data) {
         Swal.fire({
@@ -147,9 +144,7 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
     }
   };
 
-  const handlePasswordConfirmation = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handlePasswordConfirmation = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
     const newValue = event.target.value;
     setPasswordConfirmation(newValue);
@@ -161,17 +156,17 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
       <ModalContent>
         <ThemeProvider theme={theme}>
           <ModalHeaderContainer>
-            <h2>회원가입</h2>
+            <h2>{'회원가입'}</h2>
             <IconButton onClick={onClose}>
-              <CloseIcon fontSize='large' />
+              <CloseIcon fontSize={'large'} />
             </IconButton>
           </ModalHeaderContainer>
           <ModalFormContainer>
             <IdContainer>
               <TextField
-                label='아이디'
-                variant='outlined'
-                margin='dense'
+                label={'아이디'}
+                variant={'outlined'}
+                margin={'dense'}
                 value={username}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                   setUsername(event.target.value)
@@ -181,28 +176,29 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
                 disabled={isIdUnique && true}
               />
               <Button
-                variant='contained'
-                size='large'
+                variant={'contained'}
+                size={'large'}
                 sx={{ padding: '0.8rem', marginLeft: 'auto', fontSize: '16px' }}
-                onClick={handleIdCheck}>
-                중복확인
+                onClick={handleIdCheck}
+              >
+                {'중복확인'}
               </Button>
             </IdContainer>
             <TextField
-              label='비밀번호'
-              variant='outlined'
-              margin='dense'
-              type='password'
+              label={'비밀번호'}
+              variant={'outlined'}
+              margin={'dense'}
+              type={'password'}
               value={password}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setPassword(event.target.value)
               }
             />
             <TextField
-              label='비밀번호 확인'
-              variant='outlined'
-              margin='dense'
-              type='password'
+              label={'비밀번호 확인'}
+              variant={'outlined'}
+              margin={'dense'}
+              type={'password'}
               value={passwordConfirmation}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 handlePasswordConfirmation(event)
@@ -211,32 +207,31 @@ const SignupModal: React.FC<SignupModalProps> = ({ onClose }) => {
               helperText={!isPasswordMatch && '비밀번호가 일치하지 않습니다.'}
             />
             <TextField
-              label='이름'
-              variant='outlined'
-              margin='dense'
+              label={'이름'}
+              variant={'outlined'}
+              margin={'dense'}
               value={name}
-              placeholder='홍길동'
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                setName(event.target.value)
-              }
+              placeholder={'홍길동'}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value)}
             />
             <TextField
-              label='전화번호'
-              variant='outlined'
-              margin='dense'
+              label={'전화번호'}
+              variant={'outlined'}
+              margin={'dense'}
               value={phoneNumber}
-              placeholder='01012345678'
+              placeholder={'01012345678'}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setPhoneNumber(event.target.value)
               }
-              helperText="'-'없이 입력해주세요."
+              helperText={"'-'없이 입력해주세요."}
             />
             <Button
-              variant='contained'
-              size='large'
+              variant={'contained'}
+              size={'large'}
               sx={{ padding: '0.6rem', marginTop: '1rem', fontSize: '20px' }}
-              onClick={handleSignUp}>
-              가입완료
+              onClick={handleSignUp}
+            >
+              {'가입완료'}
             </Button>
           </ModalFormContainer>
         </ThemeProvider>
