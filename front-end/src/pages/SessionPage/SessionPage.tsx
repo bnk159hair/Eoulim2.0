@@ -258,8 +258,8 @@ const SessionPage = () => {
 
   useEffect(() => {
     // @ts-ignore
-    const getTokenFromApp = (message: Message) => {
-      if (message.token != 'null') {
+    window.getTokenFromApp = (message: Message) => {
+      if (message.token !== 'null') {
         setUserToken(message.token);
       }
     };
