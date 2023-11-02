@@ -77,8 +77,8 @@ public class ChildController {
   @ResponseBody
   public SuccessResponse<?> modify(
           @PathVariable @NotBlank Long childId, @Valid @RequestBody ChildRequest request) {
-    childService.modify(childId, Child.of(request));
-    return new SuccessResponse<>(null);
+    Child updatedChild = childService.modify(childId, Child.of(request));
+    return new SuccessResponse<>(updatedChild);
   }
 
   @DeleteMapping("/{childId}")

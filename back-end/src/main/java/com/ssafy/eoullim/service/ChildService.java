@@ -89,9 +89,10 @@ public class ChildService {
     }
 
     @Transactional
-    public void modify(Long childId, Child child) {
+    public Child modify(Long childId, Child child) {
         final var childEntity = getChildEntity(childId);
         childEntity.modify(child);
+        return Child.fromEntity(childEntity);
     }
 
     @Transactional
