@@ -1,5 +1,7 @@
 package com.ssafy.eoullim.service;
 
+import com.ssafy.eoullim.dto.response.Record.RecordListResponse;
+import com.ssafy.eoullim.dto.response.Record.RecordResponse;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.GuideEntity;
@@ -9,6 +11,7 @@ import com.ssafy.eoullim.repository.ChildRepository;
 import com.ssafy.eoullim.repository.jpa.GuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordGuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordRepository;
+import com.ssafy.eoullim.repository.query.RecordQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -35,6 +38,8 @@ public class RecordService {
     private final GuideRepository guideRepository;
     private final RecordGuideRepository recordGuideRepository;
     private final ChildRepository childRepository;
+
+    private final RecordQueryRepository recordQueryRepository;
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -110,8 +115,13 @@ public class RecordService {
         /* JSON Parse 종료 */
     }
 
-    public List<Record> getRecordList(Long masterId) {
-        return recordRepository.findRecordEntitiesByMasterId(Integer.parseInt("3"))
-                .stream().map(Record::fromEntity).collect(Collectors.toList());
+    public List<RecordListResponse> getRecordList(Long masterId) {
+        return recordQueryRepository.findRecordsByChildId(masterId);
+    }
+
+    public RecordResponse getRecord(Long recordId) {
+        RecordResponse result = recordQueryRepository.findRecordById(recordId);
+        result.setGuideInfo(recordQueryRepository.findGuideInfoById(recordId));
+        return result;
     }
 }

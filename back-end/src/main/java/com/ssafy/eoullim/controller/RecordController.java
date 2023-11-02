@@ -1,5 +1,7 @@
 package com.ssafy.eoullim.controller;
 
+import com.ssafy.eoullim.dto.response.Record.RecordListResponse;
+import com.ssafy.eoullim.dto.response.Record.RecordResponse;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.service.RecordService;
 import io.openvidu.java.client.OpenViduHttpException;
@@ -24,8 +26,14 @@ public class RecordController {
     private final RecordService recordService;
 
     @GetMapping("/{childId}")
-    public ResponseEntity<SuccessResponse<List<Record>>> getRecordList(@NotBlank @PathVariable Long childId) {
-        List<Record> recordList = recordService.getRecordList(childId);
+    public ResponseEntity<SuccessResponse<List<RecordListResponse>>> getRecordList(@NotBlank @PathVariable Long childId) {
+        List<RecordListResponse> recordList = recordService.getRecordList(childId);
         return ResponseEntity.ok(new SuccessResponse<>(recordList));
+    }
+
+    @GetMapping("/list/{recordId}")
+    public ResponseEntity<SuccessResponse<RecordResponse>> getRecordInfo(@NotBlank @PathVariable Long recordId) {
+        RecordResponse result = recordService.getRecord(recordId);
+        return ResponseEntity.ok(new SuccessResponse<>(result));
     }
 }
