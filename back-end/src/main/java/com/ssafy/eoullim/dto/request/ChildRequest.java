@@ -15,7 +15,7 @@ import javax.validation.constraints.Pattern;
 public class ChildRequest {
   // 자녀 정보
   @NotBlank
-  @Length(max = 17, message = "이름은 17자 이하여야 합니다.")
+  @Pattern(regexp = "^[가-힣]{2,17}$", message = "이름은 17자 이하의 한글 문자여야 합니다.")
   private String name; // front 단에서 비동기 처리
 
   @NotBlank

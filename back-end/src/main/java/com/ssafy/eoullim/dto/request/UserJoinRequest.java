@@ -28,7 +28,7 @@ public class UserJoinRequest {
   String password;
 
   @NotBlank
-  @Length(max = 17, message = "이름은 17자 이하여야 합니다.")
+  @Pattern(regexp = "^[가-힣]{2,17}$", message = "이름은 17자 이하의 한글 문자여야 합니다.")
   String name;
 
   @NotBlank
