@@ -7,8 +7,8 @@ import com.ssafy.eoullim.model.Status;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.FollowEntity;
 import com.ssafy.eoullim.repository.ChildCacheRepository;
-import com.ssafy.eoullim.repository.ChildRepository;
-import com.ssafy.eoullim.repository.FollowRepository;
+import com.ssafy.eoullim.repository.jpa.ChildRepository;
+import com.ssafy.eoullim.repository.jpa.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

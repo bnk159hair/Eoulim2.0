@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.service;
 
 import com.google.auth.oauth2.GoogleCredentials;
-import com.ssafy.eoullim.repository.FcmTokenRepository;
+import com.ssafy.eoullim.repository.jpa.FcmTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;

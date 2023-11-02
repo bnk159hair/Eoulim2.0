@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.repository;
+package com.ssafy.eoullim.repository.jpa;
 
 import com.ssafy.eoullim.model.entity.AnimonEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

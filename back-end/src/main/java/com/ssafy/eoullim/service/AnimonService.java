@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.service;
 
 import com.ssafy.eoullim.model.Animon;
-import com.ssafy.eoullim.repository.AnimonRepository;
+import com.ssafy.eoullim.repository.jpa.AnimonRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

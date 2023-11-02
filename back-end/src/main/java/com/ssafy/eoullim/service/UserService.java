@@ -6,7 +6,7 @@ import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.model.UserRole;
 import com.ssafy.eoullim.model.entity.UserEntity;
 import com.ssafy.eoullim.repository.UserCacheRepository;
-import com.ssafy.eoullim.repository.UserRepository;
+import com.ssafy.eoullim.repository.jpa.UserRepository;
 import com.ssafy.eoullim.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

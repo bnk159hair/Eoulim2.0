@@ -7,7 +7,7 @@ import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.GuideEntity;
 import com.ssafy.eoullim.model.entity.RecordEntity;
 import com.ssafy.eoullim.model.entity.RecordGuideEntity;
-import com.ssafy.eoullim.repository.ChildRepository;
+import com.ssafy.eoullim.repository.jpa.ChildRepository;
 import com.ssafy.eoullim.repository.jpa.GuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordGuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordRepository;

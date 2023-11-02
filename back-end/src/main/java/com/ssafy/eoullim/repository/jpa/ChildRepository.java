@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.repository;
+package com.ssafy.eoullim.repository.jpa;
 
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.entity.AnimonEntity;
