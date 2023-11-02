@@ -4,14 +4,14 @@ import 'package:mobile/model/request_models/put_signup.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/login_screen.dart';
 
-class SginupFrom extends StatefulWidget {
-  const SginupFrom({super.key});
+class SginupForm extends StatefulWidget {
+  const SginupForm({super.key});
 
   @override
-  State<SginupFrom> createState() => _SginupFromState();
+  State<SginupForm> createState() => _SginupFromState();
 }
 
-class _SginupFromState extends State<SginupFrom> {
+class _SginupFromState extends State<SginupForm> {
   final SignupFormKey = GlobalKey<FormState>();
 
   String id = '';
@@ -188,7 +188,7 @@ class _SginupFromState extends State<SginupFrom> {
                 else {
                   SignupFormKey.currentState?.save();
                   signupAuth = await apiSignup.signup(SignupRequestModel(id: id, password: pw, name: name, phoneNumber: phonenumber));
-                  if (signupAuth?.status == 'OK') {
+                  if (signupAuth?.status == 'CREATED') {
                     showDialog(context: context,
                      barrierDismissible: false,
                      builder: (BuildContext ctx){

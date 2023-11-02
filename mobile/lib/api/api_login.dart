@@ -18,11 +18,11 @@ class ApiLogin {
       loginPost loginInfo = loginPost.fromJson(json.decode(response.body));
       print(loginPost.fromJson(json.decode(response.body)));
       final storage = new FlutterSecureStorage();
-      await storage.write(key: 'Authkey', value: loginInfo.content);
+      await storage.write(key: 'Authkey', value: loginInfo.data);
       print("++++++++++++++++++++++++++++++++++++++++");
-      print(loginInfo.content);
+      print(loginInfo.data);
       String? authKey = await storage.read(key: 'Authkey');
       print("${authKey}");
-      return generalResponse(loginInfo.status, loginInfo.message);
+      return generalResponse(loginInfo.code, loginInfo.status);
   }
 }

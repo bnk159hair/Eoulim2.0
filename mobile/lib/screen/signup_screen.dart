@@ -33,7 +33,7 @@ class _SignupState extends State<Signup> {
                 ),
               ),
               Center(
-                child: SginupFrom(), // Center the SignupForm
+                child: SginupForm(), // Center the SignupForm
               ),
             ],
           ),
