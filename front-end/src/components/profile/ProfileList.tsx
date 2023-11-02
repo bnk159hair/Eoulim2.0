@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRecoilValue } from 'recoil';
+import { useNavigate } from 'react-router-dom';
 import ProfileListItem from './ProfileListItem';
 import { ProfileCreateBox, ProfileListBox } from './ProfileListStyles';
 import CreateModal from './CreateModal';
 import { tokenState } from '../../atoms/Auth';
-import { useRecoilValue } from 'recoil';
 import { API_BASE_URL } from '../../apis/urls';
-import { useNavigate } from 'react-router-dom';
 
 interface Profile {
   id: number;
@@ -31,7 +31,6 @@ const ProfileList = () => {
     } else {
       resetList();
     }
-    
   }, []);
 
   const handleModalOpen = () => {
@@ -49,37 +48,35 @@ const ProfileList = () => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {
-        const data = response.data.data;
+      .then(response => {
+        const { data } = response.data;
         setProfiles(data); // profiles 상태 업데이트
         console.log(data);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response && error.response.status === 401) {
           navigate('/login');
         } else {
           console.error('데이터 가져오기 오류:', error);
         }
-        
       });
   };
 
   return (
     <ProfileListBox>
-      {profiles.map((profile) => (
+      {profiles.map(profile => (
         <ProfileListItem
           key={profile.id}
           childId={profile.id}
           name={profile.name}
           resetList={resetList}
-          imgurl={profile.animon.name}
+          // imgurl={profile.animon.name}
+          imgurl={'dog'}
         />
       ))}
 
       {profiles.length < 3 && <ProfileCreateBox onClick={handleModalOpen} />}
-      {isModalOpen && (
-        <CreateModal onClose={handleModalClose} resetList={resetList} />
-      )}
+      {isModalOpen && <CreateModal onClose={handleModalClose} resetList={resetList} />}
     </ProfileListBox>
   );
 };

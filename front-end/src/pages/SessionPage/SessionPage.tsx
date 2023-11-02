@@ -51,12 +51,17 @@ interface FriendsProfile {
   animon: { id: number; imagePath: string; name: string };
 }
 
+interface Message {
+  token: string;
+}
+
 const SessionPage = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
+  const [userToken, setUserToken] = useRecoilState(tokenState);
   const [publisherId, setPublisherId] = useRecoilState(PublisherId);
   const [subscriberId, setSubscriberId] = useRecoilState(SubscriberId);
   const [publisherVideoStatus, setPublisherVideoStatus] = useRecoilState(PublisherVideoStatus);
@@ -68,7 +73,6 @@ const SessionPage = () => {
 
   const [clickEnabled, setClickEnabled] = useState(false);
   const profileId = useRecoilValue(Profilekey);
-  const userToken = useRecoilValue(tokenState);
   const profile = useRecoilValue(Profile);
   const [subscriberName, setSubscriberName] = useState('');
   const isAnimonLoaded = useRecoilValue(IsAnimonLoaded);
@@ -249,6 +253,15 @@ const SessionPage = () => {
     }, 30000);
     return () => {
       clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    // @ts-ignore
+    const getTokenFromApp = (message: Message) => {
+      if (message.token != 'null') {
+        setUserToken(message.token);
+      }
     };
   }, []);
 

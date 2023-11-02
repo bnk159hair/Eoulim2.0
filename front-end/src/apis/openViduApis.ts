@@ -20,7 +20,7 @@ export const getUserInfo = async (userId: string, userToken: string) => {
 
     console.log('유저 정보 가져오기 성공!');
     console.log(response);
-    return response.data.result;
+    return response.data.data;
   } catch (error) {
     console.log('유저 정보 가져오기 실패ㅠ');
     console.log(error);
@@ -42,7 +42,7 @@ export const getToken = async (userInfo: User, userToken: string) => {
 
     console.log('토큰 가져오기 성공!');
     console.log(response);
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.log('토큰 가져오기 실패ㅠ');
     console.log(error);

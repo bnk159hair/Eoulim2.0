@@ -26,7 +26,8 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const profileId = useRecoilValue(Profilekey);
   const token = useRecoilValue(tokenState);
-  const [profile, setProfile] = useRecoilState(Profile);
+  // const [profile, setProfile] = useRecoilState(Profile);
+  const [_, setProfile] = useRecoilState(Profile);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
@@ -161,7 +162,8 @@ const MainPage: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
-  const IMGURL = `/${profile.animon.name}.png`;
+  // const IMGURL = `/${profile.animon.name}.png`;
+  const IMGURL = `/dog.png`;
 
   const audioObjRef = useRef(new Audio('/mainguide.mp3'));
 
