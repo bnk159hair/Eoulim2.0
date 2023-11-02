@@ -18,7 +18,10 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
-
+springfox:
+  documentation:
+    swagger:
+      use-model-v3=false:
 jwt:
   secret-key: ssafy_9th_gwanju_c207_eoullim_secret_key
   token.expired-time-ms: 3600000
