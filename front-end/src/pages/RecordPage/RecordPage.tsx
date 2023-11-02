@@ -1,15 +1,10 @@
-import { useState, useEffect } from 'react';
-import RecordListItem from '../../components/record/RecordListItem';
-import {
-  RecordPageContainer,
-  EmptyRecord,
-  Scroll,
-  BackIcon,
-} from './RecordPageStyles';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { tokenState } from '../../atoms/Auth';
 import { useRecoilValue } from 'recoil';
+import RecordListItem from '../../components/record/RecordListItem';
+import { RecordPageContainer, EmptyRecord, Scroll, BackIcon } from './RecordPageStyles';
+import { tokenState } from '../../atoms/Auth';
 import { Profilekey } from '../../atoms/Profile';
 import { API_BASE_URL } from '../../apis/urls';
 
@@ -45,13 +40,13 @@ const RecordPage = () => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {
-        const data = response.data;
+      .then(response => {
+        const { data } = response;
         console.log(response);
         setRecords(data);
         console.log('녹화영상 불러오기');
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response && error.response.status === 401) {
           navigate('/login');
         } else {
@@ -69,7 +64,7 @@ const RecordPage = () => {
       <BackIcon onClick={getBack} />
       {records.length > 0 ? (
         <Scroll>
-          {records.map((record) => (
+          {records.map(record => (
             <RecordListItem
               key={record.record_id}
               name={record.name}

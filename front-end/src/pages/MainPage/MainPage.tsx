@@ -1,4 +1,7 @@
-import React, { useEffect,useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import axios from 'axios';
 import {
   MainPageContainer,
   ProfileImg,
@@ -13,12 +16,9 @@ import {
   HoberLeft,
   HoberRight,
 } from './MainPageStyles';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import AnimonModal from '../../components/main/AnimonModal';
-import axios from 'axios';
 import { API_BASE_URL } from '../../apis/urls';
 import AlarmModal from '../../components/main/AlarmModal';
 
@@ -26,15 +26,14 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const profileId = useRecoilValue(Profilekey);
   const token = useRecoilValue(tokenState);
-  const [profile, setProfile] = useRecoilState(Profile);
+  // const [profile, setProfile] = useRecoilState(Profile);
+  const [_, setProfile] = useRecoilState(Profile);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
-  const [userName,setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
 
   useEffect(() => {
-    const source = new EventSource(
-      `${API_BASE_URL}/alarms/subscribe/${profileId}`
-    );
+    const source = new EventSource(`${API_BASE_URL}/alarms/subscribe/${profileId}`);
     setEventSource(source);
     console.log(source, eventSource);
     return () => {
@@ -59,14 +58,14 @@ const MainPage: React.FC = () => {
     if (eventSource) {
       const eventListener = (event: any) => {
         if (event.data === 'connect completed') {
-          console.log('SSE와 연결')
+          console.log('SSE와 연결');
         } else if (event) {
-          console.log(event)
-          const message = JSON.parse(event.data)
-          console.log(message.sessionId)
-          setSessionId(message.sessionId)
-          setUserName(message.userName)
-          setAlarmOpen(true)
+          console.log(event);
+          const message = JSON.parse(event.data);
+          console.log(message.sessionId);
+          setSessionId(message.sessionId);
+          setUserName(message.userName);
+          setAlarmOpen(true);
         }
       };
       eventSource.addEventListener('sse', eventListener);
@@ -76,7 +75,7 @@ const MainPage: React.FC = () => {
       };
     }
   });
-  
+
   const profileLogin = () => {
     axios
       .post(
@@ -86,13 +85,13 @@ const MainPage: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
-      .then((response) => {
-        console.log("프로필로그인");
+      .then(() => {
+        console.log('프로필로그인');
       })
-      .catch((error) => {
-        console.log("프로필 로그인 오류", error);
+      .catch(error => {
+        console.log('프로필 로그인 오류', error);
       });
   };
 
@@ -109,7 +108,6 @@ const MainPage: React.FC = () => {
     profileLogout();
     navigate('/profile');
   };
-  
 
   const getprofilelist = () => {
     axios
@@ -118,11 +116,11 @@ const MainPage: React.FC = () => {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((response) => {
+      .then(response => {
         console.log(response);
         setProfile(response.data.result);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response && error.response.status === 401) {
           navigate('/login');
         } else {
@@ -140,12 +138,12 @@ const MainPage: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       )
       .then(() => {
         console.log('프로필로그아웃');
       })
-      .catch((error) => {
+      .catch(error => {
         console.log('프로필 로그아웃 오류', error);
       });
   };
@@ -160,14 +158,14 @@ const MainPage: React.FC = () => {
 
   const closeAlarm = () => {
     setAlarmOpen(false);
-  }
+  };
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
-  const IMGURL = `/${profile.animon.name}.png`;
+  // const IMGURL = `/${profile.animon.name}.png`;
+  const IMGURL = `/dog.png`;
 
   const audioObjRef = useRef(new Audio('/mainguide.mp3'));
-  
 
   const playAudio = () => {
     const audioObj = audioObjRef.current;
@@ -186,26 +184,18 @@ const MainPage: React.FC = () => {
     <MainPageContainer>
       <MarginContainer>
         <BackIcon onClick={getBack} />
-        <ProfileImg
-          style={{ backgroundImage: `url(${IMGURL})` }}
-          onClick={openModal}
-        />
+        <ProfileImg style={{ backgroundImage: `url(${IMGURL})` }} onClick={openModal} />
       </MarginContainer>
       <ChaterLocation>
-        {isModalOpen && (
-          <AnimonModal onClose={closeModal} profile={getprofilelist} />
-        )}
+        {isModalOpen && <AnimonModal onClose={closeModal} profile={getprofilelist} />}
         {isAlarmOpen && (
-          <AlarmModal onClose={closeAlarm} sessionId={sessionId} userName={userName}/>
+          <AlarmModal onClose={closeAlarm} sessionId={sessionId} userName={userName} />
         )}
         <HoberLeft onClick={getNewFriend}>
           <NewFriend />
           <NewFirendsignpost />
         </HoberLeft>
-        <MainCharacter
-          style={{ backgroundImage: `url(${IMGURL})` }}
-          onClick={playAudio}
-        />
+        <MainCharacter style={{ backgroundImage: `url(${IMGURL})` }} onClick={playAudio} />
         <HoberRight onClick={handleFriendsClick}>
           <MyFirendsignpost />
           <MyFriend />

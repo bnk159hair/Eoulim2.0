@@ -1,10 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ModalOverlay, ModalContent, Accept,Refuse,FlexContent,AlarmMessage } from './AlarmModalStyles';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { Client } from '@stomp/stompjs';
+import {
+  ModalOverlay,
+  ModalContent,
+  Accept,
+  Refuse,
+  FlexContent,
+  AlarmMessage,
+} from './AlarmModalStyles';
 import { Profilekey } from '../../atoms/Profile';
 import { invitationSessionId } from '../../atoms/Ivitation';
-import { Client } from '@stomp/stompjs';
 import { WebSocketApis } from '../../apis/webSocketApis';
 import { WS_BASE_URL } from '../../apis/urls';
 
@@ -14,10 +21,10 @@ interface AlarmModalProps {
   onClose: () => void;
 }
 
-const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose,userName }) => {
+const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose, userName }) => {
   const navigate = useNavigate();
 
-  const [invitationId, setInvitationId] = useRecoilState(invitationSessionId);
+  const [, setInvitationId] = useRecoilState(invitationSessionId);
   const profileId = useRecoilValue(Profilekey);
 
   const [connected, setConnected] = useState<boolean>(false);
@@ -28,34 +35,31 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose,userName }) 
       connectHeaders: WebSocketApis.getInstance().header,
       brokerURL: WS_BASE_URL,
       reconnectDelay: 5000,
-      debug: (str) => console.log(str),
+      debug: str => console.log(str),
     });
-    console.log(client)
+    console.log(client);
     client.onConnect = () => {
       console.log('WebSocket 연결됨');
       setConnected(true);
       setStompClient(client);
-  
-      client.subscribe(
-        `/topic/${sessionId}/leave-session`,
-        (response) => {
-          const message = JSON.parse(response.body);
-          console.log(message);
-        }
-      );
-    }
-  
+
+      client.subscribe(`/topic/${sessionId}/leave-session`, response => {
+        const message = JSON.parse(response.body);
+        console.log(message);
+      });
+    };
+
     client.onDisconnect = () => {
       console.log('WebSocket 연결 닫힘');
       setConnected(false);
       setStompClient(null);
     };
-  
+
     client.activate();
     return () => {
       client.deactivate();
     };
-  }, [])
+  }, []);
 
   const acceptInvitation = () => {
     setInvitationId(sessionId);
@@ -77,22 +81,21 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose,userName }) 
       stompClient.deactivate();
     }
     onClose();
-  }
+  };
 
   return (
-    <>
-      <ModalOverlay onClick={onClose}>
+    <ModalOverlay onClick={onClose}>
       <ModalContent>
         <AlarmMessage>
-        {userName}님이 초대를 보내셨습니다
+          {userName}
+          {'님이 초대를 보내셨습니다'}
         </AlarmMessage>
         <FlexContent>
-          <Accept onClick={acceptInvitation}/>
-          <Refuse onClick={refuseInvitaion}/>
+          <Accept onClick={acceptInvitation} />
+          <Refuse onClick={refuseInvitaion} />
         </FlexContent>
       </ModalContent>
-      </ModalOverlay>
-    </>
+    </ModalOverlay>
   );
 };
 

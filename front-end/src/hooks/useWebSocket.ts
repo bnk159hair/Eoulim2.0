@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from 'react';
-import { Client, Frame, StompConfig } from '@stomp/stompjs';
+import { useEffect, useState } from 'react';
+import { Client } from '@stomp/stompjs';
 import { WS_BASE_URL } from '../apis/urls';
 
-interface Param {
-  onConnect: (frame: Frame, client: Client) => void;
-  reconnectDelay?: number;
-}
+// interface Param {
+//   onConnect: (frame: Frame, client: Client) => void;
+//   reconnectDelay?: number;
+// }
 
-export const useWebSocket = (param: Param) => {
+export const useWebSocket = () => {
   const [connected, setConnected] = useState<boolean>(false);
   const [stompClient, setStompClient] = useState<Client | null>(null);
 
@@ -16,7 +16,7 @@ export const useWebSocket = (param: Param) => {
     const client = new Client({
       brokerURL: WS_BASE_URL,
       reconnectDelay: 5000,
-      debug: (str) => console.log(str),
+      debug: str => console.log(str),
     });
 
     client.onConnect = () => {

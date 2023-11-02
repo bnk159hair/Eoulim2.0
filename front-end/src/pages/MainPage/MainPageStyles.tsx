@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import mainBackground from '../../assets/background/main.gif'; // 이미지를 import 해옵니다.
-import profileimg from '../../assets/ecc/profile.png';
 import back from '../../assets/ecc/back.png';
 import bear from '../../assets/animon/bear.png';
 import fox from '../../assets/animon/fox.png';
@@ -58,11 +57,13 @@ export const BackIcon = styled.div`
     transform: scale(1.1);
   }
 `;
+
 export const ChaterLocation = styled.div`
   display: flex;
   height: 1000px;
   justify-content: space-between;
 `;
+
 export const NewFriend = styled.div`
   width: 30%;
   height: 30%;
@@ -71,6 +72,7 @@ export const NewFriend = styled.div`
   margin-left: 15%;
   margin-top: 15%;
 `;
+
 export const NewFirendsignpost = styled.div`
   width: 25%;
   height: 25%;
@@ -80,6 +82,7 @@ export const NewFirendsignpost = styled.div`
   margin-top: 45%;
   transform: rotate(15deg);
 `;
+
 export const MyFriend = styled.div`
   width: 30%;
   height: 30%;
@@ -100,6 +103,7 @@ export const MyFirendsignpost = styled.div`
   background-size: cover;
   transform: rotate(347deg);
 `;
+
 export const HoberLeft = styled.div`
   width: 580px;
   display: flex;
@@ -110,6 +114,7 @@ export const HoberLeft = styled.div`
     }
   }
 `;
+
 export const HoberRight = styled.div`
   width: 580px;
   display: flex;

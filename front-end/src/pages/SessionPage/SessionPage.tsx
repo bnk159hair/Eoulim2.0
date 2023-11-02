@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { Client } from '@stomp/stompjs';
+import axios from 'axios';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -13,8 +19,6 @@ import {
   Click,
   CharacterContainer,
 } from './SessionPageStyles';
-import { Button } from '@mui/material';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import {
@@ -31,13 +35,8 @@ import {
   GuideScript,
   TimeStamp,
 } from '../../atoms/Session';
-import { Client } from '@stomp/stompjs';
-import { WS_BASE_URL } from '../../apis/urls';
+import { WS_BASE_URL, API_BASE_URL } from '../../apis/urls';
 import { WebSocketApis } from '../../apis/webSocketApis';
-import axios from 'axios';
-import { API_BASE_URL } from '../../apis/urls';
-import MicIcon from '@mui/icons-material/Mic';
-import MicOffIcon from '@mui/icons-material/MicOff';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
 
@@ -52,32 +51,28 @@ interface FriendsProfile {
   animon: { id: number; imagePath: string; name: string };
 }
 
+interface Message {
+  token: string;
+}
+
 const SessionPage = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
+  const [userToken, setUserToken] = useRecoilState(tokenState);
   const [publisherId, setPublisherId] = useRecoilState(PublisherId);
   const [subscriberId, setSubscriberId] = useRecoilState(SubscriberId);
-  const [publisherVideoStatus, setPublisherVideoStatus] =
-    useRecoilState(PublisherVideoStatus);
-  const [subscriberVideoStatus, setSubscriberVideoStatus] = useRecoilState(
-    SubscriberVideoStatus
-  );
-  const [publisherAnimonURL, setPublisherAnimonURL] =
-    useRecoilState(PublisherAnimonURL);
-  const [subscriberAnimonURL, setSubscriberAnimonURL] =
-    useRecoilState(SubscriberAnimonURL);
-  const [publisherGuideStatus, setPublisherGuideStatus] =
-    useRecoilState(PublisherGuideStatus);
-  const [subscriberGuideStatus, setSubscriberGuideStatus] = useRecoilState(
-    SubscriberGuideStatus
-  );
+  const [publisherVideoStatus, setPublisherVideoStatus] = useRecoilState(PublisherVideoStatus);
+  const [subscriberVideoStatus, setSubscriberVideoStatus] = useRecoilState(SubscriberVideoStatus);
+  const [publisherAnimonURL, setPublisherAnimonURL] = useRecoilState(PublisherAnimonURL);
+  const [subscriberAnimonURL, setSubscriberAnimonURL] = useRecoilState(SubscriberAnimonURL);
+  const [publisherGuideStatus, setPublisherGuideStatus] = useRecoilState(PublisherGuideStatus);
+  const [subscriberGuideStatus, setSubscriberGuideStatus] = useRecoilState(SubscriberGuideStatus);
 
   const [clickEnabled, setClickEnabled] = useState(false);
   const profileId = useRecoilValue(Profilekey);
-  const userToken = useRecoilValue(tokenState);
   const profile = useRecoilValue(Profile);
   const [subscriberName, setSubscriberName] = useState('');
   const isAnimonLoaded = useRecoilValue(IsAnimonLoaded);
@@ -91,8 +86,7 @@ const SessionPage = () => {
   const [startTime, setStartTime] = useState(0);
   const [timeStamp, setTimeStamp] = useRecoilState(TimeStamp);
 
-  const { publisher, streamList, session, isOpen, onChangeMicStatus } =
-    useOpenVidu(profileId);
+  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(profileId);
   console.log(session);
   const [micStatus, setMicStatus] = useState(true);
   useEffect(() => {
@@ -114,7 +108,7 @@ const SessionPage = () => {
     setGuideScript('');
     setTimeStamp('');
     setPublisherId(profileId);
-    setPublisherAnimonURL(profile.animon.name + 'mask.png');
+    setPublisherAnimonURL(`${profile.animon.name}mask.png`);
     getFriends();
   }, []);
 
@@ -151,7 +145,7 @@ const SessionPage = () => {
     for (const user of streamList) {
       if (Number(user.userId) !== Number(publisherId)) {
         setSubscriberId(Number(user.userId));
-        friends.forEach((user: any) => {
+        friends.forEach(user => {
           console.log(user.id, subscriberId);
           console.log(Number(user.id) === Number(subscriberId));
           if (String(user.id) === String(subscriberId)) {
@@ -176,9 +170,9 @@ const SessionPage = () => {
       setIndex(nextIndex);
       const guidance = new Audio(`/${guideSequence[nextIndex]}.mp3`);
       if (nextIndex <= 4) {
-        const nextGuide = guideScript + guideSequence[nextIndex] + ' ';
+        const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
         setGuideScript(nextGuide);
-        const nextTime = timeStamp + String(Date.now() - startTime) + ' ';
+        const nextTime = `${timeStamp + String(Date.now() - startTime)} `;
         setTimeStamp(nextTime);
         guidance.play();
       }
@@ -204,7 +198,7 @@ const SessionPage = () => {
         connectHeaders: WebSocketApis.getInstance().header,
         brokerURL: WS_BASE_URL,
         reconnectDelay: 5000,
-        debug: (str) => console.log(str),
+        debug: str => console.log(str),
       });
 
       client.onConnect = () => {
@@ -212,7 +206,7 @@ const SessionPage = () => {
         setConnected(true);
         setStompClient(client);
 
-        client.subscribe(`/topic/${session.sessionId}/animon`, (response) => {
+        client.subscribe(`/topic/${session.sessionId}/animon`, response => {
           console.log('메시지 수신:', response.body);
           const message = JSON.parse(response.body);
           if (message.childId !== String(publisherId)) {
@@ -222,7 +216,7 @@ const SessionPage = () => {
             setSubscriberVideoStatus(message.isAnimonOn);
           }
         });
-        client.subscribe(`/topic/${session.sessionId}/guide`, (response) => {
+        client.subscribe(`/topic/${session.sessionId}/guide`, response => {
           const message = JSON.parse(response.body);
           console.log(message);
           if (message.childId !== String(publisherId)) {
@@ -230,16 +224,13 @@ const SessionPage = () => {
             setSubscriberGuideStatus(message.isNextGuideOn);
           }
         });
-        client.subscribe(
-          `/topic/${session.sessionId}/leave-session`,
-          (response) => {
-            const message = JSON.parse(response.body);
-            console.log(message);
-            if (message.childId !== String(publisherId)) {
-              setOpen(isTrue);
-            }
+        client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
+          const message = JSON.parse(response.body);
+          console.log(message);
+          if (message.childId !== String(publisherId)) {
+            setOpen(isTrue);
           }
-        );
+        });
       };
 
       client.onDisconnect = () => {
@@ -265,6 +256,15 @@ const SessionPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    // @ts-ignore
+    const getTokenFromApp = (message: Message) => {
+      if (message.token != 'null') {
+        setUserToken(message.token);
+      }
+    };
+  }, []);
+
   const getFriends = () => {
     console.log(profileId);
     axios
@@ -273,12 +273,12 @@ const SessionPage = () => {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then((response) => {
+      .then(response => {
         const data = response.data.result;
         setFriends(data);
         console.log(data);
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response && error.response.status === 401) {
           navigate('/login');
         } else {
@@ -289,18 +289,15 @@ const SessionPage = () => {
 
   const getAnimon = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/children/participant/${subscriberId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      );
+      const response = await axios.get(`${API_BASE_URL}/children/participant/${subscriberId}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      });
 
       console.log('유저 정보 가져오기 성공!');
       console.log(response);
-      setSubscriberAnimonURL(response.data.result.animon.name + 'mask.png');
+      setSubscriberAnimonURL(`${response.data.result.animon.name}mask.png`);
       setSubscriberName(response.data.result.name);
       return response.data.result;
     } catch (error) {
@@ -340,13 +337,13 @@ const SessionPage = () => {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
-        }
+        },
       )
-      .then((response) => {
+      .then(response => {
         console.log(response);
         leaveSession();
       })
-      .catch((error) => {
+      .catch(error => {
         if (error.response.data.resultCode === 'INVALID_DATA') {
           leaveSession();
         } else console.log(error);
@@ -360,7 +357,7 @@ const SessionPage = () => {
       setPublisherVideoStatus(isAnimonOn);
       const jsonMessage = {
         childId: String(publisherId),
-        isAnimonOn: isAnimonOn,
+        isAnimonOn,
       };
       const message = JSON.stringify(jsonMessage);
       stompClient.publish({
@@ -372,7 +369,7 @@ const SessionPage = () => {
   };
 
   const changeAudioStatus = () => {
-    setMicStatus((prev) => !prev);
+    setMicStatus(prev => !prev);
   };
 
   const nextGuidance = () => {
@@ -383,7 +380,7 @@ const SessionPage = () => {
         setPublisherGuideStatus(isNextGuideOn);
         const jsonMessage = {
           childId: String(publisherId),
-          isNextGuideOn: isNextGuideOn,
+          isNextGuideOn,
         };
         const message = JSON.stringify(jsonMessage);
         stompClient.publish({
@@ -404,6 +401,7 @@ const SessionPage = () => {
   };
 
   return (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {!open ? (
         <SessionPageContainer>
@@ -425,7 +423,7 @@ const SessionPage = () => {
             </MyVideo>
             <CharacterContainer>
               <Character onClick={nextGuidance} isPlaying={isPlaying}>
-                {clickEnabled ? <Click /> : <></>}
+                {clickEnabled ? <Click /> : null}
               </Character>
             </CharacterContainer>
             <MyVideo>
@@ -446,31 +444,19 @@ const SessionPage = () => {
           </Container>
           <NavContainer>
             <Buttons>
-              <Button
-                variant="contained"
-                onClick={changeVideoStatus}
-                sx={{ fontSize: '28px' }}
-              >
-                {publisherVideoStatus
-                  ? profile.gender === 'W'
-                    ? '👩'
-                    : '🧑'
-                  : '🙈'}
+              <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
+                {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
               </Button>
-              <Button variant="contained" onClick={changeAudioStatus}>
-                {micStatus ? (
-                  <MicIcon fontSize="large"></MicIcon>
-                ) : (
-                  <MicOffIcon fontSize="large"></MicOffIcon>
-                )}
+              <Button variant={'contained'} onClick={changeAudioStatus}>
+                {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
               </Button>
               <Button
-                variant="contained"
-                color="error"
+                variant={'contained'}
+                color={'error'}
                 onClick={sessionOver}
                 sx={{ fontSize: '30px' }}
               >
-                나가기
+                {'나가기'}
               </Button>
             </Buttons>
           </NavContainer>
@@ -480,14 +466,14 @@ const SessionPage = () => {
       ) : !isFriend ? (
         <EndModal
           onClose={leaveSession}
-          message="친구 조아?"
+          message={'친구 조아?'}
           isFriend={isFriend}
           addFriend={addFriend}
         />
       ) : (
         <EndModal
           onClose={leaveSession}
-          message="통화가 끝났습니다."
+          message={'통화가 끝났습니다.'}
           isFriend={isFriend}
           addFriend={addFriend}
         />
