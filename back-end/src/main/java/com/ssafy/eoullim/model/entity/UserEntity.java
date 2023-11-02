@@ -32,7 +32,8 @@ public class UserEntity extends BaseEntity {
     private UserRole role = UserRole.USER;
 
     @Builder
-    private UserEntity(String username, String password, String name, String phoneNumber, UserRole role) {
+    private UserEntity(Long id, String username, String password, String name, String phoneNumber, UserRole role) {
+        this.id = id;
         this.username = username;
         this.password = password;
         this.name = name;
@@ -42,6 +43,7 @@ public class UserEntity extends BaseEntity {
 
     public static UserEntity of(User user) {
         return UserEntity.builder()
+                .id(user.getId())
                 .name(user.getName())
                 .phoneNumber(user.getPhoneNumber())
                 .username(user.getUsername())
