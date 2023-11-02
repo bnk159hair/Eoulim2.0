@@ -19,7 +19,7 @@ import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -51,7 +51,17 @@ public class UserController {
     @ResponseBody
     public SuccessResponse<?> logout(Authentication authentication) {
         userService.logout(authentication.getName());
-        return new SuccessResponse<>(HttpStatus.NO_CONTENT, "로그아웃 성공!");
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
+    }
+
+    @PatchMapping("/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ResponseBody
+    public SuccessResponse<?> updatePassword(
+            @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
+        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+        userService.updatePw(user, request.getCurPassword(), request.getNewPassword());
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
 
     @GetMapping("/check-username/{username}")
@@ -69,15 +79,5 @@ public class UserController {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
         final var isCorrect = userService.isCorrectPassword(request.getPassword(), user.getPassword());
         return new SuccessResponse<>(isCorrect);
-    }
-
-    @PatchMapping("/password")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SuccessResponse<?> updatePassword(
-            @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        userService.updatePw(user, request.getCurPassword(), request.getNewPassword());
-        return new SuccessResponse<>("password changed");
     }
 }

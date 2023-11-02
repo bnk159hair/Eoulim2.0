@@ -33,17 +33,14 @@ public class UserService {
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
 
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userCacheRepository.getUser(username).orElseGet(
-                () -> userRepository.findByUsername(username).map(User::fromEntity).orElseThrow(
-                        () -> new EoullimApplicationException(ErrorCode.USER_NOT_FOUND)));
-    }
-
+    @Transactional
     public User join(String username, String password, String name, String phoneNumber) {
+        // Exception: User 중복 가입 방지
         userRepository.findByUsername(username).ifPresent(it -> {
             throw new EoullimApplicationException(ErrorCode.DUPLICATED_NAME);
         });
-        userRepository.save(
+        // save new user
+        UserEntity newUserEntity = userRepository.save(
                 UserEntity.builder()
                         .username(username)
                         .password(encoder.encode(password))
@@ -52,7 +49,8 @@ public class UserService {
                         .role(UserRole.USER)
                         .build()
         );
-        return new User();
+        // return new user saved in DB
+        return User.fromEntity(newUserEntity);
     }
 
     public String login(String username, String password) {
@@ -66,6 +64,12 @@ public class UserService {
             throw new EoullimApplicationException(ErrorCode.INVALID_PASSWORD);
         }
         return JwtTokenUtils.generateAccessToken(username, secretKey, expiredTimeMs);
+    }
+
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userCacheRepository.getUser(username).orElseGet(
+                () -> userRepository.findByUsername(username).map(User::fromEntity).orElseThrow(
+                        () -> new EoullimApplicationException(ErrorCode.USER_NOT_FOUND)));
     }
 
     public void logout(String username) {
