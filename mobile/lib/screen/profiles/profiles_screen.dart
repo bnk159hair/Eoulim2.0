@@ -9,6 +9,8 @@ class Profiles extends StatefulWidget {
   List<Profile> profiles = List.empty();
   Apiprofile apiProfile = Apiprofile();
 
+  Profiles({super.key});
+
   @override
   _ProfilesState createState() => _ProfilesState();
 }
@@ -28,7 +30,7 @@ class _ProfilesState extends State<Profiles> {
       });
     } else if (result.code == '401') {
       showDialog(
-        context: context,  // 이 부분에 정의가 필요
+        context: context, // 이 부분에 정의가 필요
         builder: (BuildContext context) {
           return AlertDialog(
             content: const Text('로그인을 해주세요'),
@@ -47,7 +49,7 @@ class _ProfilesState extends State<Profiles> {
       );
     } else {
       showDialog(
-        context: context,  // 이 부분에 정의가 필요
+        context: context, // 이 부분에 정의가 필요
         builder: (BuildContext context) {
           return AlertDialog(
             content: Text('${result.status}'),
@@ -80,7 +82,7 @@ class _ProfilesState extends State<Profiles> {
 class CarouselWidget extends StatefulWidget {
   final List<Profile> profiles;
 
-  CarouselWidget({Key? key, required this.profiles}) : super(key: key);
+  const CarouselWidget({Key? key, required this.profiles}) : super(key: key);
 
   @override
   State<CarouselWidget> createState() => _CarouselWidgetState();
