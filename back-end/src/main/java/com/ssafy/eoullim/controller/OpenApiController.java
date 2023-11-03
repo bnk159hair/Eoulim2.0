@@ -17,7 +17,7 @@ import javax.validation.Valid;
 public class OpenApiController {
   private final OpenApiService openApiService;
 
-  @PostMapping("/check-school")
+  @PostMapping("/schools")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public SuccessResponse<?> isValidSchool(@Valid @RequestBody OpenApiSchoolRequest request) {
