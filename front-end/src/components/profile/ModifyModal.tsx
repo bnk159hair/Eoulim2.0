@@ -72,7 +72,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
       })
       .then(response => {
         console.log(response);
-        setChildProfile(response.data.result);
+        setChildProfile(response.data.data);
       })
       .catch(error => {
         console.log('아이 프로필을 불러오는데 실패했습니다:', error);
@@ -175,7 +175,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
   const handleSchoolCheck = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/children/school`,
+        `${API_BASE_URL}/open-api/schools`,
         {
           keyword: childProfile.school,
         },
