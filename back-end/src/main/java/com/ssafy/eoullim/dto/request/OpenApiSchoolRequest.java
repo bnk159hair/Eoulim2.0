@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChildSchoolRequest {
+public class OpenApiSchoolRequest {
     @NotBlank
     private String keyword;
 }

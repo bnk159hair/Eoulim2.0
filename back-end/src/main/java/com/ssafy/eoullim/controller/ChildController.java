@@ -3,7 +3,6 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.dto.request.ChildLoginRequest;
 import com.ssafy.eoullim.dto.request.ChildLogoutRequest;
 import com.ssafy.eoullim.dto.request.ChildRequest;
-import com.ssafy.eoullim.dto.request.ChildSchoolRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.OtherChild;
@@ -29,6 +28,7 @@ public class ChildController {
 
     private final ChildService childService;
 
+    // Child basic CRUD
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse<?> login(@Valid @RequestBody ChildLoginRequest request, Authentication authentication) {
@@ -103,14 +103,7 @@ public class ChildController {
         return ResponseEntity.ok(new SuccessResponse<>(friend));
     }
 
-    @PostMapping("/check-school")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SuccessResponse<?> isValidSchool(
-            @Valid @RequestBody ChildSchoolRequest request) {
-        final var isValidSchool = childService.isValidSchool(request.getKeyword());
-        return new SuccessResponse<>(isValidSchool);
-    }
+
 
     //  @GetMapping("/{childId}/animons")
     //  public Response<List<Animon>> getAnimonList(@PathVariable @NotBlank Integer childId) {
