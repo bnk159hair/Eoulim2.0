@@ -21,6 +21,16 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	set('springCloudVersion', "2021.0.8")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
 dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'				// Spring dev tools
 	implementation 'org.springframework.boot:spring-boot-starter-web'			// Spring Web MVC
@@ -53,6 +63,10 @@ dependencies {
 	// Swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	// Config
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
 	compileOnly 'org.projectlombok:lombok'										// Lombok
 	annotationProcessor 'org.projectlombok:lombok'
