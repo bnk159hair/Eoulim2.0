@@ -98,7 +98,7 @@ const CreateModal: React.FC<CreateModalProps> = ({ onClose, resetList }) => {
   const handleSchoolCheck = async () => {
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/children/check-school`,
+        `${API_BASE_URL}/open-api/schools`,
         {
           keyword: school,
         },
