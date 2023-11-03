@@ -6,7 +6,7 @@ spring:
     config:
       server:
         git:
-          uri: git@github.com:bnk159hair/Eoulim_config
+          uri: git@github.com:bnk159hair/Eoulim_config.git
           default-label: master
 #          ignore-local-ssh-settings: true
 #          private-key: |
