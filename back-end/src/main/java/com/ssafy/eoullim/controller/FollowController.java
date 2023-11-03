@@ -2,7 +2,6 @@ package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.FollowRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
-import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.FollowService;
 import com.ssafy.eoullim.utils.ClassUtils;
@@ -13,8 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,16 +22,10 @@ public class FollowController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<?> create(@Valid @RequestBody FollowRequest request) {
-        followService.create(request.getChildId(), request.getFollowingChildId());
-        return new SuccessResponse<>(HttpStatus.CREATED, null);
-    }
-
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<List<Child>> getFriendsList(@Valid @RequestBody FollowRequest request, Authentication authentication) {
+    @ResponseBody
+    public SuccessResponse<?> create(@Valid @RequestBody FollowRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        List<Child> friendList = followService.getFriends(request.getChildId(), user.getId());
-        return new SuccessResponse<>(friendList);
+        followService.create(request.getChildId(), request.getFollowingChildId(), user);
+        return new SuccessResponse<>(HttpStatus.CREATED, null);
     }
 }

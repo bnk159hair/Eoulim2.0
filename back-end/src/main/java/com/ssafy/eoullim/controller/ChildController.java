@@ -3,6 +3,7 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.dto.request.ChildLoginRequest;
 import com.ssafy.eoullim.dto.request.ChildLogoutRequest;
 import com.ssafy.eoullim.dto.request.ChildRequest;
+import com.ssafy.eoullim.dto.request.FollowRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
@@ -113,6 +114,19 @@ public class ChildController {
       @PathVariable @NotBlank Long childId, @RequestBody Map<String, Long> requestBody) {
     Animon animon = childService.setProfileAnimon(childId, requestBody.get("animonId"));
     return new SuccessResponse<>(animon);
+  }
+
+  /**
+   * Child follow
+   * Child의 정보 중 팔로우 관련 API
+   */
+  @GetMapping("/{childId}/follows")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SuccessResponse<List<Child>> getFriendsList(@PathVariable @NotBlank Long childId, Authentication authentication) {
+    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+    List<Child> friendList = childService.getFriends(childId, user);
+    return new SuccessResponse<>(friendList);
   }
 
   // TODO  : api url refactoring
