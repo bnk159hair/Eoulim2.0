@@ -94,7 +94,7 @@ const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
 
     try {
       const usersData = { curPassword, newPassword };
-      const response = await axios.put(`${API_BASE_URL}/users/password`, usersData, {
+      const response = await axios.patch(`${API_BASE_URL}/users/password`, usersData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
