@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile/screen/alarm_screen.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+
+import 'package:mobile/screen/notifications_screen.dart';
 import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
+
+import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 var backButtonPressedOnce = false;
 
@@ -38,8 +40,12 @@ class Home extends StatelessWidget {
         appBar: AppBar(
           leading: IconButton(
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const Alarm()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const Notifications(),
+                ),
+              );
             },
             icon: const Icon(
               Icons.notifications,
