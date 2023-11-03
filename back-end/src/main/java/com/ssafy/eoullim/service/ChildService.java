@@ -3,11 +3,9 @@ package com.ssafy.eoullim.service;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.*;
-import com.ssafy.eoullim.model.entity.AnimonEntity;
-import com.ssafy.eoullim.model.entity.ChildEntity;
-import com.ssafy.eoullim.model.entity.FcmTokenEntity;
-import com.ssafy.eoullim.model.entity.UserEntity;
+import com.ssafy.eoullim.model.entity.*;
 import com.ssafy.eoullim.repository.ChildCacheRepository;
+import com.ssafy.eoullim.repository.jpa.ChildAnimonRepository;
 import com.ssafy.eoullim.repository.jpa.FcmTokenRepository;
 import com.ssafy.eoullim.repository.jpa.AnimonRepository;
 import com.ssafy.eoullim.repository.jpa.ChildRepository;
@@ -27,7 +25,7 @@ public class ChildService {
   private final ChildAnimonService childAnimonService;
 
   private final ChildRepository childRepository;
-  //  private final ChildAnimonRepository childAnimonRepository;
+  private final ChildAnimonRepository childAnimonRepository;
   private final AnimonRepository animonRepository;
   private final ChildCacheRepository childCacheRepository;
   private final FcmTokenRepository fcmTokenRepository;
@@ -136,6 +134,18 @@ public class ChildService {
     // 왜 나는 이거 안하면 저장 안되지?
     childRepository.save(childEntity);
     return Animon.fromEntity(animonEntity);
+
+//    !! childAnimonRepository에 의존했을 경우 !!
+//    장점: jpaEntity <-> model 변환을 하지 않아도 된다.
+//          service간 순환참조 문제가 발생하지 않는다.
+//          단일 책임 원칙을 지킬 수 있다.
+//    ChildAnimonEntity childAnimonEntity = childAnimonRepository.findByChildIdAndAnimonId(childId, animonId)
+//            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_ANIMON_NOT_FOUND, "사용자가 소유한 애니몬이 아닙니다."));
+//    ChildEntity childEntity = childAnimonEntity.getChild();
+//    AnimonEntity animonEntity = childAnimonEntity.getAnimon();
+//    childEntity.setProfileAnimon(animonEntity);
+//    return Animon.fromEntity(animonEntity);
+
   }
 
   public OtherChild getOtherChild(Long participantId) {

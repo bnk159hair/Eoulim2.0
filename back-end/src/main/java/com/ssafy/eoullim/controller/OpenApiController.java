@@ -19,7 +19,6 @@ public class OpenApiController {
 
   @PostMapping("/schools")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public SuccessResponse<?> isValidSchool(@Valid @RequestBody OpenApiSchoolRequest request) {
     final var isValidSchool = openApiService.isValidSchool(request.getKeyword());
     return new SuccessResponse<>(isValidSchool);

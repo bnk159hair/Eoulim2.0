@@ -51,7 +51,6 @@ public class ChildController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  @ResponseBody
   public SuccessResponse<?> create(
       @Valid @RequestBody ChildRequest request, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
@@ -63,7 +62,6 @@ public class ChildController {
 
   @GetMapping
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public SuccessResponse<List<Child>> getChildren(Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     List<Child> childrenList = childService.getChildren(user.getId());
@@ -72,7 +70,6 @@ public class ChildController {
 
   @GetMapping("/{childId}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public SuccessResponse<Child> getChild(
       @PathVariable @NotBlank Long childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
@@ -82,7 +79,6 @@ public class ChildController {
 
   @PutMapping("/{childId}")
   @ResponseStatus(HttpStatus.OK)
-  @ResponseBody
   public SuccessResponse<?> modify(
       @PathVariable @NotBlank Long childId, @Valid @RequestBody ChildRequest request) {
     Child updatedChild = childService.modify(childId, Child.of(request));
@@ -91,7 +87,6 @@ public class ChildController {
 
   @DeleteMapping("/{childId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @ResponseBody
   public SuccessResponse<?> delete(
       @PathVariable @NotBlank Long childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);

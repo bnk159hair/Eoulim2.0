@@ -27,7 +27,6 @@ public class UserController {
 
     @PostMapping("/join")
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     private SuccessResponse<User> join(@Valid @RequestBody UserJoinRequest request) {
         final var user = userService.join(
                 request.getUsername(),
@@ -40,7 +39,6 @@ public class UserController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public SuccessResponse<?> login(@Valid @RequestBody UserLoginRequest request) {
         String accessToken = userService.login(request.getUsername(), request.getPassword());
         return new SuccessResponse<>(accessToken);
@@ -48,7 +46,6 @@ public class UserController {
 
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
     public SuccessResponse<?> logout(Authentication authentication) {
         userService.logout(authentication.getName());
         return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
@@ -56,7 +53,6 @@ public class UserController {
 
     @PatchMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ResponseBody
     public SuccessResponse<?> updatePassword(
             @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
@@ -66,7 +62,6 @@ public class UserController {
 
     @GetMapping("/check-username/{username}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public SuccessResponse<?> isAvailableUsername(@PathVariable @NotBlank String username) {
         final var isAvailable = userService.isAvailableUsername(username);
         return new SuccessResponse<>(isAvailable);
@@ -74,7 +69,6 @@ public class UserController {
 
     @PostMapping("/check-password")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public SuccessResponse<?> isCorrectPassword(@Valid @RequestBody UserPwCheckRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
         final var isCorrect = userService.isCorrectPassword(request.getPassword(), user.getPassword());

@@ -25,7 +25,6 @@ public class FollowController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     public SuccessResponse<?> create(@Valid @RequestBody FollowRequest request) {
         followService.create(request.getChildId(), request.getFollowingChildId());
         return new SuccessResponse<>(HttpStatus.CREATED, null);
@@ -33,7 +32,6 @@ public class FollowController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public SuccessResponse<List<Child>> getFriendsList(@Valid @RequestBody FollowRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
         List<Child> friendList = followService.getFriends(request.getChildId(), user.getId());
