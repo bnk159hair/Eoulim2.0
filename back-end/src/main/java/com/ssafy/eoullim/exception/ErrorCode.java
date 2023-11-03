@@ -16,6 +16,8 @@ public enum ErrorCode {
   OPEN_API_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-001", "Open API Connection error occurs"),
   NOTIFICATION_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-002", "SSE notification Connection occurs error"),
 
+  // FcmToken Error
+  FCM_TOKEN_NOT_FOUNT(HttpStatus.NOT_FOUND, "FCM-001", "존재 하지 않는 FcmToken 입니다."),
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
   CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "Child and Animon Relation not found"),

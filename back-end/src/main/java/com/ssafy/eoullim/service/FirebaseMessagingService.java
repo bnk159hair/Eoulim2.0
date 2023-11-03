@@ -17,7 +17,7 @@ import java.util.List;
 @Service
 public class FirebaseMessagingService {
 
-    private final String API_URL = "https://fcm.googleapis.com/v1/projects/c103-7da2a/messages:send";
+    private final String API_URL = "https://fcm.googleapis.com/v1/projects/eoullim-7e5fb/messages:send";
     private final ObjectMapper objectMapper;
 
     public void sendMessageTo(String targetToken, String title, String body) throws IOException {
@@ -57,7 +57,7 @@ public class FirebaseMessagingService {
     }
 
     private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "/firebase/다운 받은 비공개키.json";
+        String firebaseConfigPath = "serviceAccount-File.json";
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())

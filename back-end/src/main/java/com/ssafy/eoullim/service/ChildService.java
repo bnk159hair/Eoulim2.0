@@ -7,9 +7,11 @@ import com.ssafy.eoullim.model.OtherChild;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.model.entity.AnimonEntity;
 import com.ssafy.eoullim.model.entity.ChildEntity;
+import com.ssafy.eoullim.model.entity.FcmTokenEntity;
 import com.ssafy.eoullim.model.entity.UserEntity;
-import com.ssafy.eoullim.repository.jpa.AnimonRepository;
 import com.ssafy.eoullim.repository.ChildCacheRepository;
+import com.ssafy.eoullim.repository.jpa.FcmTokenRepository;
+import com.ssafy.eoullim.repository.jpa.AnimonRepository;
 import com.ssafy.eoullim.repository.jpa.ChildRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +39,7 @@ public class ChildService {
     //  private final ChildAnimonRepository childAnimonRepository;
     private final AnimonRepository animonRepository;
     private final ChildCacheRepository childCacheRepository;
+    private final FcmTokenRepository fcmTokenRepository;
 
     // Open Api
     @Value("${public-api.service-key}")
@@ -46,16 +49,30 @@ public class ChildService {
     private String openApiUrl;
 
     @Transactional
-    public Child login(Long childId) {
+    public Child login(Long childId, String token, Long userId) {
         final var childEntity = getChildEntity(childId);
+        if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
+            throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
         childCacheRepository.setStatus(childId);
+        fcmTokenRepository.save(
+                FcmTokenEntity.builder()
+                        .user(childEntity.getUser())
+                        .child(childEntity)
+                        .token(token)
+                        .build()
+        );
         return Child.fromEntity(childEntity);
     }
 
     @Transactional
-    public void logout(Long childId) {
+    public void logout(Long childId, Long userId) {
         final var childEntity = getChildEntity(childId);
+        if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
+            throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
         childCacheRepository.delete(childId);
+        FcmTokenEntity fcmToken = fcmTokenRepository.findByChildId(childId).orElseThrow(
+                () -> new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUNT));
+        fcmTokenRepository.delete(fcmToken);
     }
 
     @Transactional

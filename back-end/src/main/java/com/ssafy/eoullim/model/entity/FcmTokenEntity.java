@@ -1,9 +1,9 @@
 package com.ssafy.eoullim.model.entity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 
@@ -27,6 +27,13 @@ public class FcmTokenEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String token;
+
+    @Builder
+    public FcmTokenEntity(UserEntity user, ChildEntity child, String token) {
+        this.user = user;
+        this.child = child;
+        this.token = token;
+    }
 }
 
 

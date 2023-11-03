@@ -39,7 +39,7 @@ public class AuthenticationConfiguration {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/*/users/join", "/api/*/users/login", "/api/*/users/check-username/*").permitAll()
+                .antMatchers("/api/*/users/join", "/api/*/users/login", "/api/*/users/check-username/*", "/api/fcm").permitAll()
                 .antMatchers( "/api/*/alarms/**").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .anyRequest().permitAll()
