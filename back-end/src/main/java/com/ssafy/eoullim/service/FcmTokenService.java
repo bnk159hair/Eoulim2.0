@@ -3,8 +3,9 @@ package com.ssafy.eoullim.service;
 import com.ssafy.eoullim.dto.request.ChildLoginRequest;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.FcmTokenEntity;
-import com.ssafy.eoullim.repository.ChildRepository;
-import com.ssafy.eoullim.repository.FcmTokenRepository;
+
+import com.ssafy.eoullim.repository.jpa.ChildRepository;
+import com.ssafy.eoullim.repository.jpa.FcmTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

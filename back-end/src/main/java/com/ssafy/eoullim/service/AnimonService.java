@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,5 +29,11 @@ public class AnimonService {
         .stream()
         .map(Animon::fromEntity)
         .collect(Collectors.toList());
+  }
+
+  public Animon getMinIdAnimon(List<Animon> animons) {
+    return animons.stream()
+        .min(Comparator.comparing(Animon::getId))
+        .orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "));
   }
 }

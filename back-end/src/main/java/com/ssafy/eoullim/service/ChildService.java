@@ -83,24 +83,15 @@ public class ChildService {
 
     // 애니몬 랜덤으로 2개 가져오기
     List<Animon> randomAnimons = animonService.getAnimonsAtRandom(2);
-
-    // 가져온 애니몬 중에 가장 작은 ID 가진 애니몬 선택
-    final var minAnimon =
-        randomAnimons.stream()
-            .min(Comparator.comparing(Animon::getId))
-            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "));
-    AnimonEntity animonEntity = AnimonEntity.of(minAnimon);
-
-    // 기본 프로필 애니몬 선택
+    // 가져온 애니몬 중에 가장 작은 ID 가진 애니몬을 기본 프로필 애니몬으로 선택
+    AnimonEntity animonEntity = AnimonEntity.of(animonService.getMinIdAnimon(randomAnimons));
     childEntity.setProfileAnimon(animonEntity);
 
     // child 저장
     final var newChildEntity = childRepository.save(childEntity);
-
     log.error(newChildEntity.getId().toString());
     // Child에게 애니몬 지급
     childAnimonService.saveChildAnimon(Child.fromEntity(newChildEntity), randomAnimons);
-
 
     return Child.fromEntity(newChildEntity);
   }
