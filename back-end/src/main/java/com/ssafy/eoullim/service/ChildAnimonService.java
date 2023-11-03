@@ -1,5 +1,7 @@
 package com.ssafy.eoullim.service;
 
+import com.ssafy.eoullim.exception.EoullimApplicationException;
+import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.ChildAnimon;
@@ -29,5 +31,21 @@ public class ChildAnimonService {
             .map(animon -> ChildAnimonEntity.builder().animon(animon).child(child).build())
             .collect(Collectors.toList());
     childAnimonRepository.saveAll(childAnimonEntities);
+  }
+
+  public List<ChildAnimon> getChildAnimonsByChildId(Long childId) {
+    List<ChildAnimonEntity> childAnimonEntities =
+        childAnimonRepository
+            .findByChildId(childId)
+            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_ANIMON_NOT_FOUND, "사용자가 소유한 애니몬이 없습니다."));
+    return childAnimonEntities.stream().map(ChildAnimon::fromEntity).collect(Collectors.toList());
+  }
+
+  public ChildAnimon getChildAnimonByChildIdAndAnimonId(Long childId, Long animonId) {
+    ChildAnimonEntity childAnimonEntity =
+        childAnimonRepository
+            .findByChildIdAndAnimonId(childId, animonId)
+            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_ANIMON_NOT_FOUND, "사용자가 소유한 애니몬이 아닙니다."));
+    return ChildAnimon.fromEntity(childAnimonEntity);
   }
 }

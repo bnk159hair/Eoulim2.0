@@ -35,8 +35,8 @@ public class ChildService {
   @Transactional
   public Child login(Long childId, String token, Long userId) {
     final var childEntity = getChildEntity(childId);
-    if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
-    throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
+    if (!childEntity.getUser().getId().equals(userId))
+      throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
     childCacheRepository.setStatus(childId);
     fcmTokenRepository.save(
         FcmTokenEntity.builder()
@@ -50,8 +50,8 @@ public class ChildService {
   @Transactional
   public void logout(Long childId, Long userId) {
     final var childEntity = getChildEntity(childId);
-    if (!childEntity.getUser().getId().equals(userId)) // 그 Child가 User의 Child인지
-    throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
+    if (!childEntity.getUser().getId().equals(userId))
+      throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
     childCacheRepository.delete(childId);
     FcmTokenEntity fcmToken =
         fcmTokenRepository
@@ -96,28 +96,6 @@ public class ChildService {
     childRepository.delete(childEntity);
   }
 
-  // TODO:  DB에 Child가 만든 애 + Default 1234
-  //  public List<Animon> getAnimonList(Integer childId) {
-  //    return childAnimonRepository.findAnimonsByChildId(childId).stream()
-  //        .map(Animon::fromEntity)
-  //        .collect(Collectors.toList());
-  //  }
-
-  // TODO: fix
-  //  @Transactional
-  //  public Animon setAnimon(Integer childId, Integer animonId) {
-  //    ChildAnimonEntity childAnimonEntity =
-  //        childAnimonRepository
-  //            .findByChildIdAndAnimonId(childId, animonId)
-  //            .orElseThrow(() -> new
-  // EoullimApplicationException(ErrorCode.CHILD_ANIMON_NOT_FOUND));
-  //    //    new IllegalArgumentException("Child가 소유하지 않은 애니몬은 사용할 수 없습니다."));
-  //    AnimonEntity animonEntity = childAnimonEntity.getAnimon();
-  //    ChildEntity childEntity = childAnimonEntity.getChild();
-  //    childEntity.setAnimon(animonEntity);
-  //    return Animon.fromEntity(animonEntity);
-  //  }
-
   public List<Child> getChildren(Long userId) {
     return childRepository
         .findAllByUserId(userId)
@@ -139,6 +117,25 @@ public class ChildService {
     return childRepository
         .findById(childId)
         .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
+  }
+
+  public List<Animon> getAnimonList(Long childId) {
+    final var childAnimons = childAnimonService.getChildAnimonsByChildId(childId);
+
+    return childAnimons.stream().map(ChildAnimon::getAnimon).collect(Collectors.toList());
+  }
+
+  @Transactional
+  public Animon setProfileAnimon(Long childId, Long animonId) {
+    // Child가 소유한 Animon임을 확인 한 후 해당 관계 DTO 가져오기
+    ChildAnimon childAnimon = childAnimonService.getChildAnimonByChildIdAndAnimonId(childId, animonId);
+    // 변경하려는 Animon을 Child의 프로필 Animon으로 지정.
+    AnimonEntity animonEntity = AnimonEntity.of(childAnimon.getAnimon());
+    ChildEntity childEntity = ChildEntity.of(childAnimon.getChild());
+    childEntity.setProfileAnimon(animonEntity);
+    // 왜 나는 이거 안하면 저장 안되지?
+    childRepository.save(childEntity);
+    return Animon.fromEntity(animonEntity);
   }
 
   public OtherChild getOtherChild(Long participantId) {

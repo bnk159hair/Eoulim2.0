@@ -20,7 +20,7 @@ public enum ErrorCode {
   FCM_TOKEN_NOT_FOUNT(HttpStatus.NOT_FOUND, "FCM-001", "존재 하지 않는 FcmToken 입니다."),
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
-  CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "Child and Animon Relation not found"),
+  CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "사용자가 소유한 애니몬을 찾을 수 없음."),
   // User Error
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U-001", "존재 하지 않는 User 입니다."),
   DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "U-002", "이미 사용 중인 ID 입니다."),
