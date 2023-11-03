@@ -4,7 +4,8 @@ import com.ssafy.eoullim.model.entity.AnimonEntity;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

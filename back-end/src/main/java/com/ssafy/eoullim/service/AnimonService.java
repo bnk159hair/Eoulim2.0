@@ -1,5 +1,7 @@
 package com.ssafy.eoullim.service;
 
+import com.ssafy.eoullim.exception.EoullimApplicationException;
+import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.repository.jpa.AnimonRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +15,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AnimonService {
-  AnimonRepository animonRepository;
+  private final AnimonRepository animonRepository;
 
   public List<Animon> getAnimons() {
     return animonRepository.findAll().stream().map(Animon::fromEntity).collect(Collectors.toList());
+  }
+
+  public List<Animon> getAnimonsAtRandom(int limit) {
+    return animonRepository
+        .findRandomAnimals(limit)
+        .orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "))
+        .stream()
+        .map(Animon::fromEntity)
+        .collect(Collectors.toList());
   }
 }

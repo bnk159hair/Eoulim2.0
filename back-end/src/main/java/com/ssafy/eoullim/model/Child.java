@@ -22,7 +22,9 @@ public class Child {
     private String school;
     private Short grade;
     private Status status;
-    private Animon animon;
+    private User user;
+    private Animon profileAnimon;
+
 
     public static Child fromEntity(ChildEntity entity) {
         return new Child(
@@ -33,8 +35,8 @@ public class Child {
                 entity.getSchool(),
                 entity.getGrade(),
                 entity.getStatus(),
-//                Animon.fromEntity(entity.getAnimon())
-                null
+                User.fromEntity(entity.getUser()),
+                Animon.fromEntity(entity.getProfileAnimon())
         );
     }
 
@@ -47,6 +49,7 @@ public class Child {
                 request.getGender(),
                 request.getSchool(),
                 request.getGrade(),
+                null,
                 null,
                 null
         );

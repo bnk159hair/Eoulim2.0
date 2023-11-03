@@ -3,7 +3,7 @@ package com.ssafy.eoullim.model;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import java.util.Date;
+
 @Getter
 @AllArgsConstructor
 public class OtherChild {
@@ -14,7 +14,7 @@ public class OtherChild {
         return new OtherChild(
                 entity.getId(),
                 entity.getName(),
-                Animon.fromEntity(entity.getAnimon())
+                Animon.fromEntity(entity.getProfileAnimon())
         );
     }
 }

@@ -26,7 +26,7 @@ public class ChildRequest {
   private String gender; // 남자는 M, 여자는 W
 
   @NotBlank
-  @Pattern(regexp = "^.+초등학교$", message = "학교 이름은 '초등학교'로 끝나야 합니다.")
+//  @Pattern(regexp = "^.+초등학교$", message = "학교 이름은 '초등학교'로 끝나야 합니다.")
   @Length(max = 20, message = "학교 이름은 20자 이하여야 합니다.")
   private String school;
 
