@@ -5,7 +5,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Client } from '@stomp/stompjs';
-import axios from 'axios';
+import instance from 'apis/instance';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -30,7 +30,7 @@ import {
   SubscriberAnimonURL,
   IsAnimonLoaded,
 } from '../../atoms/Session';
-import { WS_BASE_URL, API_BASE_URL } from '../../apis/urls';
+import { WS_BASE_URL } from '../../apis/urls';
 import { WebSocketApis } from '../../apis/webSocketApis';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
@@ -193,39 +193,39 @@ const FriendSessionPage = () => {
   }, [streamList]);
 
   const getFriends = async () => {
-    await axios
-      .get(`${API_BASE_URL}/friendship/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(response => {
-        const data = response.data.result;
-        setFriends(data);
-        console.log(data);
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('친구목록불러오기오류', error);
-        }
-      });
+    console.log(profileId);
+    try {
+      const response = await instance.get(`/friendship/${profileId}`);
+      setFriends(response.data.data);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    // instance
+    //   .get(`/friendship/${profileId}`)
+    //   .then(response => {
+    //     const data = response.data.result;
+    //     setFriends(data);
+    //     console.log(data);
+    //   })
+    //   .catch(error => {
+    //     if (error.response && error.response.status === 401) {
+    //       navigate('/login');
+    //     } else {
+    //       console.log('친구목록불러오기오류', error);
+    //     }
+    //   });
   };
 
   const getAnimon = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/children/participant/${subscriberId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-
+      const response = await instance.get(`/children/participant/${subscriberId}`);
       console.log('유저 정보 가져오기 성공!');
       console.log(response);
       setSubscriberAnimonURL(`${response.data.result.animon.name}mask.png`);
       setSubscriberName(response.data.result.name);
-      return response.data.result;
+      // return response.data.result;
     } catch (error) {
       console.log('유저 정보 가져오기 실패ㅠ');
       console.log(error);
@@ -248,7 +248,7 @@ const FriendSessionPage = () => {
       });
       console.log('메시지 전송:', message);
     }
-    destroySession(session, '', '', userToken);
+    destroySession(session, '', '');
     session.disconnect();
     navigate('/');
   };
@@ -256,25 +256,34 @@ const FriendSessionPage = () => {
   const addFriend = () => {
     console.log(publisherId, subscriberId);
     console.log(userToken);
-    axios
-      .post(
-        `${API_BASE_URL}/friendship`,
-        { myId: Number(publisherId), friendId: Number(subscriberId) },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        },
-      )
-      .then(response => {
-        console.log(response);
-        leaveSession();
-      })
-      .catch(error => {
-        if (error.response.data.resultCode === 'INVALID_DATA') {
-          leaveSession();
-        } else console.log(error);
+    try {
+      const response = instance.post(`/friendship`, {
+        myId: Number(publisherId),
+        friendId: Number(subscriberId),
       });
+      console.log(response);
+      leaveSession();
+    } catch (error) {
+      console.log(error);
+      // if (error.response.data.resultCode === 'INVALID_DATA') {
+      //   leaveSession();
+      // } else console.log(error);
+    }
+    // instance
+    //   .post(
+    //     `/friendship`,
+    //     { myId: Number(publisherId), friendId: Number(subscriberId) },
+
+    //   )
+    //   .then(response => {
+    //     console.log(response);
+    //     leaveSession();
+    //   })
+    //   .catch(error => {
+    //     if (error.response.data.resultCode === 'INVALID_DATA') {
+    //       leaveSession();
+    //     } else console.log(error);
+    //   });
   };
 
   const changeVideoStatus = () => {

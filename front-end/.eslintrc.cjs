@@ -71,6 +71,7 @@ module.exports = {
 
     'no-restricted-syntax': 'off',
     'consistent-return': 'off',
+    'no-param-reassign': 'off',
   },
   settings: {
     'import/resolver': {

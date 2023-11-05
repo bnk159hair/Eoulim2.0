@@ -9,7 +9,6 @@ import {
 } from '../apis/openViduApis';
 import { GuideScript, TimeStamp, guideSeq } from '../atoms/Session';
 import { invitationSessionId, invitationToken } from '../atoms/Ivitation';
-import { tokenState } from '../atoms/Auth';
 
 interface User {
   childId: string;
@@ -25,7 +24,6 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [, setGuide] = useRecoilState(guideSeq);
-  const userToken = useRecoilValue(tokenState);
 
   const guideScript = useRecoilValue(GuideScript);
   const timeStamp = useRecoilValue(TimeStamp);
@@ -42,7 +40,7 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
     if (sessionId) {
       console.log('초대 세션이랑 연결 끊기');
       session.disconnect();
-      destroyFriendSession(sessionId, userToken);
+      destroyFriendSession(sessionId);
       setSessionId('');
       setSessionToken('');
     } else if (session) {
@@ -99,17 +97,14 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
     // mySession.on('exception', (exception) => console.warn(exception));
 
     if (sessionId === undefined) {
-      getUserInfo(userId, userToken).then((userInfo: User) => {
-        getToken(
-          {
-            childId: String(userId),
-            name: userInfo.name,
-            gender: userInfo.gender,
-            school: userInfo.school,
-            grade: userInfo.grade,
-          },
-          userToken,
-        ).then((data: { token: string; guideSeq: [] }) => {
+      getUserInfo(userId).then((userInfo: User) => {
+        getToken({
+          childId: String(userId),
+          name: userInfo.name,
+          gender: userInfo.gender,
+          school: userInfo.school,
+          grade: userInfo.grade,
+        }).then((data: { token: string; guideSeq: [] }) => {
           const { token } = data;
           setGuide(data.guideSeq);
           console.log('가져온 토큰 :', token);
@@ -180,7 +175,7 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
           console.log('There was an error connecting to the session:', error.code, error.message);
         });
     } else if (userId && sessionId && sessionToken === '') {
-      getFriendSessionToken(userId, userToken, sessionId).then((token: any) => {
+      getFriendSessionToken(userId, sessionId).then((token: any) => {
         console.log('가져온 토큰 :', token);
         console.log('가져온 토큰으로 초대 세션에 연결');
         mySession
@@ -222,7 +217,7 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
 
       if (sessionId) {
         console.log('초대 세션이랑 연결 끊기');
-        destroyFriendSession(sessionId, userToken);
+        destroyFriendSession(sessionId);
         setSessionId('');
         setSessionToken('');
       } else if (mySession) {

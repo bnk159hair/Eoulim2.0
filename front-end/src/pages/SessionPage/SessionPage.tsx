@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Client } from '@stomp/stompjs';
-import axios from 'axios';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import instance from 'apis/instance';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -35,7 +35,7 @@ import {
   GuideScript,
   TimeStamp,
 } from '../../atoms/Session';
-import { WS_BASE_URL, API_BASE_URL } from '../../apis/urls';
+import { WS_BASE_URL } from '../../apis/urls';
 import { WebSocketApis } from '../../apis/webSocketApis';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
@@ -267,41 +267,40 @@ const SessionPage = () => {
     };
   });
 
-  const getFriends = () => {
+  const getFriends = async () => {
     console.log(profileId);
-    axios
-      .get(`${API_BASE_URL}/friendship/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(response => {
-        const data = response.data.result;
-        setFriends(data);
-        console.log(data);
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('친구목록불러오기오류', error);
-        }
-      });
+    try {
+      const response = await instance.get(`/friendship/${profileId}`);
+      setFriends(response.data.data);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    // instance
+    //   .get(`/friendship/${profileId}`)
+    //   .then(response => {
+    //     const data = response.data.result;
+    //     setFriends(data);
+    //     console.log(data);
+    //   })
+    //   .catch(error => {
+    //     if (error.response && error.response.status === 401) {
+    //       navigate('/login');
+    //     } else {
+    //       console.log('친구목록불러오기오류', error);
+    //     }
+    //   });
   };
 
   const getAnimon = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/children/participant/${subscriberId}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      });
-
+      const response = await instance.get(`/children/participant/${subscriberId}`);
       console.log('유저 정보 가져오기 성공!');
       console.log(response);
       setSubscriberAnimonURL(`${response.data.result.animon.name}mask.png`);
       setSubscriberName(response.data.result.name);
-      return response.data.result;
+      // return response.data.result;
     } catch (error) {
       console.log('유저 정보 가져오기 실패ㅠ');
       console.log(error);
@@ -323,7 +322,7 @@ const SessionPage = () => {
       });
       console.log('메시지 전송:', message);
     }
-    destroySession(session, guideScript, timeStamp, userToken);
+    destroySession(session, guideScript, timeStamp);
     session.disconnect();
     navigate('/');
   };
@@ -331,25 +330,34 @@ const SessionPage = () => {
   const addFriend = () => {
     console.log(publisherId, subscriberId);
     console.log(userToken);
-    axios
-      .post(
-        `${API_BASE_URL}/friendship`,
-        { myId: Number(publisherId), friendId: Number(subscriberId) },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        },
-      )
-      .then(response => {
-        console.log(response);
-        leaveSession();
-      })
-      .catch(error => {
-        if (error.response.data.resultCode === 'INVALID_DATA') {
-          leaveSession();
-        } else console.log(error);
+    try {
+      const response = instance.post(`/friendship`, {
+        myId: Number(publisherId),
+        friendId: Number(subscriberId),
       });
+      console.log(response);
+      leaveSession();
+    } catch (error) {
+      console.log(error);
+      // if (error.response.data.resultCode === 'INVALID_DATA') {
+      //   leaveSession();
+      // } else console.log(error);
+    }
+    // instance
+    //   .post(
+    //     `/friendship`,
+    //     { myId: Number(publisherId), friendId: Number(subscriberId) },
+
+    //   )
+    //   .then(response => {
+    //     console.log(response);
+    //     leaveSession();
+    //   })
+    //   .catch(error => {
+    //     if (error.response.data.resultCode === 'INVALID_DATA') {
+    //       leaveSession();
+    //     } else console.log(error);
+    //   });
   };
 
   const changeVideoStatus = () => {
@@ -402,67 +410,87 @@ const SessionPage = () => {
     return false;
   };
 
+  const [checkVideo, setCheckVideo] = useState(false);
+
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {!open ? (
-        <SessionPageContainer>
-          <Container>
-            <MyVideo>
-              {streamList.length > 1 && streamList[1].streamManager ? (
-                <>
+        !checkVideo ? (
+          <SessionPageContainer>
+            <Container>
+              <MyVideo>
+                {streamList[1]?.streamManager && (
                   <StreamCanvas
-                    streamManager={streamList[1].streamManager}
+                    streamManager={streamList[1]?.streamManager}
                     name={subscriberName}
                     avatarPath={subscriberAnimonURL}
                     videoState={subscriberVideoStatus}
                   />
-                  <Loading isAnimonLoaded={isAnimonLoaded} />
-                </>
-              ) : (
-                <Loading isAnimonLoaded={false} />
-              )}
-            </MyVideo>
-            <CharacterContainer>
-              <Character onClick={nextGuidance} isPlaying={isPlaying}>
-                {clickEnabled ? <Click /> : null}
-              </Character>
-            </CharacterContainer>
-            <MyVideo>
-              {streamList.length > 1 && streamList[0].streamManager ? (
-                <>
-                  <StreamCanvas
-                    streamManager={streamList[0].streamManager}
-                    name={profile.name}
-                    avatarPath={`${publisherAnimonURL}`}
-                    videoState={publisherVideoStatus}
-                  />
-                  <Loading isAnimonLoaded={isAnimonLoaded} />
-                </>
-              ) : (
-                <Loading isAnimonLoaded={false} />
-              )}
-            </MyVideo>
-          </Container>
-          <NavContainer>
-            <Buttons>
-              <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
-                {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
-              </Button>
-              <Button variant={'contained'} onClick={changeAudioStatus}>
-                {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
-              </Button>
-              <Button
-                variant={'contained'}
-                color={'error'}
-                onClick={sessionOver}
-                sx={{ fontSize: '30px' }}
-              >
-                {'나가기'}
-              </Button>
-            </Buttons>
-          </NavContainer>
-        </SessionPageContainer>
+                )}
+              </MyVideo>
+              <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
+            </Container>
+          </SessionPageContainer>
+        ) : (
+          <SessionPageContainer>
+            <Container>
+              <MyVideo>
+                {streamList.length > 1 && streamList[1].streamManager ? (
+                  <>
+                    <StreamCanvas
+                      streamManager={streamList[1].streamManager}
+                      name={subscriberName}
+                      avatarPath={subscriberAnimonURL}
+                      videoState={subscriberVideoStatus}
+                    />
+                    <Loading isAnimonLoaded={isAnimonLoaded} />
+                  </>
+                ) : (
+                  <Loading isAnimonLoaded={false} />
+                )}
+              </MyVideo>
+              <CharacterContainer>
+                <Character onClick={nextGuidance} isPlaying={isPlaying}>
+                  {clickEnabled ? <Click /> : null}
+                </Character>
+              </CharacterContainer>
+              <MyVideo>
+                {streamList.length > 1 && streamList[0].streamManager ? (
+                  <>
+                    <StreamCanvas
+                      streamManager={streamList[0].streamManager}
+                      name={profile.name}
+                      avatarPath={`${publisherAnimonURL}`}
+                      videoState={publisherVideoStatus}
+                    />
+                    <Loading isAnimonLoaded={isAnimonLoaded} />
+                  </>
+                ) : (
+                  <Loading isAnimonLoaded={false} />
+                )}
+              </MyVideo>
+            </Container>
+            <NavContainer>
+              <Buttons>
+                <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
+                  {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
+                </Button>
+                <Button variant={'contained'} onClick={changeAudioStatus}>
+                  {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
+                </Button>
+                <Button
+                  variant={'contained'}
+                  color={'error'}
+                  onClick={sessionOver}
+                  sx={{ fontSize: '30px' }}
+                >
+                  {'나가기'}
+                </Button>
+              </Buttons>
+            </NavContainer>
+          </SessionPageContainer>
+        )
       ) : streamList.length !== 2 ? (
         leaveSession()
       ) : !isFriend ? (
