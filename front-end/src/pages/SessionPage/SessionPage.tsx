@@ -257,14 +257,15 @@ const SessionPage = () => {
   }, []);
 
   useEffect(() => {
-    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //@ts-ignore
     window.getTokenFromApp = (message: Message) => {
       console.log(`Flutter to Web : ${message}`);
       if (message.token !== 'null') {
         setUserToken(message.token);
       }
     };
-  }, []);
+  });
 
   const getFriends = () => {
     console.log(profileId);
