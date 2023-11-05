@@ -259,6 +259,7 @@ const SessionPage = () => {
   useEffect(() => {
     // @ts-ignore
     window.getTokenFromApp = (message: Message) => {
+      console.log(`Flutter to Web : ${message}`);
       if (message.token !== 'null') {
         setUserToken(message.token);
       }
