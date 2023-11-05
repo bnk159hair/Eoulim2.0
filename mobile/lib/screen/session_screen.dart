@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Session extends StatefulWidget {
   const Session({super.key});
@@ -18,10 +19,32 @@ class Session extends StatefulWidget {
 
 class _SessionState extends State<Session> {
   late final WebViewController controller;
+  late String token = '';
+
+  Future<void> getToken() async {
+    final storage = new FlutterSecureStorage();
+    String? authKey = await storage.read(key: 'Authkey');
+    setState(() {
+      if (authKey != null) {
+        token = authKey;
+      } else {
+        token = '';
+      }
+    });
+  }
+
+  void sendToken() {
+    if (token != '') {
+      print('웹으로 보내는 중....');
+      Map<String, String> message = {'token': token};
+      controller.runJavaScript('getTokenFromApp("$message")');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    getToken();
 
     // #docregion webview_controller
     controller = WebViewController()
@@ -30,20 +53,17 @@ class _SessionState extends State<Session> {
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            // Update loading bar.
+            print('token: $token');
+            sendToken();
           },
           onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
-          onWebResourceError: (WebResourceError error) {},
-          onNavigationRequest: (NavigationRequest request) {
-            if (request.url.startsWith('https://www.youtube.com/')) {
-              return NavigationDecision.prevent;
-            }
-            return NavigationDecision.navigate;
+          onPageFinished: (String url) {
+            debugPrint('Page Finished');
           },
+          onWebResourceError: (WebResourceError error) {},
         ),
       )
-      ..loadRequest(Uri.parse('https://k9c103.p.ssafy.io/profile'));
+      ..loadRequest(Uri.parse('https://k9c103.p.ssafy.io/session'));
     // #enddocregion webview_controller
   }
 
