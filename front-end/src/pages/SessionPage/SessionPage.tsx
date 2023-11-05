@@ -259,7 +259,7 @@ const SessionPage = () => {
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
-    const getTokenFromApp = (message: Message) => {
+    window.getTokenFromApp = (message: Message) => {
       console.log(`Flutter to Web : ${message}`);
       if (message.token !== 'null') {
         setUserToken(message.token);
