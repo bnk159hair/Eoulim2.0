@@ -1,7 +1,5 @@
-package com.ssafy.eoullim.service;
+package com.ssafy.eoullim.service.impl;
 
-import com.ssafy.eoullim.EoullimApplication;
-import com.ssafy.eoullim.dto.response.Response;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Alarm;
@@ -9,12 +7,9 @@ import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
 import io.openvidu.java.client.*;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;

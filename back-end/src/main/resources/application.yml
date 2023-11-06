@@ -32,5 +32,18 @@ public-api:
 server:
   port: 8081
 
+cloud:
+  aws:
+    s3:
+      bucket: ssafy-9th-c103-eoullim-record
+    credentials:
+      access-key: AKIA2V4EIHNBC5YW73MT
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
 OPENVIDU_URL: https://k9c103.p.ssafy.io
 OPENVIDU_SECRET: eoulim

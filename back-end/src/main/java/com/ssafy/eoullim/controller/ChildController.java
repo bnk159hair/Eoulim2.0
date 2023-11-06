@@ -8,7 +8,7 @@ import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.OtherChild;
 import com.ssafy.eoullim.model.User;
-import com.ssafy.eoullim.service.ChildService;
+import com.ssafy.eoullim.service.impl.ChildService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

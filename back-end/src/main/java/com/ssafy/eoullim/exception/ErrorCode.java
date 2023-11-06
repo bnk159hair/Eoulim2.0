@@ -15,7 +15,7 @@ public enum ErrorCode {
   // Server Error
   OPEN_API_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-001", "Open API Connection error occurs"),
   NOTIFICATION_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-002", "SSE notification Connection occurs error"),
-
+  S3_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-003", "S3 업로드 중에 발생한 문제입니다."),
   // FcmToken Error
   FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM-001", "존재 하지 않는 FcmToken 입니다."),
   // Child Error

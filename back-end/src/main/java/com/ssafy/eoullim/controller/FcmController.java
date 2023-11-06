@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.FcmRequest;
-import com.ssafy.eoullim.service.FirebaseMessagingService;
+import com.ssafy.eoullim.service.impl.FirebaseMessagingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

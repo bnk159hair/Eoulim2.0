@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.service;
+package com.ssafy.eoullim.service.impl;
 
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;

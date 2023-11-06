@@ -3,11 +3,10 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.model.RecordList;
 import com.ssafy.eoullim.model.Record;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
-import com.ssafy.eoullim.service.RecordService;
+import com.ssafy.eoullim.service.impl.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotBlank;

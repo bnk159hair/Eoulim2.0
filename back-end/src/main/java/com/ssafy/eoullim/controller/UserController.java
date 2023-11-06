@@ -6,7 +6,7 @@ import com.ssafy.eoullim.dto.request.UserModifyRequest;
 import com.ssafy.eoullim.dto.request.UserPwCheckRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.User;
-import com.ssafy.eoullim.service.UserService;
+import com.ssafy.eoullim.service.impl.UserService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.dto.request.FollowRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.User;
-import com.ssafy.eoullim.service.FollowService;
+import com.ssafy.eoullim.service.impl.FollowService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

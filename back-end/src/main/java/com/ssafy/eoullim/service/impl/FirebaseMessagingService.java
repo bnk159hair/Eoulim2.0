@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.service;
+package com.ssafy.eoullim.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

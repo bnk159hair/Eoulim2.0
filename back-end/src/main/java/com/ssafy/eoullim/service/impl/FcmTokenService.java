@@ -1,4 +1,4 @@
-package com.ssafy.eoullim.service;
+package com.ssafy.eoullim.service.impl;
 
 import com.ssafy.eoullim.dto.request.ChildLoginRequest;
 import com.ssafy.eoullim.model.entity.ChildEntity;

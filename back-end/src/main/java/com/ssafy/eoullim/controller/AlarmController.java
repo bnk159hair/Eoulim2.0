@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.controller;
 
 
-import com.ssafy.eoullim.service.AlarmService;
+import com.ssafy.eoullim.service.impl.AlarmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
