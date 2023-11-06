@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/api/api_profile.dart';
+import 'package:mobile/api/api_profilelogin.dart';
+import 'package:mobile/model/request_models/put_profilelogin.dart';
+import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/model/response_models/get_profilelist.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 class Profiles extends StatefulWidget {
   List<Profile> profiles = List.empty();
@@ -90,10 +95,18 @@ class CarouselWidget extends StatefulWidget {
 
 class _CarouselWidgetState extends State<CarouselWidget> {
   CarouselController carouselController = CarouselController();
+  String? fcmToken;
+  generalResponse? profileloginAuth;
+  ApiprofileLogin apiProfileLogin = ApiprofileLogin();
 
   @override
   void initState() {
     super.initState();
+    _initializeFCMToken();
+  }
+  Future<void> _initializeFCMToken() async {
+    final storage = new FlutterSecureStorage();
+    fcmToken = (await storage.read(key: 'fcmToken')) ;
   }
 
   @override
@@ -143,21 +156,28 @@ class _CarouselWidgetState extends State<CarouselWidget> {
           CarouselSlider(
             carouselController: carouselController,
             items: widget.profiles.map((profile) {
-              return Builder(
-                builder: (BuildContext context) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: const BoxDecoration(color: Colors.amber),
-                    child: Center(
-                      child: Text(
-                        profile.name ?? 'No Name',
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                  );
-                },
-              );
+        return GestureDetector(
+          onTap: () async {
+            profileloginAuth = await apiProfileLogin.postProfileLoginAPI(ProfileLoginRequestModel(childId: profile.id,  fcmToken: fcmToken ?? ""));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Home(),
+              ),
+            );
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            decoration: const BoxDecoration(color: Colors.amber),
+            child: Center(
+              child: Text(
+                profile.name ?? 'No Name',
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            ),
+          ),
+        );
             }).toList(),
             options: CarouselOptions(
               // Set the height of each carousel item
