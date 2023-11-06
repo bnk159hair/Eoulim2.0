@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.repository.jpa;
 
+import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.entity.ChildAnimonEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

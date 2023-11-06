@@ -3,7 +3,6 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.dto.request.ChildLoginRequest;
 import com.ssafy.eoullim.dto.request.ChildLogoutRequest;
 import com.ssafy.eoullim.dto.request.ChildRequest;
-import com.ssafy.eoullim.dto.request.FollowRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
@@ -55,7 +54,7 @@ public class ChildController {
   public SuccessResponse<?> create(
       @Valid @RequestBody ChildRequest request, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-    log.error(user.toString());
+    log.info(user.toString());
     final var child = childService.create(user, Child.of(request));
 
     return new SuccessResponse<>(HttpStatus.CREATED, child);
@@ -74,15 +73,18 @@ public class ChildController {
   public SuccessResponse<Child> getChild(
       @PathVariable @NotBlank Long childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-    Child child = childService.getChild(childId, user.getId());
+    Child child = childService.getChildWithUser(childId, user.getId());
     return new SuccessResponse<>(child);
   }
 
   @PutMapping("/{childId}")
   @ResponseStatus(HttpStatus.OK)
   public SuccessResponse<?> modify(
-      @PathVariable @NotBlank Long childId, @Valid @RequestBody ChildRequest request) {
-    Child updatedChild = childService.modify(childId, Child.of(request));
+      @PathVariable @NotBlank Long childId,
+      @Valid @RequestBody ChildRequest request,
+      Authentication authentication) {
+    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+    Child updatedChild = childService.modify(childId, Child.of(request), user.getId());
     return new SuccessResponse<>(updatedChild);
   }
 
@@ -95,15 +97,14 @@ public class ChildController {
     return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
   }
 
-  /**
-   * Child Animon
-   * Child의 정보 중 애니몬 관련 API
-   */
+  /** Child Animon Child의 정보 중 애니몬 관련 API */
   // GET : Child가 소유한 Animon List
   @GetMapping("/{childId}/animons")
   @ResponseStatus(HttpStatus.OK)
-  public SuccessResponse<List<Animon>> getAnimonList(@PathVariable @NotBlank Long childId) {
-    List<Animon> animonList = childService.getAnimonList(childId);
+  public SuccessResponse<List<Animon>> getAnimonList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+    List<Animon> animonList = childService.getAnimonList(childId, user.getId());
     return new SuccessResponse<>(animonList);
   }
 
@@ -116,14 +117,12 @@ public class ChildController {
     return new SuccessResponse<>(animon);
   }
 
-  /**
-   * Child follow
-   * Child의 정보 중 팔로우 관련 API
-   */
+  /** Child follow Child의 정보 중 팔로우 관련 API */
   @GetMapping("/{childId}/follows")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public SuccessResponse<List<Child>> getFriendsList(@PathVariable @NotBlank Long childId, Authentication authentication) {
+  public SuccessResponse<List<Child>> getFriendsList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     List<Child> friendList = childService.getFriends(childId, user);
     return new SuccessResponse<>(friendList);

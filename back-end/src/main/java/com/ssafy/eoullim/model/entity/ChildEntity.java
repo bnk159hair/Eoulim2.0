@@ -77,6 +77,7 @@ public class ChildEntity extends BaseEntity {
         .grade(child.getGrade())
         .status(child.getStatus())
         .user(UserEntity.of(child.getUser()))
+        .profileAnimon(AnimonEntity.of(child.getProfileAnimon()))
         .build();
   }
 
