@@ -12,7 +12,7 @@ import lombok.*;
 public class Animon {
 
   private Long id;
-  private String headImagePath;
+  private String maskImagePath;
   private String bodyImagePath;
   private String name;
 
@@ -20,7 +20,7 @@ public class Animon {
     return Animon.builder()
         .id(entity.getId())
         .name(entity.getName())
-        .headImagePath(entity.getHeadImagePath())
+        .maskImagePath(entity.getMaskImagePath())
         .bodyImagePath(entity.getBodyImagePath())
         .build();
   }

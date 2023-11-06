@@ -19,16 +19,16 @@ public class AnimonEntity extends BaseEntity {
   private String name;
 
   @Column(nullable = false)
-  private String headImagePath;
+  private String maskImagePath;
 
   @Column(nullable = false)
   private String bodyImagePath;
 
   @Builder
-  public AnimonEntity(Long id, String name, String headImagePath, String bodyImagePath) {
+  public AnimonEntity(Long id, String name, String maskImagePath, String bodyImagePath) {
     this.id = id;
     this.name = name;
-    this.headImagePath = headImagePath;
+    this.maskImagePath = maskImagePath;
     this.bodyImagePath = bodyImagePath;
   }
 
@@ -36,7 +36,7 @@ public class AnimonEntity extends BaseEntity {
     return AnimonEntity.builder()
         .id(animon.getId())
         .name(animon.getName())
-        .headImagePath(animon.getHeadImagePath())
+        .maskImagePath(animon.getMaskImagePath())
         .bodyImagePath(animon.getBodyImagePath())
         .build();
   }
