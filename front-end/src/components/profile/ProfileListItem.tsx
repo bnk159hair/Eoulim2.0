@@ -22,18 +22,23 @@ const theme = createTheme({
 interface ProfileListItemProps {
   name: string;
   childId: number;
-  resetList: () => void;
+  getProfiles: () => void;
   imgurl: string;
 }
 
-const ProfileListItem: React.FC<ProfileListItemProps> = ({ name, childId, resetList, imgurl }) => {
+const ProfileListItem: React.FC<ProfileListItemProps> = ({
+  name,
+  childId,
+  getProfiles,
+  imgurl,
+}) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isRecordOpen, setIsRecordOpen] = useState(false);
   const token = useRecoilValue(tokenState);
   const [, setProfileKey] = useRecoilState(Profilekey);
   const [, setUserName] = useRecoilState(userState);
   const navigate = useNavigate();
-  const IMGURL = `/${imgurl}.png`;
+  const IMGURL = imgurl;
 
   const handleModalOpen = () => {
     setModalOpen(true);
@@ -53,9 +58,9 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({ name, childId, resetL
 
   const profileLogin = () => {
     axios
-      .post(
-        `${API_BASE_URL}/children/login/${childId}`,
-        {},
+      .get(
+        `${API_BASE_URL}/children/${childId}`,
+
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +110,7 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({ name, childId, resetL
         </ButtonContainer>
       </div>
       {isModalOpen && (
-        <ModifyModal onClose={handleModalClose} childId={childId} resetList={resetList} />
+        <ModifyModal onClose={handleModalClose} childId={childId} resetList={getProfiles} />
       )}
       {isRecordOpen && <ToRecordModal onClose={handleRecordClose} childId={childId} />}
     </ThemeProvider>
