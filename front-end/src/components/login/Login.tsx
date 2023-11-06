@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, InputAdornment } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import { postLogin } from 'apis/auth';
+import { postLogin } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
 import { FormContainer, LoginButton, SignupContainer, SignupAnchor } from './LoginStyles';
 import SignupModal from './SignupModal';

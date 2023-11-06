@@ -32,14 +32,19 @@ interface SignupParams extends ApiResponse {
   signupData: SignupData;
 }
 
+interface ChangePasswordParams extends ApiResponse {
+  passwordData: PasswordData;
+}
+
 interface CheckUsernameParams {
   username: string;
   onSuccess: (data: boolean) => void;
   onError: () => void;
 }
-
-interface ChangePasswordParams extends ApiResponse {
-  passwordData: PasswordData;
+interface CheckPassowrdParams {
+  password: string;
+  onSuccess: (data: boolean) => void;
+  onError: () => void;
 }
 
 const userInstance: AxiosInstance = axios.create({
@@ -86,15 +91,6 @@ export const postSignup = async ({ signupData, onSuccess, onError }: SignupParam
   }
 };
 
-export const getCheckUsername = async ({ username, onSuccess, onError }: CheckUsernameParams) => {
-  try {
-    const response = await userInstance.get(`check-username/${username}`);
-    onSuccess(response.data.data);
-  } catch (error) {
-    onError();
-  }
-};
-
 export const getLogout = async ({ onSuccess, onError }: ApiResponse) => {
   try {
     await instance.get('/users/logout');
@@ -113,6 +109,24 @@ export const patchChangePassword = async ({
   try {
     await instance.patch('/users/password', passwordData);
     onSuccess();
+  } catch (error) {
+    onError();
+  }
+};
+
+export const getCheckUsername = async ({ username, onSuccess, onError }: CheckUsernameParams) => {
+  try {
+    const response = await userInstance.get(`/check-username/${username}`);
+    onSuccess(response.data.data);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const postCheckPassword = async ({ password, onSuccess, onError }: CheckPassowrdParams) => {
+  try {
+    const response = await instance.post('/users/check-password', { password });
+    onSuccess(response.data.data);
   } catch (error) {
     onError();
   }

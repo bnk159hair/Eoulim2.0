@@ -1,56 +1,40 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue, useRecoilState } from 'recoil';
-import axios from 'axios';
+import { useRecoilState } from 'recoil';
 import { Button, TextField } from '@mui/material';
-import Swal from 'sweetalert2';
-import { tokenState } from '../../atoms/Auth';
-import { API_BASE_URL } from '../../apis/urls';
+import { postCheckPassword } from 'apis/authApis';
+import inputAlert from 'utils/inputAlert';
 import { Profilekey } from '../../atoms/Profile';
 import { ModalOverlay, ModalContent, FormContainer, ButtonContainer } from './ToRecordModalStyles';
 
-interface ToRecordModalProps {
+interface Props {
   onClose: () => void;
   childId: number;
 }
 
-const ToRecordModal: React.FC<ToRecordModalProps> = ({ onClose, childId }) => {
-  const token = useRecoilValue(tokenState);
+const ToRecordModal = ({ onClose, childId }: Props) => {
   const [password, setPassword] = useState('');
   const [, setProfileKey] = useRecoilState(Profilekey);
   const navigate = useNavigate();
 
-  const passwordCheck = (event: any) => {
+  const passwordCheck = (
+    event: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
-    axios
-      .post(
-        `${API_BASE_URL}/check-password`,
-        { password },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(response => {
-        if (response.data.data) {
+    postCheckPassword({
+      password,
+      onSuccess: isCorrect => {
+        if (isCorrect) {
           setProfileKey(childId);
-          Swal.fire({
-            text: '비밀번호가 확인되었습니다!',
-            icon: 'success',
-            confirmButtonText: '닫기',
-          }).then(() => navigate('/record'));
+          inputAlert('비밀번호가 확인되었습니다!', false).then(() => navigate('/record'));
         } else {
-          Swal.fire({
-            text: '비밀번호를 확인해주세요!',
-            icon: 'error',
-            confirmButtonText: '닫기',
-          });
+          inputAlert('비밀번호를 확인해주세요!');
         }
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      },
+      onError: () => {
+        inputAlert('잠시 후 다시 시도해주세요!');
+      },
+    });
   };
 
   return (

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { TextField, IconButton, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getCheckUsername, postSignup } from 'apis/auth';
+import { getCheckUsername, postSignup } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
 import {
   ModalOverlay,

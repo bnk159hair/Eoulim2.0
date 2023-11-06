@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import { getLogout } from 'apis/auth';
+import { getLogout } from 'apis/authApis';
 import ProfileList from '../../components/profile/ProfileList';
 import { ProfilePageContainer, PasswordChange, MarginContainer } from './ProfilePageStyles';
 import ChangePasswordModal from '../../components/profile/ChangePasswordModal';

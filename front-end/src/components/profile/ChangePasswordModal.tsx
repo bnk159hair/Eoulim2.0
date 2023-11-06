@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getLogout, patchChangePassword } from 'apis/auth';
+import { getLogout, patchChangePassword } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
 import {
   ModalOverlay,
