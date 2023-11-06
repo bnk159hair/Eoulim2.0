@@ -1,20 +1,82 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:get/get.dart';
+import 'package:mobile/api/api_profileinfo.dart';
+import 'package:mobile/controller/profile_select.dart';
+import 'package:mobile/model/response_models/get_porfile.dart';
 import 'package:mobile/screen/notifications_screen.dart';
 import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
-
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 
 var backButtonPressedOnce = false;
 
-class Home extends StatelessWidget {
-  const Home({super.key});
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+  
+  @override
+  _HomeState createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  Apiprofileinfo apiProfileinfo = Apiprofileinfo();
+  final ProfileController profileController = Get.find<ProfileController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfileInfo();
+  }
+
+  Future<void> _getProfileInfo() async {
+    getProfileinfo result = await apiProfileinfo.getprofileAPI();
+    if (result.code == '200') {
+
+    } else if (result.code == '401') {
+      showDialog(
+        context: context, // 이 부분에 정의가 필요
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('로그인을 해주세요'),
+            actions: [
+              Center(
+                child: TextButton(
+                  child: const Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context, // 이 부분에 정의가 필요
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Text('${result.status}'),
+            actions: [
+              Center(
+                child: TextButton(
+                  child: const Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         // 첫 번째 뒤로가기 버튼 누를 때
@@ -53,20 +115,30 @@ class Home extends StatelessWidget {
             iconSize: 40.0,
           ),
           actions: [
-            MaterialButton(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.0),
-              ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).clearSnackBars();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Hello There!'),
-                    duration: Duration(milliseconds: 1500),
+            Row(
+              children: [
+                MaterialButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
                   ),
-                );
-              },
-              child: Image.asset('assets/bear.png'),
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Hello There!'),
+                        duration: Duration(milliseconds: 1500),
+                      ),
+                    );
+                  },
+                  child: Image.asset('assets/bear.png'),
+                ),
+                Obx(() {
+              return Text(
+                profileController.selectedProfile.value?.name ?? 'No Name',
+                style: TextStyle(fontSize: 16),
+              );
+            }),
+              ],
             )
           ],
           // backgroundColor: Colors.black,
@@ -113,7 +185,7 @@ List<PersistentBottomNavBarItem> _navBarsItems() {
 }
 
 class HomeBottomNavBar extends StatelessWidget {
-  const HomeBottomNavBar({super.key});
+  const HomeBottomNavBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +200,7 @@ class HomeBottomNavBar extends StatelessWidget {
         backgroundColor: Colors.white, // Default is Colors.white.
         handleAndroidBackButtonPress: true, // Default is true.
         resizeToAvoidBottomInset:
-            true, // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
+            true, // This needs to be true if you want to move up the screen when the keyboard appears. Default is true.
         stateManagement: true, // Default is true.
         hideNavigationBarWhenKeyboardShows:
             true, // Recommended to set 'resizeToAvoidBottomInset' as true while using this argument. Default is true.
@@ -144,7 +216,7 @@ class HomeBottomNavBar extends StatelessWidget {
           curve: Curves.easeInOut,
         ),
         screenTransitionAnimation: const ScreenTransitionAnimation(
-          // Screen transition animation on change of selected tab.
+          // Screen transition animation on change of the selected tab.
           animateTabTransition: true,
           curve: Curves.easeInOut,
           duration: Duration(milliseconds: 50),
@@ -154,4 +226,10 @@ class HomeBottomNavBar extends StatelessWidget {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Home(),
+  ));
 }

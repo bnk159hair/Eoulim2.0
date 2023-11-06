@@ -4,7 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'firebase_options.dart';
+import 'package:mobile/controller/profile_select.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 
 import 'package:mobile/screen/splash_screen.dart';
 
@@ -75,6 +77,8 @@ void initializeNotification() async {
 
 void getMyDeviceToken() async {
   final token = await FirebaseMessaging.instance.getToken();
+  final storage = new FlutterSecureStorage();
+  await storage.write(key: 'fcmToken', value: token);
   print("내 디바이스 토큰: $token");
 }
 
@@ -101,11 +105,14 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return const MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       title: 'Eoullim',
       home: Splash(),
+      initialBinding: BindingsBuilder(() {
+        Get.put(ProfileController());
+      }),
     );
   }
 }
