@@ -1,57 +1,42 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
+import { getLogout } from 'apis/auth';
 import ProfileList from '../../components/profile/ProfileList';
 import { ProfilePageContainer, PasswordChange, MarginContainer } from './ProfilePageStyles';
-import ChagePasswordModal from '../../components/profile/ChangePasswordModal';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState, userState } from '../../atoms/Auth';
+import ChangePasswordModal from '../../components/profile/ChangePasswordModal';
+import { userState } from '../../atoms/Auth';
 
 const ProfilePage = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const token = useRecoilValue(tokenState);
   const navigate = useNavigate();
-  const [, setToken] = useRecoilState(tokenState);
+  const [isModalOpen, setModalOpen] = useState(false);
   const [, setUserName] = useRecoilState(userState);
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const logoutClick = () => {
-    axios
-      .get(`${API_BASE_URL}/logout`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => {
-        setToken('');
+  const handleLogout = () => {
+    getLogout({
+      onSuccess: () => {
         navigate('/login');
-      })
-      .catch(error => {
-        console.log(token);
-        console.log('로그아웃 오류:', error);
-        setToken('');
+      },
+      onError: () => {
         setUserName('');
         navigate('/login');
-      });
+      },
+    });
   };
 
   return (
     <ProfilePageContainer>
       <MarginContainer>
-        <PasswordChange onClick={handleModalOpen} />
+        <PasswordChange
+          onClick={() => {
+            setModalOpen(true);
+          }}
+        />
       </MarginContainer>
-      {isModalOpen && <ChagePasswordModal onClose={handleModalClose} />}
+      {isModalOpen && <ChangePasswordModal onClose={() => setModalOpen(false)} />}
       <ProfileList />
       <MarginContainer>
-        <button onClick={logoutClick}>{'로그아웃'}</button>
+        <button onClick={handleLogout}>{'로그아웃'}</button>
       </MarginContainer>
     </ProfilePageContainer>
   );

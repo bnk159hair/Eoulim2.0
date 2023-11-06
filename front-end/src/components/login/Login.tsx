@@ -1,56 +1,35 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
 import { TextField, InputAdornment } from '@mui/material';
 import { AccountCircle } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import Swal from 'sweetalert2';
-import { tokenState } from '../../atoms/Auth';
+import { postLogin } from 'apis/auth';
+import inputAlert from 'utils/inputAlert';
 import { FormContainer, LoginButton, SignupContainer, SignupAnchor } from './LoginStyles';
-import { API_BASE_URL } from '../../apis/urls';
 import SignupModal from './SignupModal';
 
 const Login = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isModalOpen, setModalOpen] = useState(false);
-  const navigate = useNavigate();
-  const [, setToken] = useRecoilState(tokenState);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleLogin = (event: any) => {
+  const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!username.trim() || !password.trim()) {
-      Swal.fire({
-        text: '아이디와 비밀번호를 확인해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('아이디와 비밀번호를 확인해주세요!');
       return;
     }
-
-    axios
-      .post(`${API_BASE_URL}/users/login`, { username, password })
-      .then(response => {
-        console.log(response);
-        setToken(response.data.data);
+    const loginData = { username, password };
+    postLogin({
+      loginData,
+      onSuccess: () => {
         navigate('/profile');
-      })
-      .catch(() => {
-        Swal.fire({
-          text: '아이디와 비밀번호를 확인해주세요!',
-          icon: 'error',
-          confirmButtonText: '닫기',
-        });
-      });
-  };
-
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
+      },
+      onError: () => {
+        inputAlert('아이디와 비밀번호를 확인해주세요!');
+      },
+    });
   };
 
   return (
@@ -101,8 +80,8 @@ const Login = () => {
       </FormContainer>
       <SignupContainer>
         <span>{'아직 회원이 아니신가요?'}</span>
-        <SignupAnchor onClick={handleModalOpen}>{'회원가입'}</SignupAnchor>
-        {isModalOpen && <SignupModal onClose={handleModalClose} />}
+        <SignupAnchor onClick={() => setIsModalOpen(true)}>{'회원가입'}</SignupAnchor>
+        {isModalOpen && <SignupModal onClose={() => setIsModalOpen(false)} />}
       </SignupContainer>
     </>
   );

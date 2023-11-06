@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useRecoilValue, useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { Button, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Swal from 'sweetalert2';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState } from '../../atoms/Auth';
+import { getLogout, patchChangePassword } from 'apis/auth';
+import inputAlert from 'utils/inputAlert';
 import {
   ModalOverlay,
   ModalContent,
   FormContainer,
   HeaderContainer,
 } from './ChangePasswordModalStyles';
-
-interface ChagePasswordModalProps {
-  onClose: () => void;
-}
 
 const theme = createTheme({
   palette: {
@@ -27,93 +20,57 @@ const theme = createTheme({
   },
 });
 
-const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
+const ChangePasswordModal = ({ onClose }: { onClose: () => void }) => {
   const [curPassword, setCurPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
-  const token = useRecoilValue(tokenState);
-  const [, setToken] = useRecoilState(tokenState);
   const navigate = useNavigate();
 
   const handlePasswordConfirmation = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const newValue = event.target.value;
-    setPasswordConfirmation(newValue);
-    setIsPasswordMatch(newPassword === newValue);
-  };
-
-  const logoutClick = () => {
-    axios
-      .get(`${API_BASE_URL}/users/logout`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => {
-        setToken('');
-        navigate('/login');
-      })
-      .catch(error => {
-        console.log(token);
-        console.log('로그아웃 오류:', error);
-        setToken('');
-        navigate('/login');
-      });
+    const inputValue = event.target.value;
+    setPasswordConfirmation(inputValue);
+    setIsPasswordMatch(newPassword === inputValue);
   };
 
   const handleChangePassword = async (event: any) => {
     event?.preventDefault();
     if (!curPassword.trim() || !newPassword.trim()) {
-      Swal.fire({
-        text: '정보를 올바르게 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('비밀번호를 입력해주세요!');
       return;
     }
 
-    if (!isPasswordMatch) {
-      Swal.fire({
-        text: '비밀번호 확인이 일치하지 않습니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+    if (curPassword === newPassword) {
+      inputAlert('새 비밀번호가 현재 비밀번호와 같습니다.');
       return;
     }
 
-    if (passwordConfirmation !== newPassword) {
+    if (!isPasswordMatch || passwordConfirmation !== newPassword) {
       setIsPasswordMatch(false);
-      Swal.fire({
-        text: '비밀번호 확인이 일치하지 않습니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('비밀번호 확인이 일치하지 않습니다!');
       return;
     }
 
-    try {
-      const usersData = { curPassword, newPassword };
-      const response = await axios.patch(`${API_BASE_URL}/users/password`, usersData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log('비밀번호 변경성공', response);
-      Swal.fire({
-        text: '비밀번호가 변경되었습니다!',
-        icon: 'success',
-        confirmButtonText: '닫기',
-      }).then(() => logoutClick());
-    } catch (error) {
-      console.log(token);
-      console.log('비밀번호 변경 실패', error);
-      Swal.fire({
-        text: '현재 비밀번호가 틀렸습니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-    }
+    const passwordData = { curPassword, newPassword };
+    patchChangePassword({
+      passwordData,
+      onSuccess: () => {
+        inputAlert('비밀번호가 변경되었습니다!', false).then(() =>
+          getLogout({
+            onSuccess: () => {
+              navigate('/login');
+            },
+            onError: () => {
+              navigate('/login');
+            },
+          }),
+        );
+      },
+      onError: () => {
+        inputAlert('잠시 후 다시 시도해주세요!');
+      },
+    });
   };
 
   return (
@@ -134,7 +91,7 @@ const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
               margin={'dense'}
               type={'password'}
               value={curPassword}
-              onChange={(event: React.ChangeEvent<HTMLInputElement> | any) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setCurPassword(event.target.value)
               }
             />
@@ -144,7 +101,7 @@ const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
               margin={'dense'}
               type={'password'}
               value={newPassword}
-              onChange={(event: React.ChangeEvent<HTMLInputElement> | any) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 setNewPassword(event.target.value)
               }
             />
@@ -154,7 +111,7 @@ const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
               margin={'dense'}
               type={'password'}
               value={passwordConfirmation}
-              onChange={(event: React.ChangeEvent<HTMLInputElement> | any) =>
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 handlePasswordConfirmation(event)
               }
               error={!isPasswordMatch}
@@ -176,4 +133,4 @@ const ChagePasswordModal: React.FC<ChagePasswordModalProps> = ({ onClose }) => {
   );
 };
 
-export default ChagePasswordModal;
+export default ChangePasswordModal;

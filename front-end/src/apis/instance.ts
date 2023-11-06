@@ -1,6 +1,4 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import { useRecoilValue } from 'recoil';
-import { tokenState } from 'atoms/Auth';
 import { API_BASE_URL } from './urls';
 
 const instance: AxiosInstance = axios.create({
@@ -9,10 +7,10 @@ const instance: AxiosInstance = axios.create({
 
 instance.interceptors.request.use(
   config => {
-    const userToken = useRecoilValue(tokenState);
+    const accessToken = localStorage.getItem('accessToken');
 
     config.headers['Content-Type'] = 'application/json';
-    config.headers.Authorization = `Bearer ${userToken}`;
+    config.headers.Authorization = `Bearer ${accessToken}`;
 
     return config;
   },

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { TextField, IconButton, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Swal from 'sweetalert2';
+import { getCheckUsername, postSignup } from 'apis/auth';
+import inputAlert from 'utils/inputAlert';
 import {
   ModalOverlay,
   ModalContent,
@@ -11,7 +11,6 @@ import {
   ModalFormContainer,
   IdContainer,
 } from './SignupModalStyles';
-import { API_BASE_URL } from '../../apis/urls';
 
 const theme = createTheme({
   palette: {
@@ -21,32 +20,19 @@ const theme = createTheme({
   },
 });
 
-interface SignupModalProps {
-  onClose: () => void;
-}
-
-const SignupModal = ({ onClose }: SignupModalProps) => {
+const SignupModal = ({ onClose }: { onClose: () => void }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
-  const [isIdUnique, setIsIdUnique] = useState(false);
+  const [isUsernameUnique, setIsUsernameUnique] = useState(false);
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
   const phoneNumberPattern = /^010\d{8}$/;
   const namePattern = /^[가-힣]{2,17}$/;
 
-  const handleSignUp = async (event: any) => {
+  const handleSignup = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (isIdUnique === false) {
-      Swal.fire({
-        text: '아이디 중복 확인을 해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-      return;
-    }
-
     if (
       !username.trim() ||
       !password.trim() ||
@@ -54,101 +40,69 @@ const SignupModal = ({ onClose }: SignupModalProps) => {
       !name.trim() ||
       !phoneNumber
     ) {
-      Swal.fire({
-        text: '모든 정보를 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('모든 정보를 입력해주세요!');
+      return;
+    }
+
+    if (isUsernameUnique === false) {
+      inputAlert('아이디 중복 확인을 해주세요!');
       return;
     }
 
     if (!isPasswordMatch) {
-      Swal.fire({
-        text: '비밀번호가 일치하지 않습니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-      return;
-    }
-
-    const isValidPhoneNumber = phoneNumberPattern.test(phoneNumber);
-    if (!isValidPhoneNumber) {
-      Swal.fire({
-        text: '올바른 전화번호 형식이 아닙니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('비밀번호가 일치하지 않습니다!');
       return;
     }
 
     const isValidName = namePattern.test(name);
     if (!isValidName) {
-      Swal.fire({
-        text: '이름을 다시 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('이름을 다시 입력해주세요!');
       return;
     }
 
-    try {
-      const signUpData = { username, password, name, phoneNumber };
-      const response = await axios.post(`${API_BASE_URL}/users/join`, signUpData);
-      Swal.fire({
-        text: '회원 가입에 성공했습니다!',
-        icon: 'success',
-        confirmButtonText: '닫기',
-      });
-      onClose();
-      console.log('회원가입 성공:', response);
-    } catch (error) {
-      console.error('회원가입 실패:', error);
+    const isValidPhoneNumber = phoneNumberPattern.test(phoneNumber);
+    if (!isValidPhoneNumber) {
+      inputAlert('올바른 전화번호 형식이 아닙니다!');
+      return;
     }
+
+    const signupData = { username, password, name, phoneNumber };
+    postSignup({
+      signupData,
+      onSuccess: () => {
+        inputAlert('회원 가입에 성공했습니다!', false);
+        onClose();
+      },
+      onError: () => {
+        inputAlert('잠시 후 다시 시도해주세요!');
+      },
+    });
   };
 
-  const handleIdCheck = async (event: any) => {
+  const handleCheckUsername = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!username.trim()) {
-      Swal.fire({
-        text: '아이디를 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('아이디를 입력해주세요!');
       return;
     }
 
-    try {
-      const response = await axios.get(`${API_BASE_URL}/users/check-username/${username}`);
-      setIsIdUnique(response.data.data);
-      console.log('아이디 중복 확인 결과:', response);
-      if (response.data.data) {
-        Swal.fire({
-          text: '사용 가능한 아이디입니다!',
-          icon: 'success',
-          confirmButtonText: '닫기',
-        });
-      } else {
-        Swal.fire({
-          text: '이미 사용 중인 아이디입니다!',
-          icon: 'error',
-          confirmButtonText: '닫기',
-        });
-      }
-    } catch (error) {
-      console.error('아이디 중복 확인 에러:', error);
-      Swal.fire({
-        text: '이미 사용 중인 아이디입니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-    }
+    getCheckUsername({
+      username,
+      onSuccess: data => {
+        setIsUsernameUnique(data);
+        inputAlert('사용 가능한 아이디입니다!', false);
+      },
+      onError: () => {
+        inputAlert('이미 사용 중인 아이디입니다!');
+      },
+    });
   };
 
   const handlePasswordConfirmation = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const newValue = event.target.value;
-    setPasswordConfirmation(newValue);
-    setIsPasswordMatch(password === newValue);
+    const inputValue = event.target.value;
+    setPasswordConfirmation(inputValue);
+    setIsPasswordMatch(password === inputValue);
   };
 
   return (
@@ -172,14 +126,14 @@ const SignupModal = ({ onClose }: SignupModalProps) => {
                   setUsername(event.target.value)
                 }
                 sx={{ width: '75%', marginTop: '0' }}
-                helperText={isIdUnique && '중복 확인이 완료되었습니다.'}
-                disabled={isIdUnique && true}
+                helperText={isUsernameUnique && '중복 확인이 완료되었습니다.'}
+                disabled={isUsernameUnique && true}
               />
               <Button
                 variant={'contained'}
                 size={'large'}
                 sx={{ padding: '0.8rem', marginLeft: 'auto', fontSize: '16px' }}
-                onClick={handleIdCheck}
+                onClick={handleCheckUsername}
               >
                 {'중복확인'}
               </Button>
@@ -229,7 +183,7 @@ const SignupModal = ({ onClose }: SignupModalProps) => {
               variant={'contained'}
               size={'large'}
               sx={{ padding: '0.6rem', marginTop: '1rem', fontSize: '20px' }}
-              onClick={handleSignUp}
+              onClick={handleSignup}
             >
               {'가입완료'}
             </Button>
