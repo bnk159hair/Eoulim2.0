@@ -21,27 +21,30 @@ export const useFireBase = () => {
   const app = initializeApp(config);
   const messaging = getMessaging(app);
 
-  getToken(messaging, {
-    vapidKey:
-      'BBOa5aFnA-ro3kuLdxF-k7Ifro9nF11wfu7w7Eh97ArUgUsO1vEQkHOznBwOlJe4wnNha6mHHcyRZV08qNtOb_Y',
-  })
-    .then(currentToken => {
-      if (currentToken) {
-        // Send the token to your server and update the UI if necessary
-        // ...
-        setFcmToken(currentToken);
-        console.log(currentToken);
-      } else {
-        // Show permission request UI
-        console.log('No registration token available. Request permission to generate one.');
-        // ...
-      }
+  if (fcmToken === '') {
+    getToken(messaging, {
+      vapidKey:
+        'BBOa5aFnA-ro3kuLdxF-k7Ifro9nF11wfu7w7Eh97ArUgUsO1vEQkHOznBwOlJe4wnNha6mHHcyRZV08qNtOb_Y',
     })
-    .catch(err => {
-      console.log('An error occurred while retrieving token. ', err);
-      // ...
-    });
-
+      .then(currentToken => {
+        if (currentToken) {
+          // Send the token to your server and update the UI if necessary
+          // ...
+          setFcmToken(currentToken);
+          console.log(currentToken);
+        } else {
+          // Show permission request UI
+          console.log('No registration token available. Request permission to generate one.');
+          // ...
+        }
+      })
+      .catch(err => {
+        console.log('An error occurred while retrieving token. ', err);
+        // ...
+      });
+  } else {
+    console.log(fcmToken);
+  }
   // 포그라운드 메시지 수신
   onMessage(messaging, payload => {
     console.log('Message received. ', payload);
