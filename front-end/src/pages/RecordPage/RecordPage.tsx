@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { getRecord } from 'apis/recordApis';
 import RecordListItem from '../../components/record/RecordListItem';
 import { RecordPageContainer, EmptyRecord, Scroll, BackIcon } from './RecordPageStyles';
 import { tokenState } from '../../atoms/Auth';
 import { Profilekey } from '../../atoms/Profile';
-import { API_BASE_URL } from '../../apis/urls';
 
 interface Record {
   animonName: string;
@@ -29,31 +28,17 @@ const RecordPage = () => {
     if (!token) {
       navigate('/login');
     } else {
-      getRecord();
+      getRecord({
+        profileId,
+        onSuccess: data => {
+          setRecords(data);
+        },
+        onError: () => {
+          console.log('녹화 영상 불러오기 오류');
+        },
+      });
     }
   }, [profileId, token]);
-
-  const getRecord = () => {
-    axios
-      .get(`${API_BASE_URL}/recordings/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        const { data } = response;
-        console.log(response);
-        setRecords(data);
-        console.log('녹화영상 불러오기');
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('녹화영상불러오기오류', error);
-        }
-      });
-  };
 
   const getBack = () => {
     navigate('/profile');
