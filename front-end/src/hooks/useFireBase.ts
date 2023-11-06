@@ -14,9 +14,8 @@ const config = {
 };
 
 const app = initializeApp(config);
-const messaging = getMessaging();
+const messaging = getMessaging(app);
 
-// 토큰값 얻기
 getToken(messaging, {
   vapidKey:
     'BBOa5aFnA-ro3kuLdxF-k7Ifro9nF11wfu7w7Eh97ArUgUsO1vEQkHOznBwOlJe4wnNha6mHHcyRZV08qNtOb_Y',
@@ -42,5 +41,3 @@ onMessage(messaging, payload => {
   console.log('Message received. ', payload);
   // ...
 });
-
-export { app };
