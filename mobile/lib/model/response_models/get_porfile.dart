@@ -1,20 +1,18 @@
-import 'package:mobile/model/response_models/general_response.dart';
+import "package:mobile/model/response_models/general_response.dart";
 
-class getProfiles extends generalResponse {
-  List<Profile>? profiles;
 
-  getProfiles(String? code, String? status, List<Profile> data)
+class getProfileinfo extends generalResponse {
+  Profile? profile;
+
+  getProfileinfo(String? code, String? status, Profile data)
       : super(code, status) {
-    this.profiles = data;
+    this.profile = data;
   }
 
-  getProfiles.fromJson(Map<String, dynamic> json)
+  getProfileinfo.fromJson(Map<String, dynamic> json)
       : super(json['code'], json['status']) {
     if (json['data'] != null) {
-      profiles = <Profile>[];
-      json['data'].forEach((v) {
-        profiles!.add(Profile.fromJson(v));
-      });
+      profile = Profile.fromJson(json['data']);
     }
   }
 }
