@@ -1,9 +1,14 @@
 import instance from 'apis/instance';
 
-// interface ApiResponse {
-//   onSuccess: () => void;
-//   onError: () => void;
-// }
+interface ApiResponse {
+  onSuccess: () => void;
+  onError: () => void;
+}
+
+interface FollowingData {
+  myId: number;
+  friendId: number;
+}
 
 interface VideoData {
   id: number;
@@ -22,15 +27,15 @@ interface ChangeVideoParams {
   onError: () => void;
 }
 
-export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonParams) => {
-  try {
-    const response = await instance.get(`/children/participant/${subscriberId}`);
-    console.log('Success Get Animon');
-    onSuccess(response.data.data);
-  } catch (error) {
-    onError();
-  }
-};
+interface FollowingParams extends ApiResponse {
+  followingData: FollowingData;
+}
+
+interface FriendsParams {
+  profileId: number;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
 
 export const changeVideo = async ({ videoData, onSuccess, onError }: ChangeVideoParams) => {
   try {
@@ -41,6 +46,36 @@ export const changeVideo = async ({ videoData, onSuccess, onError }: ChangeVideo
     };
     const message = JSON.stringify(jsonMessage);
     onSuccess(isAnimonOn, message);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const follow = async ({ followingData, onSuccess, onError }: FollowingParams) => {
+  try {
+    await instance.post(`/friendship`, {
+      followingData,
+    });
+    onSuccess();
+  } catch (error) {
+    onError();
+  }
+};
+
+export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonParams) => {
+  try {
+    const response = await instance.get(`/children/participant/${subscriberId}`);
+    console.log('Success Get Animon');
+    onSuccess(response.data.data);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const getFriends = async ({ profileId, onSuccess, onError }: FriendsParams) => {
+  try {
+    const response = await instance.get(`/friendship/${profileId}`);
+    onSuccess(response.data.data);
   } catch (error) {
     onError();
   }

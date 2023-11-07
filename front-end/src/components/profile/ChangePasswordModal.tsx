@@ -5,6 +5,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { getLogout, patchChangePassword } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
+import { useRecoilValue } from 'recoil';
+import { fcmTokenState } from 'atoms/Firebase';
 import {
   ModalOverlay,
   ModalContent,
@@ -25,6 +27,7 @@ const ChangePasswordModal = ({ onClose }: { onClose: () => void }) => {
   const [newPassword, setNewPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
   const [isPasswordMatch, setIsPasswordMatch] = useState(true);
+  const fcmToken = useRecoilValue(fcmTokenState);
   const navigate = useNavigate();
 
   const handlePasswordConfirmation = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +61,7 @@ const ChangePasswordModal = ({ onClose }: { onClose: () => void }) => {
       onSuccess: () => {
         inputAlert('비밀번호가 변경되었습니다!', false).then(() =>
           getLogout({
+            fcmToken,
             onSuccess: () => {
               navigate('/login');
             },

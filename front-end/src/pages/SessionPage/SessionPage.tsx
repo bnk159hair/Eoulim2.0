@@ -5,8 +5,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
-import instance from 'apis/instance';
-import { changeVideo, getAnimon } from 'apis/sessionApis';
+import { changeVideo, follow, getAnimon, getFriends } from 'apis/sessionApis';
 import { useWebSocket } from 'hooks/useWebSocket';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
@@ -48,7 +47,7 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-  const [userToken, setUserToken] = useRecoilState(tokenState);
+  const [, setUserToken] = useRecoilState(tokenState);
 
   const [publisherId, setPublisherId] = useState(0);
   const [subscriberId, setSubscriberId] = useState(-1);
@@ -77,6 +76,16 @@ const SessionPage = () => {
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(profileId);
 
   const [micStatus, setMicStatus] = useState(true);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  window.getTokenFromApp = async (message: Message) => {
+    console.log(`Flutter to Web : ${message}`);
+    if (message.token !== 'null') {
+      await setUserToken(message.token);
+    }
+  };
+
   useEffect(() => {
     onChangeMicStatus(micStatus);
   }, [micStatus]);
@@ -90,7 +99,16 @@ const SessionPage = () => {
   useEffect(() => {
     setPublisherId(profileId);
     setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
-    getFriends();
+    getFriends({
+      profileId,
+      onSuccess: data => {
+        setFriends(data);
+        console.log('친구 불러오기 성공');
+      },
+      onError: () => {
+        console.log('친구 불러오기 실패');
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -224,41 +242,6 @@ const SessionPage = () => {
     };
   }, []);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  window.getTokenFromApp = async (message: Message) => {
-    console.log(`Flutter to Web : ${message}`);
-    if (message.token !== 'null') {
-      await setUserToken(message.token);
-    }
-  };
-
-  const getFriends = async () => {
-    console.log(profileId);
-    try {
-      const response = await instance.get(`/friendship/${profileId}`);
-      setFriends(response.data.data);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-    // instance
-    //   .get(`/friendship/${profileId}`)
-    //   .then(response => {
-    //     const data = response.data.result;
-    //     setFriends(data);
-    //     console.log(data);
-    //   })
-    //   .catch(error => {
-    //     if (error.response && error.response.status === 401) {
-    //       navigate('/login');
-    //     } else {
-    //       console.log('친구목록불러오기오류', error);
-    //     }
-    //   });
-  };
-
   const leaveSession = () => {
     setOpen(false);
     if (client) {
@@ -279,36 +262,16 @@ const SessionPage = () => {
   };
 
   const addFriend = () => {
-    console.log(publisherId, subscriberId);
-    console.log(userToken);
-    try {
-      const response = instance.post(`/friendship`, {
-        myId: Number(publisherId),
-        friendId: Number(subscriberId),
-      });
-      console.log(response);
-      leaveSession();
-    } catch (error) {
-      console.log(error);
-      // if (error.response.data.resultCode === 'INVALID_DATA') {
-      //   leaveSession();
-      // } else console.log(error);
-    }
-    // instance
-    //   .post(
-    //     `/friendship`,
-    //     { myId: Number(publisherId), friendId: Number(subscriberId) },
-
-    //   )
-    //   .then(response => {
-    //     console.log(response);
-    //     leaveSession();
-    //   })
-    //   .catch(error => {
-    //     if (error.response.data.resultCode === 'INVALID_DATA') {
-    //       leaveSession();
-    //     } else console.log(error);
-    //   });
+    const followingData = { myId: publisherId, friendId: subscriberId };
+    follow({
+      followingData,
+      onSuccess: () => {
+        leaveSession();
+      },
+      onError: () => {
+        console.log('친구 추가를 실패하였습니다.');
+      },
+    });
   };
 
   const changeVideoStatus = () => {

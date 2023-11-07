@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { getLogout } from 'apis/authApis';
+import { fcmTokenState } from 'atoms/Firebase';
 import ProfileList from '../../components/profile/ProfileList';
 import { ProfilePageContainer, PasswordChange, MarginContainer } from './ProfilePageStyles';
 import ChangePasswordModal from '../../components/profile/ChangePasswordModal';
@@ -11,9 +12,11 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [, setUserName] = useRecoilState(userState);
+  const fcmToken = useRecoilValue(fcmTokenState);
 
   const handleLogout = () => {
     getLogout({
+      fcmToken,
       onSuccess: () => {
         navigate('/login');
       },

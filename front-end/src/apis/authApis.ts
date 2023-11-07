@@ -10,6 +10,7 @@ interface ApiResponse {
 interface LoginData {
   username: string;
   password: string;
+  fcmToken: string;
 }
 
 interface SignupData {
@@ -26,6 +27,10 @@ interface PasswordData {
 
 interface LoginParams extends ApiResponse {
   loginData: LoginData;
+}
+
+interface LogoutParams extends ApiResponse {
+  fcmToken: string;
 }
 
 interface SignupParams extends ApiResponse {
@@ -91,9 +96,9 @@ export const postSignup = async ({ signupData, onSuccess, onError }: SignupParam
   }
 };
 
-export const getLogout = async ({ onSuccess, onError }: ApiResponse) => {
+export const getLogout = async ({ fcmToken, onSuccess, onError }: LogoutParams) => {
   try {
-    await instance.get('/users/logout');
+    await userInstance.post('/logout', fcmToken);
     removeToken();
     onSuccess();
   } catch (error) {

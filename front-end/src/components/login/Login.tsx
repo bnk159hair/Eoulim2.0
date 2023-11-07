@@ -5,6 +5,8 @@ import { AccountCircle } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
 import { postLogin } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
+import { useRecoilValue } from 'recoil';
+import { fcmTokenState } from 'atoms/Firebase';
 import { FormContainer, LoginButton, SignupContainer, SignupAnchor } from './LoginStyles';
 import SignupModal from './SignupModal';
 
@@ -12,6 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const fcmToken = useRecoilValue(fcmTokenState);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
@@ -20,7 +23,7 @@ const Login = () => {
       inputAlert('아이디와 비밀번호를 확인해주세요!');
       return;
     }
-    const loginData = { username, password };
+    const loginData = { username, password, fcmToken };
     postLogin({
       loginData,
       onSuccess: () => {
