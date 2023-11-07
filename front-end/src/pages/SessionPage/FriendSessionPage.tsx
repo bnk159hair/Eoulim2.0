@@ -94,7 +94,7 @@ const FriendSessionPage = () => {
     setPublisherVideoStatus(isFalse);
     setSubscriberVideoStatus(isFalse);
     setPublisherId(profileId);
-    setPublisherAnimonURL(`${profile.animon.name}mask.png`);
+    setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
     console.log('친구불러오기 시작');
     getFriends();
   }, []);

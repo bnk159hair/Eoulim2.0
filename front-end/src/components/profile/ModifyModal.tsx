@@ -14,7 +14,7 @@ import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
 import { postCheckPassword } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
-import { deleteChild, getChildData, postCheckSchool, putModifyChild } from 'apis/profileApis';
+import { deleteChild, getChildInfo, postCheckSchool, putModifyChild } from 'apis/profileApis';
 import {
   ModalOverlay,
   ModalContent,
@@ -59,7 +59,7 @@ const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
   const isValidName = namePattern.test(childData.name);
 
   useEffect(() => {
-    getChildData({
+    getChildInfo({
       childId,
       onSuccess: data => {
         setChildData(data);
