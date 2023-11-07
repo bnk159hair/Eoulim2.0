@@ -65,6 +65,8 @@ public class MatchServiceImpl implements MatchService {
     // Room 생성
     Room newRoom = makeNewRoom(sessionId, isRandom, childId);
     mapRooms.put(sessionId, newRoom);
+    // Random 매치이면 매칭 큐에 넣기
+    if(isRandom) matchingQueue.add(newRoom);  
     // 랜덤 미팅이면 가이드 순서 넣기
     return isRandom
         ? new Match(sessionId, token, newRoom.getRandom())
