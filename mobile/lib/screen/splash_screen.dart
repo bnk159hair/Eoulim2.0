@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/login_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/screen/profiles/profiles_screen.dart';
 
 class Splash extends StatefulWidget {
   const Splash({Key? key}) : super(key: key);
@@ -22,10 +23,11 @@ class SplashState extends State<Splash> {
   Future<void> checkLoginStatus() async {
     final storage = new FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
+    String? childId = await storage.read(key: 'childId');
 
     await Future.delayed(Duration(seconds: 2)); // 가짜 로딩 시간을 나타내는 코드 (실제 앱에서는 필요 없음)
 
-    if (authKey != null) {
+    if (authKey != null && childId != null) {
       // 'Authkey' 키에 값이 이미 저장되어 있으면 메인 페이지로 이동
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -33,6 +35,13 @@ class SplashState extends State<Splash> {
         ),
       );
     } 
+    else if (authKey != null){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => Profiles(),
+        ),
+      );
+    }
     else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(

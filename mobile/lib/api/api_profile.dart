@@ -15,7 +15,8 @@ class Apiprofile {
       'Authorization': "Bearer ${authKey}",
       'Content-Type': 'application/json; charset=UTF-8',
     });
-      getProfiles profileInfo= getProfiles.fromJson(json.decode(response.body));
+      String responseBody = utf8.decode(response.bodyBytes);
+      getProfiles profileInfo= getProfiles.fromJson(json.decode(responseBody));
       print(response.body);
       print("++++++++++++++++++++++++++++++++++++++++");
       print(profileInfo);

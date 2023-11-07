@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/api/api_profilelogout.dart';
+import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/login_screen.dart';
 import 'package:get/get.dart';
+import 'package:mobile/screen/profiles/profiles_screen.dart';
+
 
 
 class Settings extends StatefulWidget {
@@ -12,16 +16,21 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  generalResponse? profileloginAuth;
+  ApiprofileLogout apiProfileLogout = ApiprofileLogout();
+
   void Logout() async {
     final storage = new FlutterSecureStorage();
     await storage.delete(key: 'Authkey');
     Get.offAll(() => Login());
-    // Navigator.of(context).pushReplacement(
-    //   MaterialPageRoute(
-    //     builder: (context) => Login(),
-    //   ),
-    // );
   }
+  void profileLogout() async {
+    // await apiProfileLogout.postProfileLogoutAPI();
+    final storage = new FlutterSecureStorage();
+    await storage.delete(key: 'childId');
+    Get.offAll(() => Profiles());
+  }
+
 
 
   @override
@@ -40,7 +49,16 @@ class _SettingsState extends State<Settings> {
             },
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.red)),
-             child:  Text('로그아웃', style: TextStyle(color: Colors.white)))
+             child:  Text('로그아웃', style: TextStyle(color: Colors.white))),
+          ElevatedButton(
+              onPressed: () {
+                profileLogout();
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+              ),
+              child: Text('프로필로 돌아가기', style: TextStyle(color: Colors.white)),
+            ),
           ],
         ),
       ),
