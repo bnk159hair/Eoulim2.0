@@ -75,11 +75,14 @@ void initializeNotification() async {
   }
 }
 
-void getMyDeviceToken() async {
+Future<String?> getMyDeviceToken() async {
   final token = await FirebaseMessaging.instance.getToken();
-  final storage = new FlutterSecureStorage();
-  await storage.write(key: 'fcmToken', value: token);
-  print("내 디바이스 토큰: $token");
+  if (token != null) {
+    final storage = FlutterSecureStorage();
+    await storage.write(key: 'fcmToken', value: token);
+    print("내 디바이스 토큰: $token");
+  }
+  return token;
 }
 
 Future<void> main() async {
@@ -88,7 +91,7 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   initializeNotification();
 
-  getMyDeviceToken();
+  await getMyDeviceToken();
 
   runApp(const MyApp());
 }
