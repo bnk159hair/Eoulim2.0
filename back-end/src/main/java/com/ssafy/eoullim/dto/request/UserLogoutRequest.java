@@ -5,14 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChildLogoutRequest {
-    @NotNull
-    private Long childId;
+public class UserLogoutRequest {
     @NotBlank
-    private String token;
+    private String fcmToken;
 }

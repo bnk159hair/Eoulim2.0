@@ -12,6 +12,7 @@ public enum ErrorCode {
   UNAUTHORIZED_TOKEN(HttpStatus.UNAUTHORIZED, "A-001", "유효 하지 않은 토큰 입니다."),
   FORBIDDEN_NO_PERMISSION(HttpStatus.FORBIDDEN, "A-002", "금지된 접근 입니다."),
   DB_NOT_FOUND(HttpStatus.NOT_FOUND, "A-003", "DB에 없는 데이터."),
+  AUTHENTICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "A-004", "Authentication이 존재하지 않습니다."),
   // Server Error
   OPEN_API_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-001", "Open API Connection error occurs"),
   NOTIFICATION_CONNECTION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-002", "SSE notification Connection occurs error"),
@@ -25,6 +26,7 @@ public enum ErrorCode {
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U-001", "존재 하지 않는 User 입니다."),
   DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "U-002", "이미 사용 중인 ID 입니다."),
   INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "U-003", "유효 하지 않은 비밀 번호 입니다."),
+  ALREADY_LOGOUT(HttpStatus.NOT_FOUND, "U-004", "이미 로그아웃 되었습니다."),
   // Friend Error
   DUPLICATED_FRIEND(HttpStatus.BAD_REQUEST, "F-001", "이미 등록된 친구 입니다."),
   // OpenVidu Error

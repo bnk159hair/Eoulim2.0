@@ -16,7 +16,7 @@ public class ChildCacheRepository {
 
     private final static Duration CHILD_CACHE_TTL = Duration.ofMinutes(5);
 
-    public void setStatus(Long childId) {
+    public void setOnline(Long childId) {
         String key = getKey(childId);
         log.info("Set Child to Redis {}({})", key, "ON");
         childRedisTemplate.opsForValue().set(key, "ON", CHILD_CACHE_TTL);
@@ -31,7 +31,7 @@ public class ChildCacheRepository {
         return true;
     }
 
-    public void delete(Long childId) {
+    public void setOffline(Long childId) {
         String key = getKey(childId);
         childRedisTemplate.delete(key);
     }

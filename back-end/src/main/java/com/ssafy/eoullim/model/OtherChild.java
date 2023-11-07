@@ -10,11 +10,12 @@ public class OtherChild {
     private Long id;
     private String name;
     private Animon animon;
-    public static OtherChild fromEntity(ChildEntity entity) {
+
+    public static OtherChild fromChild(Child child) {
         return new OtherChild(
-                entity.getId(),
-                entity.getName(),
-                Animon.fromEntity(entity.getProfileAnimon())
+                child.getId(),
+                child.getName(),
+                child.getProfileAnimon()
         );
     }
 }

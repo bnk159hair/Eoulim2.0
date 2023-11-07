@@ -18,18 +18,19 @@ public class FcmTokenEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "child_id", nullable = false)
+    @JoinColumn(name = "child_id")
     private ChildEntity child;
 
     @Column(nullable = false)
     private String token;
 
     @Builder
-    public FcmTokenEntity(UserEntity user, ChildEntity child, String token) {
+    public FcmTokenEntity(Long id, UserEntity user, ChildEntity child, String token) {
+        this.id = id;
         this.user = user;
         this.child = child;
         this.token = token;

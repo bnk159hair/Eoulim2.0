@@ -1,12 +1,9 @@
 package com.ssafy.eoullim.controller;
 
-import com.ssafy.eoullim.dto.request.UserJoinRequest;
-import com.ssafy.eoullim.dto.request.UserLoginRequest;
-import com.ssafy.eoullim.dto.request.UserModifyRequest;
-import com.ssafy.eoullim.dto.request.UserPwCheckRequest;
+import com.ssafy.eoullim.dto.request.*;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.User;
-import com.ssafy.eoullim.service.impl.UserService;
+import com.ssafy.eoullim.service.UserService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +25,7 @@ public class UserController {
     @PostMapping("/join")
     @ResponseStatus(HttpStatus.CREATED)
     private SuccessResponse<User> join(@Valid @RequestBody UserJoinRequest request) {
-        final var user = userService.join(
+        User user = userService.join(
                 request.getUsername(),
                 request.getPassword(),
                 request.getName(),
@@ -40,14 +37,14 @@ public class UserController {
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
     public SuccessResponse<?> login(@Valid @RequestBody UserLoginRequest request) {
-        String accessToken = userService.login(request.getUsername(), request.getPassword());
+        String accessToken = userService.login(request.getUsername(), request.getPassword(), request.getFcmToken());
         return new SuccessResponse<>(accessToken);
     }
 
     @GetMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public SuccessResponse<?> logout(Authentication authentication) {
-        userService.logout(authentication.getName());
+    public SuccessResponse<?> logout(@Valid @RequestBody UserLogoutRequest request, Authentication authentication) {
+        userService.logout(authentication.getName(), request.getFcmToken());
         return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
 

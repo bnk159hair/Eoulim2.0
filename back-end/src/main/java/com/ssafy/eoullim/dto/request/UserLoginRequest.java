@@ -14,4 +14,6 @@ public class UserLoginRequest {
     private String username;
     @NotBlank
     private String password;
+    @NotBlank
+    private String fcmToken;
 }

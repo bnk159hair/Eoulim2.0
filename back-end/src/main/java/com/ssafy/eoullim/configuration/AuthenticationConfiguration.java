@@ -2,7 +2,7 @@ package com.ssafy.eoullim.configuration;
 
 import com.ssafy.eoullim.exception.CustomAuthenticationEntryPoint;
 import com.ssafy.eoullim.filter.JwtTokenFilter;
-import com.ssafy.eoullim.service.impl.UserService;
+import com.ssafy.eoullim.service.UserService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;

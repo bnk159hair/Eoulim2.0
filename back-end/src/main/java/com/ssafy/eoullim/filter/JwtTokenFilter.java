@@ -1,7 +1,7 @@
 package com.ssafy.eoullim.filter;
 
 import com.ssafy.eoullim.model.User;
-import com.ssafy.eoullim.service.impl.UserService;
+import com.ssafy.eoullim.service.UserService;
 import com.ssafy.eoullim.utils.JwtTokenUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

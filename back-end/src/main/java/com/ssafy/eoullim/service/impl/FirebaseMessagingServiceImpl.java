@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.common.net.HttpHeaders;
 import com.ssafy.eoullim.model.FcmMessage;
+import com.ssafy.eoullim.service.FirebaseMessagingService;
 import okhttp3.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-public class FirebaseMessagingService {
+public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/eoullim-7e5fb/messages:send";
     private final ObjectMapper objectMapper;
@@ -32,8 +33,7 @@ public class FirebaseMessagingService {
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
 
-        Response response = client.newCall(request)
-                .execute();
+        Response response = client.newCall(request).execute();
 
         System.out.println(response.body().string());
     }

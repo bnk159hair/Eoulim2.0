@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-@Setter
 @Getter
 @AllArgsConstructor
 public class Child {
@@ -21,10 +20,8 @@ public class Child {
     private String gender;
     private String school;
     private Short grade;
-    private Status status;
     private User user;
     private Animon profileAnimon;
-
 
     public static Child fromEntity(ChildEntity entity) {
         return new Child(
@@ -34,7 +31,6 @@ public class Child {
                 entity.getGender(),
                 entity.getSchool(),
                 entity.getGrade(),
-                entity.getStatus(),
                 User.fromEntity(entity.getUser()),
                 Animon.fromEntity(entity.getProfileAnimon())
         );
@@ -49,7 +45,6 @@ public class Child {
                 request.getGender(),
                 request.getSchool(),
                 request.getGrade(),
-                null,
                 null,
                 null
         );
