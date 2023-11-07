@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import axios from 'axios';
 import {
   Button,
   IconButton,
@@ -14,6 +12,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import CloseIcon from '@mui/icons-material/Close';
 import dayjs from 'dayjs';
 import Swal from 'sweetalert2';
+import { postCheckPassword } from 'apis/authApis';
+import inputAlert from 'utils/inputAlert';
+import { deleteChild, getChildData, postCheckSchool, putModifyChild } from 'apis/profileApis';
 import {
   ModalOverlay,
   ModalContent,
@@ -22,196 +23,128 @@ import {
   HeaderContainer,
   FlexContainer,
 } from './ModifyModalStyles';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState } from '../../atoms/Auth';
 
-interface ChildProfile {
-  id: number;
+interface ChildData {
+  childId: number;
   name: string;
-  birth: number;
+  birth: string;
   gender: string;
   school: string;
-  grade: number;
+  grade: string;
   status: string;
 }
 
-interface ModifyModalProps {
-  onClose: () => void;
+interface Props {
   childId: number;
-  resetList: () => void;
+  onClose: () => void;
+  getChildren: () => void;
 }
 
-const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }) => {
-  const [childProfile, setChildProfile] = useState<ChildProfile>({
-    id: 0,
+const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
+  const [childData, setChildData] = useState<ChildData>({
+    childId,
     name: '',
-    birth: 0,
+    birth: '',
     gender: '',
     school: '',
-    grade: 0,
+    grade: '',
     status: '',
   });
 
-  const token = useRecoilValue(tokenState);
   const [password, setPassword] = useState('');
   const [isPasswordCorrect, setIsPasswordCorrect] = useState(false);
   const [, setSchoolChange] = useState(false);
   const [isSchoolCorrect, setIsSchoolCorrect] = useState(false);
   const namePattern = /^[가-힣]{2,4}$/;
+  const isValidName = namePattern.test(childData.name);
 
   useEffect(() => {
-    fetchChildProfile();
-  }, [childId, token]);
+    getChildData({
+      childId,
+      onSuccess: data => {
+        setChildData(data);
+      },
+      onError: () => {
+        inputAlert('아이 프로필을 불러오는데 실패했습니다.');
+      },
+    });
+  }, [childId]);
 
-  const fetchChildProfile = () => {
-    axios
-      .get(`${API_BASE_URL}/children/${childId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        console.log(response);
-        setChildProfile(response.data.data);
-      })
-      .catch(error => {
-        console.log('아이 프로필을 불러오는데 실패했습니다:', error);
-      });
-  };
-
-  const passwordCheck = (event: any) => {
+  const handlePasswordCheck = (
+    event: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
-    axios
-      .post(
-        `${API_BASE_URL}/users/check-password`,
-        { password },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(() => {
-        Swal.fire({
-          text: '비밀번호가 확인되었습니다!',
-          icon: 'success',
-          confirmButtonText: '닫기',
-        }).then(() => setIsPasswordCorrect(true));
-      })
-      .catch(() => {
-        Swal.fire({
-          text: '비밀번호를 확인해주세요!',
-          icon: 'error',
-          confirmButtonText: '닫기',
-        });
-      });
+    postCheckPassword({
+      password,
+      onSuccess: isCorrect => {
+        if (isCorrect) {
+          inputAlert('비밀번호가 확인되었습니다!', false).then(() => setIsPasswordCorrect(true));
+        } else {
+          inputAlert('비밀번호를 확인해주세요!');
+        }
+      },
+      onError: () => {
+        inputAlert('잠시 후 다시 시도해주세요!');
+      },
+    });
   };
 
-  const handleUpdateProfile = async () => {
+  const handleModifyChild = () => {
     if (
-      !childProfile.name.trim() ||
-      !childProfile.birth ||
-      !childProfile.gender ||
-      !childProfile.school ||
-      !childProfile.grade
+      !childData.name.trim() ||
+      !childData.birth ||
+      !childData.gender ||
+      !childData.school ||
+      !childData.grade
     ) {
-      Swal.fire({
-        text: '모든 정보를 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('모든 정보를 입력해주세요!');
       return;
     }
 
     if (!isSchoolCorrect) {
-      Swal.fire({
-        text: '학교 확인을 해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('학교 확인을 해주세요!');
       return;
     }
 
-    const isValidName = namePattern.test(childProfile.name);
     if (!isValidName) {
-      Swal.fire({
-        text: '이름을 다시 입력해주세요!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
+      inputAlert('이름을 다시 입력해주세요!');
       return;
     }
 
-    try {
-      const response = await axios.put(
-        `${API_BASE_URL}/children/${childProfile.id}`,
-        childProfile,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      console.log('프로필 수정 성공:', response);
-      Swal.fire({
-        text: '프로필 수정에 성공했습니다!',
-        icon: 'success',
-        confirmButtonText: '닫기',
-      }).then(() => {
-        resetList();
-        onClose();
-      });
-    } catch (error) {
-      console.log('프로필 수정 실패:', error);
-      Swal.fire({
-        text: '프로필 수정에 실패했습니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-    }
+    putModifyChild({
+      childData,
+      onSuccess: () => {
+        inputAlert('수정 완료했습니다!', false).then(() => {
+          getChildren();
+          onClose();
+        });
+      },
+      onError: () => {
+        inputAlert('프로필 수정에 실패했습니다!');
+      },
+    });
   };
 
-  const handleSchoolCheck = async () => {
-    try {
-      const response = await axios.post(
-        `${API_BASE_URL}/open-api/schools`,
-        {
-          keyword: childProfile.school,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      setIsSchoolCorrect(response.data.data);
-      if (response.data.data) {
-        Swal.fire({
-          text: '올바른 학교정보입니다!',
-          icon: 'success',
-          confirmButtonText: '닫기',
-        });
-      } else {
-        Swal.fire({
-          text: '다시 입력해주세요!',
-          icon: 'error',
-          confirmButtonText: '닫기',
-        });
-      }
-    } catch (error) {
-      console.error(error);
-      Swal.fire({
-        text: '잘못된 입력입니다!',
-        icon: 'error',
-        confirmButtonText: '닫기',
-      });
-    }
+  const handleSchoolCheck = () => {
+    postCheckSchool({
+      school: childData.school,
+      onSuccess: isCorrect => {
+        setIsSchoolCorrect(isCorrect);
+        if (isCorrect) {
+          inputAlert('올바른 학교정보입니다!', false);
+        } else {
+          inputAlert('다시 입력해주세요!');
+        }
+      },
+      onError: () => {
+        inputAlert('잘못된 입력입니다!');
+      },
+    });
   };
 
-  const deleteProfile = () => {
+  const handleDeleteChild = () => {
     Swal.fire({
-      title: '이 프로필을 삭제하시겠습니까?',
+      title: `${childData.name} 정보를 삭제하시겠습니까?`,
       text: '되돌릴 수 없습니다!',
       icon: 'warning',
       showCancelButton: true,
@@ -219,21 +152,15 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
       cancelButtonText: '취소',
     }).then(result => {
       if (result.isConfirmed) {
-        axios
-          .delete(`${API_BASE_URL}/children/${childId}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then(() => {
-            Swal.fire({
-              text: '삭제되었습니다!',
-              icon: 'success',
-              confirmButtonText: '닫기',
-            }).then(() => resetList());
-            console.log('삭제완료');
-          })
-          .catch(() => console.log('실패'));
+        deleteChild({
+          childId,
+          onSuccess: () => {
+            inputAlert('삭제되었습니다!', false).then(() => getChildren());
+          },
+          onError: () => {
+            inputAlert('잠시 후 다시 시도해주세요!');
+          },
+        });
       }
     });
   };
@@ -242,7 +169,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
     <ModalOverlay>
       <ModalContent>
         {!isPasswordCorrect ? (
-          <FormContainer onSubmit={passwordCheck}>
+          <FormContainer onSubmit={handlePasswordCheck}>
             <h2>{'비밀번호 확인'}</h2>
             <TextField
               label={'비밀번호 확인'}
@@ -259,7 +186,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
                 variant={'contained'}
                 size={'small'}
                 sx={{ fontSize: '18px', margin: '0.5rem' }}
-                onClick={passwordCheck}
+                onClick={handlePasswordCheck}
                 fullWidth
               >
                 {'확인'}
@@ -288,10 +215,10 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
                 label={'이름'}
                 variant={'outlined'}
                 placeholder={'홍길동'}
-                value={childProfile.name}
+                value={childData.name}
                 onChange={event => {
-                  setChildProfile(prevProfile => ({
-                    ...prevProfile,
+                  setChildData(prev => ({
+                    ...prev,
                     name: event.target.value,
                   }));
                 }}
@@ -299,13 +226,13 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
               />
               <ToggleButtonGroup
                 color={'primary'}
-                value={childProfile.gender}
+                value={childData.gender}
                 exclusive
                 sx={{ marginLeft: 'auto' }}
                 size={'large'}
                 onChange={(_, newGender) => {
-                  setChildProfile(prevProfile => ({
-                    ...prevProfile,
+                  setChildData(prev => ({
+                    ...prev,
                     gender: newGender,
                   }));
                 }}
@@ -317,11 +244,11 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 label={'생년월일'}
-                value={dayjs(childProfile.birth)}
+                value={dayjs(childData.birth)}
                 onChange={(newDate: dayjs.Dayjs | null) => {
                   if (newDate) {
-                    setChildProfile((prevProfile: any) => ({
-                      ...prevProfile,
+                    setChildData((prev: any) => ({
+                      ...prev,
                       birth: newDate.format('YYYY-MM-DD'),
                     }));
                   }
@@ -334,10 +261,10 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
               <TextField
                 label={'학교 이름'}
                 variant={'outlined'}
-                value={childProfile.school}
+                value={childData.school}
                 onChange={event => {
-                  setChildProfile(prevProfile => ({
-                    ...prevProfile,
+                  setChildData(prev => ({
+                    ...prev,
                     school: event.target.value,
                   }));
                   setSchoolChange(true);
@@ -365,12 +292,12 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
             </FlexContainer>
             <ToggleButtonGroup
               color={'primary'}
-              value={String(childProfile.grade)}
+              value={childData.grade}
               exclusive
               fullWidth
               onChange={(_, newGrade) => {
-                setChildProfile(prevProfile => ({
-                  ...prevProfile,
+                setChildData(prev => ({
+                  ...prev,
                   grade: newGrade,
                 }));
               }}
@@ -389,7 +316,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
                   marginTop: '1rem',
                   fontSize: '18px',
                 }}
-                onClick={handleUpdateProfile}
+                onClick={handleModifyChild}
               >
                 {'수정'}
               </Button>
@@ -403,7 +330,7 @@ const ModifyModal: React.FC<ModifyModalProps> = ({ onClose, childId, resetList }
                   marginTop: '1rem',
                   fontSize: '18px',
                 }}
-                onClick={deleteProfile}
+                onClick={handleDeleteChild}
               >
                 {'삭제'}
               </Button>

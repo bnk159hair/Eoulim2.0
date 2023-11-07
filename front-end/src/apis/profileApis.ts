@@ -18,8 +18,25 @@ interface ChildLoginoutData {
   fcmToken: string;
 }
 
-interface CreateProfileParams extends ApiResponse {
+interface ModifyChildData extends ChildData {
+  childId: number;
+  status: string;
+}
+
+interface GetChildInfo extends ModifyChildData {
+  profileAnimon: { id: number; bodyImagePath: string; maskImagePath: string; name: string };
+}
+
+interface CreateChildParams extends ApiResponse {
   childData: ChildData;
+}
+
+interface ModifyChildParams extends ApiResponse {
+  childData: ModifyChildData;
+}
+
+interface DeleteChildParams extends ApiResponse {
+  childId: number;
 }
 
 interface ChildLoginParams extends ApiResponse {
@@ -38,13 +55,13 @@ interface CheckSchoolParams {
 
 interface GetChildInfoParams {
   childId: number;
-  onSuccess: (data: any) => void;
+  onSuccess: (data: GetChildInfo) => void;
   onError: () => void;
 }
 
-export const postCreateProfile = async ({ childData, onSuccess, onError }: CreateProfileParams) => {
+export const postCreateChild = async ({ childData, onSuccess, onError }: CreateChildParams) => {
   try {
-    await instance.post(`/children`, childData);
+    await instance.post('/children', childData);
     onSuccess();
   } catch (error) {
     onError();
@@ -57,6 +74,24 @@ export const postCheckSchool = async ({ school, onSuccess, onError }: CheckSchoo
       keyword: school,
     });
     onSuccess(response.data.data);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const putModifyChild = async ({ childData, onSuccess, onError }: ModifyChildParams) => {
+  try {
+    await instance.put(`/children/${childData.childId}`, childData);
+    onSuccess();
+  } catch (error) {
+    onError();
+  }
+};
+
+export const deleteChild = async ({ childId, onSuccess, onError }: DeleteChildParams) => {
+  try {
+    await instance.delete(`/children/${childId}`);
+    onSuccess();
   } catch (error) {
     onError();
   }

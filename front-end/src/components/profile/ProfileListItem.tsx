@@ -22,14 +22,14 @@ const theme = createTheme({
 interface ProfileListItemProps {
   name: string;
   childId: number;
-  getProfiles: () => void;
+  getChildren: () => void;
   imgurl: string;
 }
 
 const ProfileListItem: React.FC<ProfileListItemProps> = ({
   name,
   childId,
-  getProfiles,
+  getChildren,
   imgurl,
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -110,7 +110,7 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
         </ButtonContainer>
       </div>
       {isModalOpen && (
-        <ModifyModal onClose={handleModalClose} childId={childId} resetList={getProfiles} />
+        <ModifyModal onClose={handleModalClose} childId={childId} getChildren={getChildren} />
       )}
       {isRecordOpen && <ToRecordModal onClose={handleRecordClose} childId={childId} />}
     </ThemeProvider>

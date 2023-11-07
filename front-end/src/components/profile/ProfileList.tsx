@@ -20,10 +20,10 @@ const ProfileList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
 
   useEffect(() => {
-    getProfiles();
+    getChildren();
   }, []);
 
-  const getProfiles = async () => {
+  const getChildren = async () => {
     try {
       const response = await instance.get(`/children`);
       setProfiles(response.data.data);
@@ -41,12 +41,12 @@ const ProfileList = () => {
           childId={profile.id}
           name={profile.name}
           imgurl={profile.profileAnimon.bodyImagePath}
-          getProfiles={getProfiles}
+          getChildren={getChildren}
         />
       ))}
       {profiles.length < 3 && <ProfileCreateBox onClick={() => setIsModalOpen(true)} />}
       {isModalOpen && (
-        <CreateModal onClose={() => setIsModalOpen(false)} getProfiles={getProfiles} />
+        <CreateModal onClose={() => setIsModalOpen(false)} getChildren={getChildren} />
       )}
     </ProfileListBox>
   );

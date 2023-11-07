@@ -13,11 +13,11 @@ interface Props {
 }
 
 const ToRecordModal = ({ onClose, childId }: Props) => {
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [, setProfileKey] = useRecoilState(Profilekey);
-  const navigate = useNavigate();
 
-  const passwordCheck = (
+  const handlePasswordCheck = (
     event: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
@@ -40,7 +40,7 @@ const ToRecordModal = ({ onClose, childId }: Props) => {
   return (
     <ModalOverlay>
       <ModalContent>
-        <FormContainer onSubmit={passwordCheck}>
+        <FormContainer onSubmit={handlePasswordCheck}>
           <h2>{'비밀번호 확인'}</h2>
           <TextField
             label={'비밀번호 확인'}
@@ -57,7 +57,7 @@ const ToRecordModal = ({ onClose, childId }: Props) => {
               variant={'contained'}
               size={'small'}
               sx={{ fontSize: '18px', margin: '0.5rem' }}
-              onClick={passwordCheck}
+              onClick={handlePasswordCheck}
               fullWidth
             >
               {'확인'}
