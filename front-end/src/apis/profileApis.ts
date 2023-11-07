@@ -5,7 +5,7 @@ interface ApiResponse {
   onError: () => void;
 }
 
-interface ProfileData {
+interface ChildData {
   name: string;
   birth: string;
   gender: string;
@@ -13,8 +13,21 @@ interface ProfileData {
   grade: string;
 }
 
+interface ChildLoginoutData {
+  childId: number;
+  fcmToken: string;
+}
+
 interface CreateProfileParams extends ApiResponse {
-  profileData: ProfileData;
+  childData: ChildData;
+}
+
+interface ChildLoginParams extends ApiResponse {
+  childLoginData: ChildLoginoutData;
+}
+
+interface ChildLogoutParams extends ApiResponse {
+  childLogoutData: ChildLoginoutData;
 }
 
 interface CheckSchoolParams {
@@ -23,13 +36,15 @@ interface CheckSchoolParams {
   onError: () => void;
 }
 
-export const postCreateProfile = async ({
-  profileData,
-  onSuccess,
-  onError,
-}: CreateProfileParams) => {
+interface GetChildInfoParams {
+  childId: number;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+export const postCreateProfile = async ({ childData, onSuccess, onError }: CreateProfileParams) => {
   try {
-    await instance.post(`/children`, profileData);
+    await instance.post(`/children`, childData);
     onSuccess();
   } catch (error) {
     onError();
@@ -41,6 +56,39 @@ export const postCheckSchool = async ({ school, onSuccess, onError }: CheckSchoo
     const response = await instance.post(`/open-api/schools`, {
       keyword: school,
     });
+    onSuccess(response.data.data);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const childLogin = async ({ childLoginData, onSuccess, onError }: ChildLoginParams) => {
+  try {
+    await instance.post('/children/login', {
+      childId: childLoginData.childId,
+      fcmToken: childLoginData.fcmToken,
+    });
+    onSuccess();
+  } catch (error) {
+    onError();
+  }
+};
+
+export const childLogout = async ({ childLogoutData, onSuccess, onError }: ChildLogoutParams) => {
+  try {
+    await instance.post('/children/logout', {
+      childId: childLogoutData.childId,
+      fcmToken: childLogoutData.fcmToken,
+    });
+    onSuccess();
+  } catch (error) {
+    onError();
+  }
+};
+
+export const getChildInfo = async ({ childId, onSuccess, onError }: GetChildInfoParams) => {
+  try {
+    const response = await instance.get(`/children/${childId}`);
     onSuccess(response.data.data);
   } catch (error) {
     onError();

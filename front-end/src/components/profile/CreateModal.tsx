@@ -61,9 +61,9 @@ const CreateModal = ({ onClose, getProfiles }: Props) => {
       return;
     }
 
-    const profileData = { name, birth, gender, school: `${school}초등학교`, grade };
+    const childData = { name, birth, gender, school: `${school}초등학교`, grade };
     postCreateProfile({
-      profileData,
+      childData,
       onSuccess: () => {
         inputAlert('프로필을 생성했습니다!', false).then(() => {
           getProfiles();
