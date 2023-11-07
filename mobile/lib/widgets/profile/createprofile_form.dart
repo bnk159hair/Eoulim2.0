@@ -231,7 +231,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                 else {
                   CreateprofileFormkey.currentState?.save();
                   profileCreate = await apiProfile.createprofile(CreateprofileRequestModel(name: name, birth: birth, gender: gender, school: school, grade: grade));
-                  if (profileCreate?.status == 'OK') {
+                  if (profileCreate?.status == 'CREATED') {
                     showDialog(context: context,
                      barrierDismissible: false,
                      builder: (BuildContext ctx){
