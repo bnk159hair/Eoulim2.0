@@ -39,7 +39,6 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
         {
           childId: profileKey,
           friendId, // 친구 아이디
-          name: myName, // 내 이름
         },
         {
           headers: {
