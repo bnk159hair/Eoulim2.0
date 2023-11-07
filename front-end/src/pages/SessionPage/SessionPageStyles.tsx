@@ -1,6 +1,7 @@
 import { styled, keyframes, css } from 'styled-components';
 import loginBackground from '../../assets/background/login.gif';
 import click from '../../assets/ecc/click.png';
+
 const IMGURL = '/bear.png';
 
 export const SessionPageContainer = styled.div`
@@ -66,7 +67,7 @@ export const Character = styled.div<{ isPlaying: boolean }>`
   justify-content: center;
   align-items: center;
 
-  ${(props) =>
+  ${props =>
     props.isPlaying &&
     css`
       animation: ${gelatineAnimation} 0.5s infinite;

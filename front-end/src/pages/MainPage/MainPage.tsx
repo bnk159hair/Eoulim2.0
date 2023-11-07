@@ -1,4 +1,8 @@
-import React, { useEffect,useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { childLogin, childLogout, getChildInfo } from 'apis/profileApis';
+import { fcmTokenState } from 'atoms/Firebase';
 import {
   MainPageContainer,
   ProfileImg,
@@ -13,12 +17,9 @@ import {
   HoberLeft,
   HoberRight,
 } from './MainPageStyles';
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import AnimonModal from '../../components/main/AnimonModal';
-import axios from 'axios';
 import { API_BASE_URL } from '../../apis/urls';
 import AlarmModal from '../../components/main/AlarmModal';
 
@@ -26,15 +27,16 @@ const MainPage: React.FC = () => {
   const navigate = useNavigate();
   const profileId = useRecoilValue(Profilekey);
   const token = useRecoilValue(tokenState);
-  const [profile, setProfile] = useRecoilState(Profile);
+  const fcmToken = useRecoilValue(fcmTokenState);
+  // const [profile, setProfile] = useRecoilState(Profile);
+  const [_, setProfile] = useRecoilState(Profile);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
   const [sessionId, setSessionId] = useState<string>('');
-  const [userName,setUserName] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
+  const childLoginoutData = { childId: profileId, fcmToken };
 
   useEffect(() => {
-    const source = new EventSource(
-      `${API_BASE_URL}/alarms/subscribe/${profileId}`
-    );
+    const source = new EventSource(`${API_BASE_URL}/alarms/subscribe/${profileId}`);
     setEventSource(source);
     console.log(source, eventSource);
     return () => {
@@ -50,8 +52,16 @@ const MainPage: React.FC = () => {
     if (!token) {
       navigate('/login');
     } else {
-      getprofilelist();
-      profileLogin();
+      getChild();
+      childLogin({
+        childLoginData: childLoginoutData,
+        onSuccess: () => {
+          console.log('프로필 로그인에 성공했습니다.');
+        },
+        onError: () => {
+          console.log('프로필 로그인에 실패하였습니다.');
+        },
+      });
     }
   }, [profileId, token, navigate]);
 
@@ -59,14 +69,14 @@ const MainPage: React.FC = () => {
     if (eventSource) {
       const eventListener = (event: any) => {
         if (event.data === 'connect completed') {
-          console.log('SSE와 연결')
+          console.log('SSE와 연결');
         } else if (event) {
-          console.log(event)
-          const message = JSON.parse(event.data)
-          console.log(message.sessionId)
-          setSessionId(message.sessionId)
-          setUserName(message.userName)
-          setAlarmOpen(true)
+          console.log(event);
+          const message = JSON.parse(event.data);
+          console.log(message.sessionId);
+          setSessionId(message.sessionId);
+          setUserName(message.userName);
+          setAlarmOpen(true);
         }
       };
       eventSource.addEventListener('sse', eventListener);
@@ -76,78 +86,44 @@ const MainPage: React.FC = () => {
       };
     }
   });
-  
-  const profileLogin = () => {
-    axios
-      .post(
-        `${API_BASE_URL}/children/login/${profileId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => {
-        console.log("프로필로그인");
-      })
-      .catch((error) => {
-        console.log("프로필 로그인 오류", error);
-      });
-  };
 
   const getNewFriend = () => {
     navigate('/session');
-    profileLogout();
+    logout();
   };
 
   const handleFriendsClick = () => {
     navigate('/friends');
-    profileLogout();
+    logout();
   };
   const getBack = () => {
-    profileLogout();
+    logout();
     navigate('/profile');
   };
-  
 
-  const getprofilelist = () => {
-    axios
-      .get(`${API_BASE_URL}/children/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        console.log(response);
-        setProfile(response.data.result);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('데이터 불러오기 오류', error);
-        }
-      });
+  const getChild = () => {
+    getChildInfo({
+      childId: profileId,
+      onSuccess: data => {
+        setProfile(data);
+        console.log('프로필 가져오기에 성공하였습니다.');
+      },
+      onError: () => {
+        console.log('프로필 가져오기에 실패하였습니다.');
+      },
+    });
   };
 
-  const profileLogout = () => {
-    axios
-      .post(
-        `${API_BASE_URL}/children/logout/${profileId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then(() => {
-        console.log('프로필로그아웃');
-      })
-      .catch((error) => {
-        console.log('프로필 로그아웃 오류', error);
-      });
+  const logout = () => {
+    childLogout({
+      childLogoutData: childLoginoutData,
+      onSuccess: () => {
+        console.log('프로필 로그아웃에 성공했습니다.');
+      },
+      onError: () => {
+        console.log('프로필 로그아웃에 실패하였습니다.');
+      },
+    });
   };
 
   const openModal = () => {
@@ -160,14 +136,14 @@ const MainPage: React.FC = () => {
 
   const closeAlarm = () => {
     setAlarmOpen(false);
-  }
+  };
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
-  const IMGURL = `/${profile.animon.name}.png`;
+  // const IMGURL = `/${profile.profileAnimon.name}.png`;
+  const IMGURL = `/dog.png`;
 
   const audioObjRef = useRef(new Audio('/mainguide.mp3'));
-  
 
   const playAudio = () => {
     const audioObj = audioObjRef.current;
@@ -186,26 +162,18 @@ const MainPage: React.FC = () => {
     <MainPageContainer>
       <MarginContainer>
         <BackIcon onClick={getBack} />
-        <ProfileImg
-          style={{ backgroundImage: `url(${IMGURL})` }}
-          onClick={openModal}
-        />
+        <ProfileImg style={{ backgroundImage: `url(${IMGURL})` }} onClick={openModal} />
       </MarginContainer>
       <ChaterLocation>
-        {isModalOpen && (
-          <AnimonModal onClose={closeModal} profile={getprofilelist} />
-        )}
+        {isModalOpen && <AnimonModal onClose={closeModal} profile={getChild} />}
         {isAlarmOpen && (
-          <AlarmModal onClose={closeAlarm} sessionId={sessionId} userName={userName}/>
+          <AlarmModal onClose={closeAlarm} sessionId={sessionId} userName={userName} />
         )}
         <HoberLeft onClick={getNewFriend}>
           <NewFriend />
           <NewFirendsignpost />
         </HoberLeft>
-        <MainCharacter
-          style={{ backgroundImage: `url(${IMGURL})` }}
-          onClick={playAudio}
-        />
+        <MainCharacter style={{ backgroundImage: `url(${IMGURL})` }} onClick={playAudio} />
         <HoberRight onClick={handleFriendsClick}>
           <MyFirendsignpost />
           <MyFriend />

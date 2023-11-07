@@ -1,4 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
+import CloseIcon from '@mui/icons-material/Close';
+import { IconButton, Button } from '@mui/material';
+import ReactPlayer from 'react-player';
 import {
   ModalOverlay,
   ModalContent,
@@ -8,9 +11,6 @@ import {
   GuideInfo,
   GuideContainer,
 } from './RecordVideoStyles';
-import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, Button } from '@mui/material';
-import ReactPlayer from 'react-player';
 
 interface VideoModalProps {
   onClose: () => void;
@@ -19,12 +19,7 @@ interface VideoModalProps {
   timeStamp: string;
 }
 
-const VideoModal: React.FC<VideoModalProps> = ({
-  onClose,
-  videoPath,
-  guideSeq,
-  timeStamp,
-}) => {
+const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, guideSeq, timeStamp }) => {
   const guideScript: { [key: string]: string } = {
     '1': '안녕~ 다들 만나서 반가워!! 나는 어울림학교에 다니는 곰탱이 라고 해. 너희는 어디 학교 다니는지 이름이 뭔지~ 소개 해줄 수 있어?',
     '2': '나는 만화를 아주 좋아하는데 엉덩이탐정을 가장 좋아해. 너희는 어떤 만화를 좋아해? 친구에게 너가 가장 좋아하는 만화를 소개해줘.',
@@ -55,12 +50,12 @@ const VideoModal: React.FC<VideoModalProps> = ({
     duration: 0, // 전체 시간
   });
 
-  const { playing, muted, volume, playbackRate, played } = state;
+  const { playing, muted, volume, playbackRate } = state;
 
   let count = 0;
 
   const format = (seconds: string) => {
-    if (isNaN(Number(seconds))) {
+    if (Number.isNaN(Number(seconds))) {
       return `00:00`;
     }
     const date = new Date(Number(seconds));
@@ -74,14 +69,14 @@ const VideoModal: React.FC<VideoModalProps> = ({
   };
 
   function pad(string: number) {
-    return ('0' + String(string)).slice(-2);
+    return `0${String(string)}`.slice(-2);
   }
 
   const guideIndex = guideSeq?.split(' ');
   const highlight = timeStamp?.split(' ');
   const info = [];
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 4; i += 1) {
     if (guideIndex.length > i) {
       const index = guideIndex[i];
       const guide = guideScript[index];
@@ -99,10 +94,7 @@ const VideoModal: React.FC<VideoModalProps> = ({
       controlsRef.current.style.visibility = 'hidden';
       count = 0;
     }
-    if (
-      controlsRef.current &&
-      controlsRef.current.style.visibility === 'visible'
-    ) {
+    if (controlsRef.current && controlsRef.current.style.visibility === 'visible') {
       count += 1;
     }
     if (!state.seeking) {
@@ -111,60 +103,58 @@ const VideoModal: React.FC<VideoModalProps> = ({
   };
 
   return (
-    <>
-      <ModalOverlay>
-        <ModalContent>
-          <HeaderContainer>
-            <IconButton onClick={onClose}>
-              <CloseIcon fontSize="large" />
-            </IconButton>
-          </HeaderContainer>
-          <FormContainer>
-            <ReactPlayer
-              ref={videoRef}
-              url={videoPath} // 서버에서 받아온 video url
-              playing={playing} // true = 재생중 / false = 멈춤
-              controls={true} // 기본 컨트롤러 사용
-              muted={muted} // 음소거인지
-              volume={volume} // 소리조절 기능
-              playbackRate={playbackRate} // 배속기능
-              onProgress={progressHandler} // 재생 및 로드된 시점을 반환
-            />
-            <VideoInfo>
-              <GuideContainer>
-                {info.length ? (
-                  info.map(([guide, time, second]: any[], index: number) => (
-                    <div
-                      className="timestamp_box"
-                      key={index}
-                      onClick={() => {
-                        videoRef.current.seekTo(second);
+    <ModalOverlay>
+      <ModalContent>
+        <HeaderContainer>
+          <IconButton onClick={onClose}>
+            <CloseIcon fontSize={'large'} />
+          </IconButton>
+        </HeaderContainer>
+        <FormContainer>
+          <ReactPlayer
+            ref={videoRef}
+            url={videoPath} // 서버에서 받아온 video url
+            playing={playing} // true = 재생중 / false = 멈춤
+            controls // 기본 컨트롤러 사용
+            muted={muted} // 음소거인지
+            volume={volume} // 소리조절 기능
+            playbackRate={playbackRate} // 배속기능
+            onProgress={progressHandler} // 재생 및 로드된 시점을 반환
+          />
+          <VideoInfo>
+            <GuideContainer>
+              {info.length ? (
+                info.map(([guide, time, second]: any[]) => (
+                  <button
+                    className={'timestamp_box'}
+                    key={second}
+                    onClick={() => {
+                      videoRef.current.seekTo(second);
+                    }}
+                  >
+                    <Button
+                      variant={'contained'}
+                      color={'primary'}
+                      size={'small'}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
                       }}
                     >
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        size="small"
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <span>{time}</span>
-                      </Button>
-                      <GuideInfo>{guide}</GuideInfo>
-                    </div>
-                  ))
-                ) : (
-                  <GuideInfo>타임라인이 없습니다</GuideInfo>
-                )}
-              </GuideContainer>
-            </VideoInfo>
-          </FormContainer>
-        </ModalContent>
-      </ModalOverlay>
-    </>
+                      <span>{time}</span>
+                    </Button>
+                    <GuideInfo>{guide}</GuideInfo>
+                  </button>
+                ))
+              ) : (
+                <GuideInfo>{'타임라인이 없습니다'}</GuideInfo>
+              )}
+            </GuideContainer>
+          </VideoInfo>
+        </FormContainer>
+      </ModalContent>
+    </ModalOverlay>
   );
 };
 

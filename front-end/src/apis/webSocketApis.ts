@@ -1,5 +1,6 @@
 export class WebSocketApis {
   private static instance: WebSocketApis;
+
   public header = this.createHeader();
 
   static getInstance(): WebSocketApis {

@@ -1,38 +1,29 @@
 import { OpenVidu } from 'openvidu-browser';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRecoilState } from 'recoil';
 import {
   getUserInfo,
   getToken,
   getFriendSessionToken,
   destroyFriendSession,
 } from '../apis/openViduApis';
-import { GuideScript, TimeStamp, guideSeq } from '../atoms/Session';
+import { guideSeq } from '../atoms/Session';
 import { invitationSessionId, invitationToken } from '../atoms/Ivitation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRecoilValue, useRecoilState } from 'recoil';
-import { tokenState } from '../atoms/Auth';
 
 interface User {
-  childId: String;
-  name: String;
-  gender: String;
-  school: String;
-  grade: Number;
+  childId: string;
+  name: string;
+  gender: string;
+  school: string;
+  grade: number;
 }
 
-export const useOpenVidu = (
-  userId?: any,
-  sessionId?: string,
-  sessionToken?: string
-) => {
+export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: string) => {
   const [session, setSession] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [guide, setGuide] = useRecoilState(guideSeq);
-  const userToken = useRecoilValue(tokenState);
-  
-  const guideScript = useRecoilValue(GuideScript);
-  const timeStamp = useRecoilValue(TimeStamp);
+  const [, setGuide] = useRecoilState(guideSeq);
 
   const [, setSessionId] = useRecoilState(invitationSessionId);
   const [, setSessionToken] = useRecoilState(invitationToken);
@@ -46,7 +37,7 @@ export const useOpenVidu = (
     if (sessionId) {
       console.log('초대 세션이랑 연결 끊기');
       session.disconnect();
-      destroyFriendSession(sessionId, userToken);
+      destroyFriendSession(sessionId);
       setSessionId('');
       setSessionToken('');
     } else if (session) {
@@ -54,7 +45,6 @@ export const useOpenVidu = (
       session.disconnect();
       console.log(session);
       console.log('서버에 세션 끊어달라고 보내기');
-      console.log(guideScript, timeStamp);
     }
     setSession(null);
     setPublisher(null);
@@ -68,15 +58,15 @@ export const useOpenVidu = (
     const OV = new OpenVidu();
     //   OV.enableProdMode(); // 배포 시 사용 production 모드로 전환
     console.log('세션 시작');
-    let mySession = OV.initSession();
+    const mySession = OV.initSession();
 
-    mySession.on('streamCreated', (event) => {
+    mySession.on('streamCreated', event => {
       console.log('스트림 생성');
       const subscriber = mySession.subscribe(event.stream, '');
       const data = JSON.parse(event.stream.connection.data);
-      setSubscribers((prev) => {
+      setSubscribers(prev => {
         return [
-          ...prev.filter((sub) => sub.userId !== data.childId),
+          ...prev.filter(sub => sub.userId !== data.childId),
           {
             streamManager: subscriber,
             userId: data.childId,
@@ -103,18 +93,15 @@ export const useOpenVidu = (
     // mySession.on('exception', (exception) => console.warn(exception));
 
     if (sessionId === undefined) {
-      getUserInfo(userId, userToken).then((userInfo: User) => {
-        getToken(
-          {
-            childId: String(userId),
-            name: userInfo.name,
-            gender: userInfo.gender,
-            school: userInfo.school,
-            grade: userInfo.grade,
-          },
-          userToken
-        ).then((data: { token: string; guideSeq: [] }) => {
-          const token = data.token;
+      getUserInfo(userId).then((userInfo: User) => {
+        getToken({
+          childId: String(userId),
+          name: userInfo.name,
+          gender: userInfo.gender,
+          school: userInfo.school,
+          grade: userInfo.grade,
+        }).then((data: { token: string; guideSeq: [] }) => {
+          const { token } = data;
           setGuide(data.guideSeq);
           console.log('가져온 토큰 :', token);
           console.log('가져온 토큰으로 세션에 연결');
@@ -126,9 +113,7 @@ export const useOpenVidu = (
                 video: true,
               });
               const devices = await OV.getDevices();
-              const videoDevices = devices.filter(
-                (device) => device.kind === 'videoinput'
-              );
+              const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
               console.log('나를 publisher라고 하자!');
               const publisher = OV.initPublisher('', {
@@ -145,12 +130,12 @@ export const useOpenVidu = (
               setPublisher(publisher);
               mySession.publish(publisher);
             })
-            .catch((error) => {
+            .catch(error => {
               console.log('세션 연결을 실패했다!');
               console.log(
                 'There was an error connecting to the session:',
                 error.code,
-                error.message
+                error.message,
               );
             });
         });
@@ -164,9 +149,7 @@ export const useOpenVidu = (
             video: true,
           });
           const devices = await OV.getDevices();
-          const videoDevices = devices.filter(
-            (device) => device.kind === 'videoinput'
-          );
+          const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
           console.log('나를 publisher라고 하자!');
           const publisher = OV.initPublisher('', {
@@ -183,16 +166,12 @@ export const useOpenVidu = (
           setPublisher(publisher);
           mySession.publish(publisher);
         })
-        .catch((error) => {
+        .catch(error => {
           console.log('초대 세션 연결을 실패했다!');
-          console.log(
-            'There was an error connecting to the session:',
-            error.code,
-            error.message
-          );
+          console.log('There was an error connecting to the session:', error.code, error.message);
         });
     } else if (userId && sessionId && sessionToken === '') {
-      getFriendSessionToken(userId, userToken, sessionId).then((token: any) => {
+      getFriendSessionToken(userId, sessionId).then((token: any) => {
         console.log('가져온 토큰 :', token);
         console.log('가져온 토큰으로 초대 세션에 연결');
         mySession
@@ -203,9 +182,7 @@ export const useOpenVidu = (
               video: true,
             });
             const devices = await OV.getDevices();
-            const videoDevices = devices.filter(
-              (device) => device.kind === 'videoinput'
-            );
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
             console.log('나를 publisher라고 하자!');
             const publisher = OV.initPublisher('', {
@@ -218,19 +195,13 @@ export const useOpenVidu = (
               insertMode: 'APPEND',
               mirror: false,
             });
-            console.log(
-              'publisher의 옵션을 설정했고 초대 세션 연결을 성공했다!'
-            );
+            console.log('publisher의 옵션을 설정했고 초대 세션 연결을 성공했다!');
             setPublisher(publisher);
             mySession.publish(publisher);
           })
-          .catch((error) => {
+          .catch(error => {
             console.log('초대 세션 연결을 실패했다!');
-            console.log(
-              'There was an error connecting to the session:',
-              error.code,
-              error.message
-            );
+            console.log('There was an error connecting to the session:', error.code, error.message);
           });
       });
     }
@@ -242,13 +213,12 @@ export const useOpenVidu = (
 
       if (sessionId) {
         console.log('초대 세션이랑 연결 끊기');
-        destroyFriendSession(sessionId, userToken);
+        destroyFriendSession(sessionId);
         setSessionId('');
         setSessionToken('');
       } else if (mySession) {
         console.log('서버에 세션 끊어달라고 보내기');
         console.log(mySession);
-        console.log(guideScript, timeStamp)
       }
       setSession(null);
       setPublisher(null);
@@ -271,19 +241,19 @@ export const useOpenVidu = (
     (status: boolean) => {
       publisher?.publishVideo(status);
     },
-    [publisher]
+    [publisher],
   );
 
   const onChangeMicStatus = useCallback(
     (status: boolean) => {
       publisher?.publishAudio(status);
     },
-    [publisher]
+    [publisher],
   );
 
   const streamList = useMemo(
     () => [{ streamManager: publisher, userId }, ...subscribers],
-    [publisher, subscribers, userId]
+    [publisher, subscribers, userId],
   );
   console.log(streamList);
   return {

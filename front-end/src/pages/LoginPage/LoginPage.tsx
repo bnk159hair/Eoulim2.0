@@ -1,13 +1,16 @@
-import Login from "../../components/login/Login";
+import React from 'react';
+import { useFireBase } from 'hooks/useFireBase';
+import Login from '../../components/login/Login';
 import {
   LoginPageContainer,
   LoginContainer,
   Logo,
   ImageContainer,
   Animals,
-} from "./LoginPageStyles";
+} from './LoginPageStyles';
 
 const LoginPage = () => {
+  useFireBase();
   return (
     <LoginPageContainer>
       <LoginContainer>

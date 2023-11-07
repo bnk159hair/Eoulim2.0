@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { SpinnerContainer, AnimalEmoji, Spinner } from './LoadingStyles';
 
@@ -7,7 +6,7 @@ interface IProps {
   isAnimonLoaded: boolean;
 }
 
-const Loading: FC<IProps> = ({ isAnimonLoaded }) => {
+const Loading = ({ isAnimonLoaded }: IProps) => {
   const [animal, setAnimal] = useState('🐱');
   useEffect(() => {
     const animalArray = [
