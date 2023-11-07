@@ -146,22 +146,11 @@ public class ChildServiceImpl implements ChildService {
     }
 
     @Transactional
-    public void delete(Long childId, Long userId) {
-        final var childEntity =
-                childRepository
-                        .findByIdAndUserId(childId, userId)
-                        .orElseThrow(() -> new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION));
-        log.info(childEntity.getId() + " " + childEntity.getUser().getId());
+    public void delete(Long childId, Authentication authentication) {
+        Child child = checkPermission(childId, authentication);
+        ChildEntity childEntity = ChildEntity.of(child);
         childRepository.delete(childEntity);
     }
-
-//    public Child getChildWithUser(Long childId, Long userId) {
-//        final var childEntity = getChildEntity(childId); // Child Entity 조회
-//        // 접근 권한이 있는 Child인지 체크
-//        if (!childEntity.getUser().getId().equals(userId))
-//            throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
-//        return Child.fromEntity(childEntity);
-//    }
 
     /**
      * Child - Animon 관련

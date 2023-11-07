@@ -41,7 +41,7 @@ public class UserController {
         return new SuccessResponse<>(accessToken);
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public SuccessResponse<?> logout(@Valid @RequestBody UserLogoutRequest request, Authentication authentication) {
         userService.logout(authentication.getName(), request.getFcmToken());

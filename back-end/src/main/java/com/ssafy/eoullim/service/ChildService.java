@@ -18,11 +18,9 @@ public interface ChildService {
 
     Child getChild(Long childId, Authentication authentication);
 
-//    Child getChildWithUser(Long childId, Long id);
-
     Child modify(Long childId, Child changedChild, Authentication authentication);
 
-    void delete(Long childId, Long id);
+    void delete(Long childId, Authentication authentication);
 
     List<Animon> getAnimonList(Long childId, Authentication authentication);
 

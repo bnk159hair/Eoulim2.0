@@ -7,9 +7,7 @@ import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.OtherChild;
-import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.ChildService;
-import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,7 +40,7 @@ public class ChildController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public SuccessResponse<Void> logout(
             @Valid @RequestBody ChildLogoutRequest request, Authentication authentication) {
-        childService.logout(request.getChildId(), request.getToken(), authentication);
+        childService.logout(request.getChildId(), request.getFcmToken(), authentication);
         return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
 
@@ -83,8 +81,7 @@ public class ChildController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public SuccessResponse<?> delete(
             @PathVariable @NotBlank Long childId, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        childService.delete(childId, user.getId());
+        childService.delete(childId, authentication);
         return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
 

@@ -14,5 +14,5 @@ public class ChildLogoutRequest {
     @NotNull
     private Long childId;
     @NotBlank
-    private String token;
+    private String fcmToken;
 }
