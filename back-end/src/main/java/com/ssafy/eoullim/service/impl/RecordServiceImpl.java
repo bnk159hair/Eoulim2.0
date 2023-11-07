@@ -1,6 +1,5 @@
 package com.ssafy.eoullim.service.impl;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -18,6 +17,7 @@ import com.ssafy.eoullim.repository.jpa.GuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordGuideRepository;
 import com.ssafy.eoullim.repository.jpa.RecordRepository;
 import com.ssafy.eoullim.repository.query.RecordQueryRepository;
+import com.ssafy.eoullim.service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RecordService {
+public class RecordServiceImpl implements RecordService {
 
     private final RecordRepository recordRepository;
     private final GuideRepository guideRepository;
@@ -54,6 +54,7 @@ public class RecordService {
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
 
+    @Override
     public String uploadToS3(String recordingId, String recordFolder) {
         // S3에 업로드할 파일 정보
         File recordZip = new File(recordFolder, "VideoInfo.zip");
@@ -84,6 +85,7 @@ public class RecordService {
         }
     }
 
+    @Override
     @Transactional
     public void saveRecordToDB(String url, ChildEntity owner, ChildEntity other) {
         final var recordEntity = RecordEntity.builder().participant(other)
@@ -94,6 +96,7 @@ public class RecordService {
         return ;    //mapper
     }
 
+    @Override
     public void writeVideoToDB(String recordingId, Room room) throws IOException, ParseException {
 
         System.out.println(room.getChildOne());
@@ -172,10 +175,12 @@ public class RecordService {
         /* JSON Parse 종료 */
     }
 
+    @Override
     public List<RecordList> getRecordList(Long masterId) {
         return recordQueryRepository.findRecordsByChildId(masterId);
     }
 
+    @Override
     public Record getRecord(Long recordId) {
         Record result = recordQueryRepository.findRecordById(recordId);
         result.setGuideInfo(recordQueryRepository.findGuideInfoById(recordId));

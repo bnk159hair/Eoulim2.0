@@ -3,7 +3,7 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.model.RecordList;
 import com.ssafy.eoullim.model.Record;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
-import com.ssafy.eoullim.service.impl.RecordService;
+import com.ssafy.eoullim.service.RecordService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

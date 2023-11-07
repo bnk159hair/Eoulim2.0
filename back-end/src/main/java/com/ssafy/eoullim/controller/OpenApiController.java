@@ -2,7 +2,7 @@ package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.OpenApiSchoolRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
-import com.ssafy.eoullim.service.impl.OpenApiService;
+import com.ssafy.eoullim.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

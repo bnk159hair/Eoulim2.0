@@ -5,6 +5,8 @@ import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Alarm;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
+import com.ssafy.eoullim.service.MatchService;
+import com.ssafy.eoullim.service.RecordService;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
 import io.openvidu.java.client.*;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
-public class MatchService {
+public class MatchServiceImpl implements MatchService {
   @Value("${OPENVIDU_URL}")
   private String OPENVIDU_URL;
 
@@ -44,6 +46,7 @@ public class MatchService {
     this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
   }
 
+  @Override
   public synchronized Match startRandom(Long childId)
       throws OpenViduJavaClientException, OpenViduHttpException, InterruptedException {
 //    Map<String, Object> params = new HashMap<>(); // 빈 파일
@@ -118,6 +121,7 @@ public class MatchService {
     }
   }
 
+  @Override
   public Recording stopRandom(
       String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
@@ -155,6 +159,7 @@ public class MatchService {
     }
   }
 
+  @Override
   public synchronized Match startFriend(
       Long childId,
       String childName,
@@ -236,6 +241,7 @@ public class MatchService {
     }
   }
 
+  @Override
   public Recording stopFriend(String sessionId, RecordService recordService)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
     log.info("sessionId: " + sessionId);

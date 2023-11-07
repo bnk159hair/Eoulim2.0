@@ -6,18 +6,20 @@ import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.model.entity.ChildEntity;
 import com.ssafy.eoullim.model.entity.FollowEntity;
 import com.ssafy.eoullim.repository.jpa.FollowRepository;
+import com.ssafy.eoullim.service.FollowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class FollowService {
+public class FollowServiceImpl implements FollowService {
   // Service
   private final ChildService childService;
   // Repo
   private final FollowRepository followRepository;
 
+  @Override
   @Transactional
   public void create(Long childId, Long friendId, User user) {
     // childId와 friendId가 같은 경우

@@ -4,6 +4,7 @@ import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.repository.jpa.AnimonRepository;
+import com.ssafy.eoullim.service.AnimonService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,13 +16,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AnimonService {
+public class AnimonServiceImpl implements AnimonService {
   private final AnimonRepository animonRepository;
 
+  @Override
   public List<Animon> getAnimons() {
     return animonRepository.findAll().stream().map(Animon::fromEntity).collect(Collectors.toList());
   }
 
+  @Override
   public List<Animon> getAnimonsAtRandom(int limit) {
     return animonRepository
         .findRandomAnimals(limit)
@@ -31,6 +34,7 @@ public class AnimonService {
         .collect(Collectors.toList());
   }
 
+  @Override
   public Animon getMinIdAnimon(List<Animon> animons) {
     return animons.stream()
         .min(Comparator.comparing(Animon::getId))

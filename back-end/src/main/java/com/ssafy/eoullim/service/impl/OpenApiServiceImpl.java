@@ -2,6 +2,7 @@ package com.ssafy.eoullim.service.impl;
 
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
+import com.ssafy.eoullim.service.OpenApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class OpenApiService {
+public class OpenApiServiceImpl implements OpenApiService {
   // Open Api
   @Value("${public-api.service-key}")
   private String openApiServiceKey;
@@ -27,6 +28,7 @@ public class OpenApiService {
   @Value("${public-api.url}")
   private String openApiUrl;
 
+  @Override
   public Boolean isValidSchool(String keyword) {
     try {
       URL url = getOpenApiUrl(keyword);
@@ -64,6 +66,7 @@ public class OpenApiService {
     }
   }
 
+  @Override
   public URL getOpenApiUrl(String keyword) {
     StringBuilder urlBuilder = new StringBuilder(openApiUrl);
     try {
