@@ -8,6 +8,7 @@ import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/screen/record_screen.dart';
 
 
 class Profiles extends StatefulWidget {
@@ -104,102 +105,170 @@ class _CarouselWidgetState extends State<CarouselWidget> {
     super.initState();
     _initializeFCMToken();
   }
+
   Future<void> _initializeFCMToken() async {
-    final storage = new FlutterSecureStorage();
-    fcmToken = (await storage.read(key: 'fcmToken')) ;
+    final storage = FlutterSecureStorage();
+    fcmToken = (await storage.read(key: 'fcmToken'));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: const Color(0xffffffff),
-        leading: IconButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).clearSnackBars();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('알림목록으로 이동'),
-                duration: Duration(milliseconds: 1500),
-              ),
-            );
-          },
-          icon: const Icon(
-            Icons.notifications_none,
-            color: Color(0xff000000),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CreateProfile(),
-                ),
-              );
-            },
-            child: const Text(
-              "계정 설정",
-              style: TextStyle(
-                fontSize: 20,
-                color: Color(0xff000000),
-              ),
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          CarouselSlider(
-            carouselController: carouselController,
-            items: widget.profiles.map((profile) {
-        return GestureDetector(
-          onTap: () async {
-            profileloginAuth = await apiProfileLogin.postProfileLoginAPI(ProfileLoginRequestModel(childId: profile.id,  fcmToken: fcmToken ?? ""));
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Home(),
-              ),
-            );
-          },
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.symmetric(horizontal: 5.0),
-            decoration: const BoxDecoration(color: Colors.amber),
-            child: Center(
-              child: Text(
-                profile.name ?? 'No Name',
-                style: const TextStyle(fontSize: 16.0),
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/login.gif"), 
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-        );
-            }).toList(),
-            options: CarouselOptions(
-              // Set the height of each carousel item
-              height: 350,
-              // Set the size of each carousel item
-              // if height is not specified
-              aspectRatio: 16 / 9,
-              // Set how much space current item widget
-              // will occupy from current page view
-              viewportFraction: 0.8,
-              // Set the initial page
-              initialPage: 0,
-              // Set carousel to repeat when reaching the end
-              enableInfiniteScroll: false,
-              reverse: false,
-              // Set carousel to display next page automatically
-              autoPlay: false,
-              enlargeCenterPage: true,
-              // Do actions for each page change
-              onPageChanged: (index, reason) {},
-              // Set the scroll direction
-              scrollDirection: Axis.horizontal,
+            child: Column(
+              children: [
+                AppBar(
+                  elevation: 0, 
+                  backgroundColor: Colors.transparent, 
+                  leading: IconButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('알림목록으로 이동'),
+                          duration: Duration(milliseconds: 1500),
+                        ),
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.notifications_none,
+                      color: Color(0xff000000),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CreateProfile(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        "계정 설정",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xff000000),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Center(
+                    child: CarouselSlider(
+                      carouselController: carouselController,
+                      items: widget.profiles.map((profile) {
+                        return GestureDetector(
+                          onTap: () async {
+                            profileloginAuth = await apiProfileLogin.postProfileLoginAPI(
+                                ProfileLoginRequestModel(childId: profile.id, fcmToken: fcmToken ?? ""));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Home(),
+                              ),
+                            );
+                          },
+                          child: Stack(
+                            children: [
+                              Image.asset(
+                                'assets/bear.png',
+                                fit: BoxFit.fitHeight,
+                                height: 400,
+                                width: 400,
+                                alignment: Alignment.center,
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/dialog.png',
+                                      width: 170,
+                                    ),
+                                    Text(
+                                      '${profile.name}',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Color(0xff000000),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: ()async {
+                                    final storage = FlutterSecureStorage();
+                                    await storage.write(key: 'childId', value: profile.id.toString());
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => Record(),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 100,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.red,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.videocam,
+                                          size: 30,
+                                          color: Colors.white,
+                                        ),
+                                        Text(
+                                          '녹화영상',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      options: CarouselOptions(
+                        height: 350,
+                        aspectRatio: 16 / 9,
+                        viewportFraction: 0.8,
+                        initialPage: 0,
+                        enableInfiniteScroll: false,
+                        reverse: false,
+                        autoPlay: false,
+                        enlargeCenterPage: true,
+                        onPageChanged: (index, reason) {},
+                        scrollDirection: Axis.horizontal,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
