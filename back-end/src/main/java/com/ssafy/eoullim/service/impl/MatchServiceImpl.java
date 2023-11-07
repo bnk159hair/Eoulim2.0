@@ -5,13 +5,16 @@ import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Alarm;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
+import com.ssafy.eoullim.service.ChildService;
 import com.ssafy.eoullim.service.MatchService;
 import com.ssafy.eoullim.service.RecordService;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
 import io.openvidu.java.client.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -21,9 +24,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class MatchServiceImpl implements MatchService {
+  private final ChildService childService;
+
   @Value("${OPENVIDU_URL}")
   private String OPENVIDU_URL;
 
@@ -32,12 +38,12 @@ public class MatchServiceImpl implements MatchService {
 
   private OpenVidu openvidu;
 
-  private Queue<Room> matchingQueue = new LinkedList<Room>();
+  private Queue<Room> matchingQueue = new LinkedList<>();
+
   // Collection to pair session names and OpenVidu Session objects
   private Map<String, Session> mapSessions = new ConcurrentHashMap<>();
-  // Collection to pair session names and tokens (the inner Map pairs tokens and
-  // role associated)
 
+  // Collection to pair session names and tokens (the inner Map pairs tokens and role associated)
   private Map<String, String> sessionRecordings = new ConcurrentHashMap<>();
   private Map<String, Room> mapRooms = new ConcurrentHashMap<>();
 
@@ -46,78 +52,172 @@ public class MatchServiceImpl implements MatchService {
     this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
   }
 
-  @Override
-  public synchronized Match startRandom(Long childId)
-      throws OpenViduJavaClientException, OpenViduHttpException, InterruptedException {
-//    Map<String, Object> params = new HashMap<>(); // 빈 파일
-//    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
-    /* 비어있는 설정을 통한 설정파일 지정 */
-    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(new HashMap<String, Object>()).build();
+  private Match createNewMatch(Long childId, Boolean isRandom) {
+    // session ID 짓기
+    String sessionId = buildSessionId(childId);
+    // Session Id를 통해 Open Vidu Session 생성
+    Session session = createNewOpenViduSession(sessionId);
+    mapSessions.put(sessionId, session);
+    // Connection Token 생성
+    String token = creatConnectionToken(session);
+    // Room 생성
+    Room newRoom = makeNewRoom(sessionId, isRandom, childId);
+    mapRooms.put(sessionId, newRoom);
+    // 랜덤 미팅이면 가이드 순서 넣기
+    return isRandom
+        ? new Match(sessionId, token, newRoom.getRandom())
+        : new Match(sessionId, token, null);
+  }
 
-
-//    LocalDateTime now = LocalDateTime.now();
+  private String buildSessionId(Long childId) {
     String formatNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-    String sessionId = childId.toString() + "_" + formatNow; // sessionId 결정
-
-    if (this.mapSessions.get(sessionId) != null) { // 만드려는 세션 Id가 이미 존재하는지
+    String sessionId = String.format("%d_%s", childId, formatNow);
+    log.info("[EMPTY] SessionId is created: " + sessionId);
+    if (this.mapSessions.get(sessionId) != null) { // 만들려는 세션 Id가 이미 존재 하는 지
       throw new EoullimApplicationException(ErrorCode.MATCH_CONFLICT);
     }
-    if (matchingQueue.isEmpty()) { // 비어있다면
-      Room newRoom = new Room();
-      matchingQueue.add(newRoom);
+    return sessionId;
+  }
 
-      log.info("[EMPTY] SessionId created: " + sessionId);
+  private Session createNewOpenViduSession(String sessionId) {
+    SessionProperties sessionProperties =
+        new SessionProperties.Builder()
+            .customSessionId(sessionId)
+            .recordingMode(RecordingMode.MANUAL)
+            .build();
+    try {
+        return openvidu.createSession(sessionProperties);
+    } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+      throw new EoullimApplicationException(ErrorCode.OPENVIDU_SERVER_ERROR, "Session 생성 실패");
+    }
+  }
 
-      SessionProperties sessionProperties =
-          new SessionProperties.Builder()
-              .customSessionId(sessionId)
-              .recordingMode(RecordingMode.MANUAL)
-              .build();
-
-      Session session = openvidu.createSession(sessionProperties);
-      log.info("[EMPTY] SessionId is created: " + sessionId);
-
+  private String creatConnectionToken(Session session) {
+    // 비어있는 설정을 통한 설정파일 지정
+    ConnectionProperties connectionProperties =
+        ConnectionProperties.fromJson(new HashMap<String, Object>()).build();
+    try {
       String token = session.createConnection(connectionProperties).getToken();
-      log.info("[EMPTY] Token is created - sessionId : " + sessionId);
+      log.info("[EMPTY] Token is created - sessionId : " + session.getSessionId());
+      return token;
+    } catch (OpenViduJavaClientException | OpenViduHttpException e) {
+      throw new EoullimApplicationException(ErrorCode.OPENVIDU_HTTP_ERROR, "Connection 생성 실패");
+    }
+  }
 
+  private Room makeNewRoom(String sessionId, Boolean isRandom, Long childId) {
+    Room newRoom = new Room();
+    if (isRandom) {
       List<Integer> random = RandomGeneratorUtils.generateRandomNumbers(2, 12, 4);
       log.info("[EMPTY] randomNum is created - sessionId : " + sessionId);
+      newRoom.setRandom(random); // random 일 때만
+    }
+    newRoom.setSessionId(sessionId);
+    newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
+    return newRoom;
+  }
 
-      newRoom.setSessionId(session.getSessionId());
-      newRoom.setRandom(random);
+  private String startRecording(String sessionId) { // 녹화
+    RecordingProperties recordingProperties =
+        new RecordingProperties.Builder() // 녹화 설정
+            .outputMode(Recording.OutputMode.INDIVIDUAL)
+            .resolution("1280x960")
+            .frameRate(30)
+            .name("VideoInfo")
+            .build();
+    try {
+      Recording recording = openvidu.startRecording(sessionId, recordingProperties); // 녹화 시작
+      sessionRecordings.put(sessionId, recording.getId());
+      return recording.getId();
+    } catch (OpenViduHttpException | OpenViduJavaClientException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-      mapSessions.put(sessionId, session);
+  private Session getExistingSession(String sessionId) {
+    Session existingSession = mapSessions.get(sessionId);
+    if (existingSession == null) {
+      throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
+    }
+    log.info("[ALREADY] Session is already created: " + sessionId);
+    return existingSession;
+  }
 
-      newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
-      mapRooms.put(sessionId, newRoom);
-      Match result = new Match(sessionId, token, random);
+  @Override
+  public synchronized Match startRandom(Long childId, Authentication authentication) {
+    // Child ID가 현재 User의 Child가 맞는지 체크
+    final var child = childService.getChild(childId, authentication);
+
+    // 매칭 큐 - Empty
+    if (matchingQueue.isEmpty()) {
+      Match result = createNewMatch(childId, true);
+      return result;
+    }
+    // 매칭 큐 - Not Empty
+    else { 
+      Room existingRoom = matchingQueue.poll();
+      String sessionId = existingRoom.getSessionId();
+
+      Session existingSession = getExistingSession(sessionId);
+      String token = creatConnectionToken(existingSession);
+
+      Match result = new Match(sessionId, token, existingRoom.getRandom());
+
+      try {
+        Thread.sleep(3000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+
+      existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+
+      // 녹화 시작
+      String recordingId = startRecording(sessionId);
+
+      existingRoom.setRecordingId(recordingId);
 
       return result;
-    } else { // 비어있지 않다면
-      Room existingRoom = matchingQueue.poll();
-      sessionId = existingRoom.getSessionId();
-      if (mapSessions.get(sessionId) != null) { // 세션이 정상적으로 존재한다면
-        log.info("[ALREADY] Session created: " + sessionId);
-        String token = mapSessions.get(sessionId).createConnection(connectionProperties).getToken();
+    }
+  }
 
-        Match result = new Match(sessionId, token, existingRoom.getRandom());
-        RecordingProperties recordingProperties =
-            new RecordingProperties.Builder() // 녹화 설정
-                .outputMode(Recording.OutputMode.INDIVIDUAL)
-                .resolution("1280x960")
-                .frameRate(30)
-                .name("VideoInfo")
-                .build();
-        Thread.sleep(3000);
+  @Override
+  public synchronized Match startFriend(
+      Long childId,
+      String childName,
+      Long friendId,
+      AlarmService alarmService,
+      String existSessionId,
+      Authentication authentication) {
+    // Child ID가 현재 User의 Child가 맞는지 체크
+    final var child = childService.getChild(childId, authentication);
 
-        existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
-        Recording recording = openvidu.startRecording(sessionId, recordingProperties); // 녹화 시작
-        sessionRecordings.put(sessionId, recording.getId());
-        existingRoom.setRecordingId(recording.getId());
-        return result;
-      } else {
-        throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
-      }
+    // 존재 하는 방이 없을 때
+    if (existSessionId == null) {
+      // 없는거 확인했으면 세로운 세션 Id 만들기
+      Match result = createNewMatch(childId, false);
+
+      // 알림 서비스
+      Alarm alarm = new Alarm(result.getSessionId(), childName);
+      alarmService.send(friendId, alarm);
+
+      return result;
+    }
+    // existSessionId is not null
+    else {
+      String sessionId = existSessionId;
+      Room existingRoom = mapRooms.get(sessionId);
+
+      Session existingSession = getExistingSession(sessionId);
+      String token = creatConnectionToken(existingSession);
+
+      Match result = new Match(sessionId, token, null);
+
+      String recordingId = startRecording(sessionId);
+
+      existingRoom.setRecordingId(recordingId);
+      existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+
+      return result;
     }
   }
 
@@ -156,88 +256,6 @@ public class MatchServiceImpl implements MatchService {
       }
     } else {
       throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
-    }
-  }
-
-  @Override
-  public synchronized Match startFriend(
-      Long childId,
-      String childName,
-      Long friendId,
-      String existSessionId,
-      AlarmService alarmService)
-      throws OpenViduJavaClientException, OpenViduHttpException {
-//    Map<String, Object> params = new HashMap<>(); // 빈 파일
-//    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(params).build();
-
-    ConnectionProperties connectionProperties = ConnectionProperties.fromJson(new HashMap<String, Object>()).build();
-
-    if (existSessionId == null) { // 존재하는 방이 없을 때
-//      LocalDateTime now = LocalDateTime.now();
-      String formatNow = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-      String sessionId = childId.toString() + "_" + formatNow; // sessionId 결정
-
-      if (this.mapSessions.get(sessionId) != null) { // 만드려는 세션 Id가 이미 존재하는지
-        throw new EoullimApplicationException(ErrorCode.MATCH_CONFLICT);
-      } else { // 없는거 확인했으면 세로운 세션 Id 만들기
-        log.info("[EMPTY] Session created: " + sessionId);
-
-        SessionProperties sessionProperties =
-            new SessionProperties.Builder()
-                .customSessionId(sessionId)
-                .recordingMode(RecordingMode.MANUAL)
-                .build();
-
-        Session session = openvidu.createSession(sessionProperties);
-
-        String token = session.createConnection(connectionProperties).getToken();
-
-        Room newRoom = new Room();
-        newRoom.setSessionId(session.getSessionId());
-
-        mapSessions.put(sessionId, session);
-        Match result = new Match(sessionId, token, null);
-        newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
-        mapRooms.put(sessionId, newRoom);
-
-        /*
-        알림 서비스 코드 작성
-         */
-        Alarm alarm = new Alarm(sessionId, childName);
-        alarmService.send(friendId, alarm);
-
-        return result;
-      }
-    } else {
-      if (mapSessions.get(existSessionId) != null) { // 방이 실제로 존재할 때
-        String sessionId = existSessionId;
-        if (mapSessions.get(sessionId) != null) { // 세션이 정상적으로 존재한다면
-          Room existingRoom = mapRooms.get(sessionId);
-          log.info("[ALREADY] Session created: " + sessionId);
-          String token =
-              mapSessions.get(sessionId).createConnection(connectionProperties).getToken();
-          Match result = new Match(sessionId, token, null);
-
-          RecordingProperties recordingProperties =
-              new RecordingProperties.Builder() // 녹화 설정
-                  .outputMode(Recording.OutputMode.INDIVIDUAL)
-                  .resolution("1280x960")
-                  .frameRate(30)
-                  .name("VideoInfo")
-                  .build();
-          Recording recording = openvidu.startRecording(sessionId, recordingProperties); // 녹화 시작
-
-          sessionRecordings.put(sessionId, recording.getId());
-          existingRoom.setRecordingId(recording.getId());
-          existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
-
-          return result;
-        } else {
-          throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
-        }
-      } else {
-        throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
-      }
     }
   }
 

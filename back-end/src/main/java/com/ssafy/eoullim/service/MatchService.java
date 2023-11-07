@@ -6,22 +6,25 @@ import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import io.openvidu.java.client.Recording;
 import org.json.simple.parser.ParseException;
+import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface MatchService {
-  Match startRandom(Long childId) throws OpenViduJavaClientException, OpenViduHttpException, InterruptedException;
-
-  Recording stopRandom(
-      String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService) throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException ;
+  Match startRandom(Long childId, Authentication authentication);
 
   Match startFriend(
-      Long childId,
-      String childName,
-      Long friendId,
-      String existSessionId,
-      AlarmService alarmService)  throws OpenViduJavaClientException, OpenViduHttpException;
+          Long childId,
+          String childName,
+          Long friendId,
+          AlarmService alarmService,
+          String existSessionId,
+          Authentication authentication);
+
+  Recording stopRandom(
+      String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService)
+      throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException;
 
   Recording stopFriend(String sessionId, RecordService recordService)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException;
