@@ -24,7 +24,7 @@ public interface ChildService {
 
     List<Animon> getAnimonList(Long childId, Authentication authentication);
 
-    Animon setProfileAnimon(Long childId, Long animonId);
+    Animon setProfileAnimon(Long childId, Long animonId, Authentication authentication);
 
     List<Child> getFriends(Long childId, Authentication authentication);
 

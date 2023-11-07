@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ChildAnimonRepository extends JpaRepository<ChildAnimonEntity, Long> {
 
-    Optional<List<ChildAnimonEntity>> findByChildId(Long childId);
+    Optional<List<ChildAnimonEntity>> findAllByChildId(Long childId);
 
     Optional<ChildAnimonEntity> findByChildIdAndAnimonId(Long childId, Long animonId);
 }

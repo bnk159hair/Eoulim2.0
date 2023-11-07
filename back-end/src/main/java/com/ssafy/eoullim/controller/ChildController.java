@@ -26,103 +26,101 @@ import java.util.Map;
 @RestController
 public class ChildController {
 
-    private final ChildService childService;
+  private final ChildService childService;
 
-    @PostMapping("/login")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<Child> login(
-            @Valid @RequestBody ChildLoginRequest request, Authentication authentication) {
-        Child child = childService.login(request.getChildId(), request.getFcmToken(), authentication);
-        return new SuccessResponse<>(child);
-    }
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> login(
+      @Valid @RequestBody ChildLoginRequest request, Authentication authentication) {
+    Child child = childService.login(request.getChildId(), request.getFcmToken(), authentication);
+    return new SuccessResponse<>(child);
+  }
 
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public SuccessResponse<Void> logout(
-            @Valid @RequestBody ChildLogoutRequest request, Authentication authentication) {
-        childService.logout(request.getChildId(), request.getFcmToken(), authentication);
-        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
-    }
+  @PostMapping("/logout")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public SuccessResponse<Void> logout(
+      @Valid @RequestBody ChildLogoutRequest request, Authentication authentication) {
+    childService.logout(request.getChildId(), request.getFcmToken(), authentication);
+    return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<Child> create(
-            @Valid @RequestBody ChildRequest request, Authentication authentication) {
-        Child child = childService.create(Child.of(request), authentication);
-        return new SuccessResponse<>(HttpStatus.CREATED, child);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public SuccessResponse<Child> create(
+      @Valid @RequestBody ChildRequest request, Authentication authentication) {
+    Child child = childService.create(Child.of(request), authentication);
+    return new SuccessResponse<>(HttpStatus.CREATED, child);
+  }
 
-    @GetMapping
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<List<Child>> getChildren(Authentication authentication) {
-        List<Child> childrenList = childService.getChildren(authentication);
-        return new SuccessResponse<>(childrenList);
-    }
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<List<Child>> getChildren(Authentication authentication) {
+    List<Child> childrenList = childService.getChildren(authentication);
+    return new SuccessResponse<>(childrenList);
+  }
 
-    @GetMapping("/{childId}")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<Child> getChild(
-            @PathVariable @NotBlank Long childId, Authentication authentication) {
-        Child child = childService.getChild(childId, authentication);
-        return new SuccessResponse<>(child);
-    }
+  @GetMapping("/{childId}")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> getChild(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    Child child = childService.getChild(childId, authentication);
+    return new SuccessResponse<>(child);
+  }
 
-    @PutMapping("/{childId}")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<Child> modify(
-            @PathVariable @NotBlank Long childId,
-            @Valid @RequestBody ChildRequest request,
-            Authentication authentication) {
-        Child updatedChild = childService.modify(childId, Child.of(request), authentication);
-        return new SuccessResponse<>(updatedChild);
-    }
+  @PutMapping("/{childId}")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> modify(
+      @PathVariable @NotBlank Long childId,
+      @Valid @RequestBody ChildRequest request,
+      Authentication authentication) {
+    Child updatedChild = childService.modify(childId, Child.of(request), authentication);
+    return new SuccessResponse<>(updatedChild);
+  }
 
-    @DeleteMapping("/{childId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public SuccessResponse<?> delete(
-            @PathVariable @NotBlank Long childId, Authentication authentication) {
-        childService.delete(childId, authentication);
-        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
-    }
+  @DeleteMapping("/{childId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public SuccessResponse<?> delete(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    childService.delete(childId, authentication);
+    return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
+  }
 
-    /**
-     * Child Animon Child의 정보 중 애니몬 관련 API
-     */
-    // GET : Child가 소유한 Animon List
-    @GetMapping("/{childId}/animons")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<List<Animon>> getAnimonList(
-            @PathVariable @NotBlank Long childId, Authentication authentication) {
-        List<Animon> animonList = childService.getAnimonList(childId, authentication);
-        return new SuccessResponse<>(animonList);
-    }
+  /** Child Animon Child의 정보 중 애니몬 관련 API */
+  // GET : Child가 소유한 Animon List
+  @GetMapping("/{childId}/animons")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<List<Animon>> getAnimonList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    List<Animon> animonList = childService.getAnimonList(childId, authentication);
+    return new SuccessResponse<>(animonList);
+  }
 
-    // PATCH : Child의 프로필 애니몬을 변경
-    @PatchMapping("/{childId}/animons")
-    @ResponseStatus(HttpStatus.OK)
-    public SuccessResponse<Animon> selectAnimon(
-            @PathVariable @NotBlank Long childId, @RequestBody Map<String, Long> requestBody) {
-        Animon animon = childService.setProfileAnimon(childId, requestBody.get("animonId"));
-        return new SuccessResponse<>(animon);
-    }
+  // PATCH : Child의 프로필 애니몬을 변경
+  @PatchMapping("/{childId}/animons")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Animon> selectAnimon(
+      @PathVariable @NotBlank Long childId,
+      @RequestBody Map<String, Long> requestBody,
+      Authentication authentication) {
+    Animon animon = childService.setProfileAnimon(childId, requestBody.get("animonId"), authentication);
+    return new SuccessResponse<>(animon);
+  }
 
-    /**
-     * Child follow Child의 정보 중 팔로우 관련 API
-     */
-    @GetMapping("/{childId}/follows")
-    @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public SuccessResponse<List<Child>> getFriendsList(
-            @PathVariable @NotBlank Long childId, Authentication authentication) {
-        List<Child> friendList = childService.getFriends(childId, authentication);
-        return new SuccessResponse<>(friendList);
-    }
+  /** Child follow Child의 정보 중 팔로우 관련 API */
+  @GetMapping("/{childId}/follows")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SuccessResponse<List<Child>> getFriendsList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    List<Child> friendList = childService.getFriends(childId, authentication);
+    return new SuccessResponse<>(friendList);
+  }
 
-    // TODO  : api url refactoring
-    @GetMapping("/participant/{participantId}")
-    public ResponseEntity<SuccessResponse<OtherChild>> getOtherChild(
-            @PathVariable @NotBlank Long participantId) {
-        OtherChild friend = childService.getOtherChild(participantId);
-        return ResponseEntity.ok(new SuccessResponse<>(friend));
-    }
+  // TODO  : api url refactoring
+  @GetMapping("/participant/{participantId}")
+  public ResponseEntity<SuccessResponse<OtherChild>> getOtherChild(
+      @PathVariable @NotBlank Long participantId) {
+    OtherChild friend = childService.getOtherChild(participantId);
+    return ResponseEntity.ok(new SuccessResponse<>(friend));
+  }
 }

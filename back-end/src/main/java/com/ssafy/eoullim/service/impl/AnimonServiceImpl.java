@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AnimonServiceImpl implements AnimonService {
+
   private final AnimonRepository animonRepository;
 
   @Override
