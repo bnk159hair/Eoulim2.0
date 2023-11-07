@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import instance from 'apis/instance';
+import { getChildren } from 'apis/profileApis';
 import ProfileListItem from './ProfileListItem';
 import { ProfileCreateBox, ProfileListBox } from './ProfileListStyles';
 import CreateModal from './CreateModal';
 
 interface Profile {
-  id: number;
-  birth: number;
+  childId: number;
+  birth: string;
   gender: string;
-  grade: number;
+  grade: string;
   name: string;
   school: string;
   status: string;
-  profileAnimon: { id: 0; bodyImagePath: ''; maskImagePath: ''; name: '' };
+  profileAnimon: { id: number; bodyImagePath: string; maskImagePath: string; name: string };
 }
 
 const ProfileList = () => {
@@ -20,33 +20,31 @@ const ProfileList = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
 
   useEffect(() => {
-    getChildren();
+    handleGetChildren();
   }, []);
 
-  const getChildren = async () => {
-    try {
-      const response = await instance.get(`/children`);
-      setProfiles(response.data.data);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-    }
+  const handleGetChildren = () => {
+    getChildren({
+      onSuccess: data => {
+        setProfiles(data);
+      },
+    });
   };
 
   return (
     <ProfileListBox>
-      {profiles.map(profile => (
+      {profiles.map((profile: Profile) => (
         <ProfileListItem
-          key={profile.id}
-          childId={profile.id}
+          key={profile.childId}
+          childId={profile.childId}
           name={profile.name}
-          imgurl={profile.profileAnimon.bodyImagePath}
-          getChildren={getChildren}
+          imgUrl={profile.profileAnimon.bodyImagePath}
+          getChildren={handleGetChildren}
         />
       ))}
       {profiles.length < 3 && <ProfileCreateBox onClick={() => setIsModalOpen(true)} />}
       {isModalOpen && (
-        <CreateModal onClose={() => setIsModalOpen(false)} getChildren={getChildren} />
+        <CreateModal onClose={() => setIsModalOpen(false)} getChildren={handleGetChildren} />
       )}
     </ProfileListBox>
   );

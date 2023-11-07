@@ -59,6 +59,10 @@ interface GetChildInfoParams {
   onError: () => void;
 }
 
+interface GetChildrenParams {
+  onSuccess: (data: GetChildInfo[]) => void;
+}
+
 export const postCreateChild = async ({ childData, onSuccess, onError }: CreateChildParams) => {
   try {
     await instance.post('/children', childData);
@@ -127,5 +131,14 @@ export const getChildInfo = async ({ childId, onSuccess, onError }: GetChildInfo
     onSuccess(response.data.data);
   } catch (error) {
     onError();
+  }
+};
+
+export const getChildren = async ({ onSuccess }: GetChildrenParams) => {
+  try {
+    const response = await instance.get('/children');
+    onSuccess(response.data.data);
+  } catch (error) {
+    console.error(error);
   }
 };

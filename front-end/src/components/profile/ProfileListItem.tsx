@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { fcmTokenState } from 'atoms/Firebase';
+import { childLogin } from 'apis/profileApis';
 import { ProfileUserContainer, NameTag, ButtonContainer } from './ProfileListItemStyles';
 import ModifyModal from './ModifyModal';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState, userState } from '../../atoms/Auth';
+import { userState } from '../../atoms/Auth';
 import { Profilekey } from '../../atoms/Profile';
 import ToRecordModal from './ToRecordModal';
 
@@ -23,72 +23,45 @@ interface ProfileListItemProps {
   name: string;
   childId: number;
   getChildren: () => void;
-  imgurl: string;
+  imgUrl: string;
 }
 
 const ProfileListItem: React.FC<ProfileListItemProps> = ({
   name,
   childId,
   getChildren,
-  imgurl,
+  imgUrl,
 }) => {
+  const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isRecordOpen, setIsRecordOpen] = useState(false);
-  const token = useRecoilValue(tokenState);
-  const [, setProfileKey] = useRecoilState(Profilekey);
+  const [, setChildId] = useRecoilState(Profilekey);
+  const fcmToken = useRecoilValue(fcmTokenState);
   const [, setUserName] = useRecoilState(userState);
-  const navigate = useNavigate();
-  const IMGURL = imgurl;
+  const childLoginoutData = { childId, fcmToken };
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setModalOpen(false);
-  };
-
-  const handleMainClick = () => {
+  const handleChildLogin = () => {
     console.log(childId, name);
-    setProfileKey(childId);
+    setChildId(childId);
     setUserName(name);
-    profileLogin();
+    childLogin({
+      childLoginData: childLoginoutData,
+      onSuccess: () => {
+        console.log('프로필 로그인에 성공했습니다.');
+      },
+      onError: () => {
+        console.log('프로필 로그인에 실패하였습니다.');
+      },
+    });
     navigate('/');
-  };
-
-  const profileLogin = () => {
-    axios
-      .get(
-        `${API_BASE_URL}/children/${childId}`,
-
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(() => {
-        console.log('프로필로그인');
-      })
-      .catch(error => {
-        console.log('프로필 로그인 오류', error);
-      });
-  };
-
-  const handleRecordOpen = () => {
-    setIsRecordOpen(true);
-  };
-
-  const handleRecordClose = () => {
-    setIsRecordOpen(false);
   };
 
   return (
     <ThemeProvider theme={theme}>
       <div>
         <ProfileUserContainer
-          style={{ backgroundImage: `url(${IMGURL})` }}
-          onClick={handleMainClick}
+          style={{ backgroundImage: `url(${imgUrl})` }}
+          onClick={handleChildLogin}
         >
           <NameTag>{name}</NameTag>
         </ProfileUserContainer>
@@ -96,23 +69,27 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
           <Button
             variant={'contained'}
             sx={{ fontSize: '18px', paddingX: '1.8rem' }}
-            onClick={handleModalOpen}
+            onClick={() => setModalOpen(true)}
           >
             {'프로필 관리'}
           </Button>
           <Button
             variant={'contained'}
             sx={{ fontSize: '18px', paddingX: '1.8rem' }}
-            onClick={handleRecordOpen}
+            onClick={() => setIsRecordOpen(true)}
           >
             {'녹화영상'}
           </Button>
         </ButtonContainer>
       </div>
       {isModalOpen && (
-        <ModifyModal onClose={handleModalClose} childId={childId} getChildren={getChildren} />
+        <ModifyModal
+          onClose={() => setModalOpen(false)}
+          childId={childId}
+          getChildren={getChildren}
+        />
       )}
-      {isRecordOpen && <ToRecordModal onClose={handleRecordClose} childId={childId} />}
+      {isRecordOpen && <ToRecordModal onClose={() => setIsRecordOpen(false)} childId={childId} />}
     </ThemeProvider>
   );
 };
