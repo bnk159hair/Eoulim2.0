@@ -28,6 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Service
 public class MatchServiceImpl implements MatchService {
+  private final RecordService recordService;
+  private final AlarmService alarmservice;
   private final ChildService childService;
 
   @Value("${OPENVIDU_URL}")
@@ -150,7 +152,7 @@ public class MatchServiceImpl implements MatchService {
 
     // 매칭 큐 - Empty
     if (matchingQueue.isEmpty()) {
-      Match result = createNewMatch(childId, true);
+      Match result = createNewMatch(child.getId(), true);
       return result;
     }
     // 매칭 큐 - Not Empty
@@ -169,7 +171,7 @@ public class MatchServiceImpl implements MatchService {
         throw new RuntimeException(e);
       }
 
-      existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+      existingRoom.setChildTwo(child.getId()); // 두번째 입장자 아이디 저장
 
       // 녹화 시작
       String recordingId = startRecording(sessionId);
@@ -183,9 +185,7 @@ public class MatchServiceImpl implements MatchService {
   @Override
   public synchronized Match startFriend(
       Long childId,
-      String childName,
       Long friendId,
-      AlarmService alarmService,
       String existSessionId,
       Authentication authentication) {
     // Child ID가 현재 User의 Child가 맞는지 체크
@@ -194,11 +194,11 @@ public class MatchServiceImpl implements MatchService {
     // 존재 하는 방이 없을 때
     if (existSessionId == null) {
       // 없는거 확인했으면 세로운 세션 Id 만들기
-      Match result = createNewMatch(childId, false);
+      Match result = createNewMatch(child.getId(), false);
 
       // 알림 서비스
-      Alarm alarm = new Alarm(result.getSessionId(), childName);
-      alarmService.send(friendId, alarm);
+      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
+      alarmservice.send(friendId, alarm);
 
       return result;
     }
@@ -215,7 +215,7 @@ public class MatchServiceImpl implements MatchService {
       String recordingId = startRecording(sessionId);
 
       existingRoom.setRecordingId(recordingId);
-      existingRoom.setChildTwo(childId); // 두번째 입장자 아이디 저장
+      existingRoom.setChildTwo(child.getId()); // 두번째 입장자 아이디 저장
 
       return result;
     }
@@ -223,7 +223,7 @@ public class MatchServiceImpl implements MatchService {
 
   @Override
   public Recording stopRandom(
-      String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService)
+      String sessionId, List<Integer> guideSeq, List<String> timeline)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
 
     if (mapSessions.get(sessionId) != null && mapRooms.get(sessionId) != null) {
@@ -260,7 +260,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
-  public Recording stopFriend(String sessionId, RecordService recordService)
+  public Recording stopFriend(String sessionId)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
     log.info("sessionId: " + sessionId);
     if (mapSessions.get(sessionId) != null && mapRooms.get(sessionId) != null) {

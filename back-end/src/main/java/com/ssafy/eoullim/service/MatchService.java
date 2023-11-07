@@ -1,7 +1,6 @@
 package com.ssafy.eoullim.service;
 
 import com.ssafy.eoullim.model.Match;
-import com.ssafy.eoullim.service.impl.AlarmService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import io.openvidu.java.client.Recording;
@@ -16,16 +15,14 @@ public interface MatchService {
 
   Match startFriend(
           Long childId,
-          String childName,
           Long friendId,
-          AlarmService alarmService,
           String existSessionId,
           Authentication authentication);
 
   Recording stopRandom(
-      String sessionId, List<Integer> guideSeq, List<String> timeline, RecordService recordService)
+      String sessionId, List<Integer> guideSeq, List<String> timeline)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException;
 
-  Recording stopFriend(String sessionId, RecordService recordService)
+  Recording stopFriend(String sessionId)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException;
 }
