@@ -44,6 +44,12 @@ cloud:
       auto: false
     stack:
       auto: false
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
 
 OPENVIDU_URL: https://k9c103.p.ssafy.io
 OPENVIDU_SECRET: eoulim
