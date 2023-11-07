@@ -32,6 +32,7 @@ public-api:
 server:
   port: 8081
 
+# aws s3 설정
 cloud:
   aws:
     s3:
@@ -44,6 +45,8 @@ cloud:
       auto: false
     stack:
       auto: false
+
+# Local에서 돌릴 경우 Amazon cloud 설정이 없어서 나오는 warning log 출력 하지 않도록 설정
 logging:
   level:
     com:
