@@ -1,13 +1,13 @@
 import { OpenVidu } from 'openvidu-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import {
   getUserInfo,
   getToken,
   getFriendSessionToken,
   destroyFriendSession,
 } from '../apis/openViduApis';
-import { GuideScript, TimeStamp, guideSeq } from '../atoms/Session';
+import { guideSeq } from '../atoms/Session';
 import { invitationSessionId, invitationToken } from '../atoms/Ivitation';
 
 interface User {
@@ -24,9 +24,6 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [, setGuide] = useRecoilState(guideSeq);
-
-  const guideScript = useRecoilValue(GuideScript);
-  const timeStamp = useRecoilValue(TimeStamp);
 
   const [, setSessionId] = useRecoilState(invitationSessionId);
   const [, setSessionToken] = useRecoilState(invitationToken);
@@ -48,7 +45,6 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
       session.disconnect();
       console.log(session);
       console.log('서버에 세션 끊어달라고 보내기');
-      console.log(guideScript, timeStamp);
     }
     setSession(null);
     setPublisher(null);
@@ -223,7 +219,6 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
       } else if (mySession) {
         console.log('서버에 세션 끊어달라고 보내기');
         console.log(mySession);
-        console.log(guideScript, timeStamp);
       }
       setSession(null);
       setPublisher(null);

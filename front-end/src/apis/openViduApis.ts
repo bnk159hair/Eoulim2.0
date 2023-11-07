@@ -56,7 +56,11 @@ export const getFriendSessionToken = async (childId: string, sessionId: string) 
   }
 };
 
-export const destroySession = async (session: Session, guideScript: string, timeStamp: string) => {
+export const destroySession = async (
+  session: Session,
+  guideScript: number[],
+  timeStamp: string[],
+) => {
   console.log('세션 파괴!!!!!!');
   console.log(session.sessionId, guideScript, timeStamp);
   try {

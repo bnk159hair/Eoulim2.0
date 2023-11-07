@@ -248,7 +248,7 @@ const FriendSessionPage = () => {
       });
       console.log('메시지 전송:', message);
     }
-    destroySession(session, '', '');
+    destroySession(session, [], []);
     session.disconnect();
     navigate('/');
   };

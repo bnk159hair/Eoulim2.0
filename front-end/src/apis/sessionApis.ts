@@ -5,9 +5,20 @@ import instance from 'apis/instance';
 //   onError: () => void;
 // }
 
+interface VideoData {
+  id: number;
+  status: boolean;
+}
+
 interface AnimonParams {
   subscriberId: number;
   onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface ChangeVideoParams {
+  videoData: VideoData;
+  onSuccess: (isAnimonOn: boolean, message: string) => void;
   onError: () => void;
 }
 
@@ -16,6 +27,20 @@ export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonPara
     const response = await instance.get(`/children/participant/${subscriberId}`);
     console.log('Success Get Animon');
     onSuccess(response.data.data);
+  } catch (error) {
+    onError();
+  }
+};
+
+export const changeVideo = async ({ videoData, onSuccess, onError }: ChangeVideoParams) => {
+  try {
+    const isAnimonOn = !videoData.status;
+    const jsonMessage = {
+      childId: videoData.id,
+      isAnimonOn,
+    };
+    const message = JSON.stringify(jsonMessage);
+    onSuccess(isAnimonOn, message);
   } catch (error) {
     onError();
   }

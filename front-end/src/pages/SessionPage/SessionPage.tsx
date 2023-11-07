@@ -6,7 +6,8 @@ import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import instance from 'apis/instance';
-import { getAnimon } from 'apis/sessionApis';
+import { changeVideo, getAnimon } from 'apis/sessionApis';
+import { useWebSocket } from 'hooks/useWebSocket';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -22,22 +23,7 @@ import {
 } from './SessionPageStyles';
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
-import {
-  PublisherId,
-  SubscriberId,
-  PublisherVideoStatus,
-  SubscriberVideoStatus,
-  PublisherAnimonURL,
-  SubscriberAnimonURL,
-  PublisherGuideStatus,
-  SubscriberGuideStatus,
-  IsAnimonLoaded,
-  guideSeq,
-  GuideScript,
-  TimeStamp,
-} from '../../atoms/Session';
-import { WS_BASE_URL } from '../../apis/urls';
-import { WebSocketApis } from '../../apis/webSocketApis';
+import { IsAnimonLoaded, guideSeq } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
 
@@ -63,14 +49,15 @@ const SessionPage = () => {
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
   const [userToken, setUserToken] = useRecoilState(tokenState);
-  const [publisherId, setPublisherId] = useRecoilState(PublisherId);
-  const [subscriberId, setSubscriberId] = useRecoilState(SubscriberId);
-  const [publisherVideoStatus, setPublisherVideoStatus] = useRecoilState(PublisherVideoStatus);
-  const [subscriberVideoStatus, setSubscriberVideoStatus] = useRecoilState(SubscriberVideoStatus);
-  const [publisherAnimonURL, setPublisherAnimonURL] = useRecoilState(PublisherAnimonURL);
-  const [subscriberAnimonURL, setSubscriberAnimonURL] = useRecoilState(SubscriberAnimonURL);
-  const [publisherGuideStatus, setPublisherGuideStatus] = useRecoilState(PublisherGuideStatus);
-  const [subscriberGuideStatus, setSubscriberGuideStatus] = useRecoilState(SubscriberGuideStatus);
+
+  const [publisherId, setPublisherId] = useState(0);
+  const [subscriberId, setSubscriberId] = useState(-1);
+  const [publisherVideoStatus, setPublisherVideoStatus] = useState(false);
+  const [subscriberVideoStatus, setSubscriberVideoStatus] = useState(false);
+  const [publisherAnimonURL, setPublisherAnimonURL] = useState('');
+  const [subscriberAnimonURL, setSubscriberAnimonURL] = useState('');
+  const [publisherGuideStatus, setPublisherGuideStatus] = useState(false);
+  const [subscriberGuideStatus, setSubscriberGuideStatus] = useState(false);
 
   const [clickEnabled, setClickEnabled] = useState(false);
   const profileId = useRecoilValue(Profilekey);
@@ -78,17 +65,17 @@ const SessionPage = () => {
   const [subscriberName, setSubscriberName] = useState('');
   const isAnimonLoaded = useRecoilValue(IsAnimonLoaded);
   const step = useRecoilValue(guideSeq);
-  const [guideScript, setGuideScript] = useRecoilState(GuideScript);
   const [index, setIndex] = useState(-1);
   const guideSequence = [...step, 13];
   const guidance = new Audio(`/1.mp3`);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const [startTime, setStartTime] = useState(0);
-  const [timeStamp, setTimeStamp] = useRecoilState(TimeStamp);
+  const guideScript: number[] = [];
+  const startTime: number = Date.now();
+  const timeStamp: string[] = [];
 
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(profileId);
-  console.log(session);
+
   const [micStatus, setMicStatus] = useState(true);
   useEffect(() => {
     onChangeMicStatus(micStatus);
@@ -98,16 +85,9 @@ const SessionPage = () => {
     setOpen(isTrue);
   };
 
-  const [connected, setConnected] = useState<boolean>(false);
-  const [stompClient, setStompClient] = useState<Client | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
-    setPublisherVideoStatus(isFalse);
-    setSubscriberVideoStatus(isFalse);
-    setPublisherGuideStatus(isFalse);
-    setSubscriberGuideStatus(isFalse);
-    setGuideScript('');
-    setTimeStamp('');
     setPublisherId(profileId);
     setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
     getFriends();
@@ -127,7 +107,6 @@ const SessionPage = () => {
 
     if (!open && streamList[0]?.userId && streamList[1]?.userId && first) {
       setFirst(isFalse);
-      setStartTime(Date.now());
       setTimeout(() => {
         guidance.play();
         setIsPlaying(true);
@@ -180,10 +159,10 @@ const SessionPage = () => {
       setIndex(nextIndex);
       const guidance = new Audio(`/${guideSequence[nextIndex]}.mp3`);
       if (nextIndex <= 4) {
-        const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
-        setGuideScript(nextGuide);
-        const nextTime = `${timeStamp + String(Date.now() - startTime)} `;
-        setTimeStamp(nextTime);
+        // const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
+        guideScript.push(guideSequence[nextIndex]);
+        // const nextTime = `${timeStamp + String(Date.now() - startTime)} `;
+        timeStamp.push(String(Date.now() - startTime));
         guidance.play();
       }
       setIsPlaying(true);
@@ -202,60 +181,39 @@ const SessionPage = () => {
     }
   }, [publisherGuideStatus, subscriberGuideStatus]);
 
-  useEffect(() => {
-    if (session) {
-      const client = new Client({
-        connectHeaders: WebSocketApis.getInstance().header,
-        brokerURL: WS_BASE_URL,
-        reconnectDelay: 5000,
-        debug: str => console.log(str),
+  useWebSocket({
+    onConnect(_, client) {
+      setClient(client);
+      client.subscribe(`/topic/${session.sessionId}/animon`, response => {
+        console.log('메시지 수신:', response.body);
+        const message = JSON.parse(response.body);
+        if (message.childId !== String(publisherId)) {
+          console.log(message.childId, message.isAnimonOn);
+          console.log('상대방이 화면을 껐습니다.');
+          // setSubscriberId(message.childId);
+          setSubscriberVideoStatus(message.isAnimonOn);
+        }
       });
-
-      client.onConnect = () => {
-        console.log('WebSocket 연결됨');
-        setConnected(true);
-        setStompClient(client);
-
-        client.subscribe(`/topic/${session.sessionId}/animon`, response => {
-          console.log('메시지 수신:', response.body);
-          const message = JSON.parse(response.body);
-          if (message.childId !== String(publisherId)) {
-            console.log(message.childId, message.isAnimonOn);
-            console.log('상대방이 화면을 껐습니다.');
-            // setSubscriberId(message.childId);
-            setSubscriberVideoStatus(message.isAnimonOn);
-          }
-        });
-        client.subscribe(`/topic/${session.sessionId}/guide`, response => {
-          const message = JSON.parse(response.body);
-          console.log(message);
-          if (message.childId !== String(publisherId)) {
-            // setSubscriberId(message.childId);
-            setSubscriberGuideStatus(message.isNextGuideOn);
-          }
-        });
-        client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
-          const message = JSON.parse(response.body);
-          console.log(message);
-          if (message.childId !== String(publisherId)) {
-            setOpen(isTrue);
-          }
-        });
-      };
-
-      client.onDisconnect = () => {
-        console.log('WebSocket 연결 닫힘');
-        setConnected(isFalse);
-        setStompClient(null);
-      };
-
-      client.activate();
-
-      return () => {
-        client.deactivate();
-      };
-    }
-  }, [streamList]);
+      client.subscribe(`/topic/${session.sessionId}/guide`, response => {
+        const message = JSON.parse(response.body);
+        console.log(message);
+        if (message.childId !== String(publisherId)) {
+          // setSubscriberId(message.childId);
+          setSubscriberGuideStatus(message.isNextGuideOn);
+        }
+      });
+      client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
+        const message = JSON.parse(response.body);
+        console.log(message);
+        if (message.childId !== String(publisherId)) {
+          setOpen(isTrue);
+        }
+      });
+    },
+    beforeDisconnected() {
+      setClient(null);
+    },
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -303,13 +261,13 @@ const SessionPage = () => {
 
   const leaveSession = () => {
     setOpen(false);
-    if (connected && stompClient) {
+    if (client) {
       const jsonMessage = {
         childId: String(publisherId),
         isLeft: true,
       };
       const message = JSON.stringify(jsonMessage);
-      stompClient.publish({
+      client.publish({
         destination: `/app/${session.sessionId}/leave-session`,
         body: message,
       });
@@ -354,21 +312,20 @@ const SessionPage = () => {
   };
 
   const changeVideoStatus = () => {
-    console.log(stompClient);
-    if (connected && stompClient) {
-      const isAnimonOn = !publisherVideoStatus;
-      setPublisherVideoStatus(isAnimonOn);
-      const jsonMessage = {
-        childId: String(publisherId),
-        isAnimonOn,
-      };
-      const message = JSON.stringify(jsonMessage);
-      stompClient.publish({
-        destination: `/app/${session.sessionId}/animon`,
-        body: message,
-      });
-      console.log('메시지 전송:', message);
-    }
+    const videoData = { id: publisherId, status: publisherVideoStatus };
+    changeVideo({
+      videoData,
+      onSuccess: (isAnimonOn, message) => {
+        setPublisherVideoStatus(isAnimonOn);
+        client?.publish({
+          destination: `/app/${session.sessionId}/animon`,
+          body: message,
+        });
+      },
+      onError: () => {
+        console.log('애니몬 전환에 실패하였습니다.');
+      },
+    });
   };
 
   const changeAudioStatus = () => {
@@ -378,7 +335,7 @@ const SessionPage = () => {
   const nextGuidance = () => {
     if (clickEnabled) {
       setClickEnabled(false); // 클릭 비활성화
-      if (connected && stompClient) {
+      if (client) {
         const isNextGuideOn = !publisherGuideStatus;
         setPublisherGuideStatus(isNextGuideOn);
         const jsonMessage = {
@@ -386,7 +343,7 @@ const SessionPage = () => {
           isNextGuideOn,
         };
         const message = JSON.stringify(jsonMessage);
-        stompClient.publish({
+        client.publish({
           destination: `/app/${session.sessionId}/guide`,
           body: message,
         });
