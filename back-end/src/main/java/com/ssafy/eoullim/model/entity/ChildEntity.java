@@ -1,6 +1,7 @@
 package com.ssafy.eoullim.model.entity;
 
 import com.ssafy.eoullim.model.Child;
+import com.ssafy.eoullim.model.OtherChild;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 
@@ -71,6 +72,17 @@ public class ChildEntity extends BaseEntity {
                 .grade(child.getGrade())
                 .user(UserEntity.of(child.getUser()))
                 .profileAnimon(AnimonEntity.of(child.getProfileAnimon()))
+                .build();
+    }
+
+    public static ChildEntity of(OtherChild otherChild) {
+        return ChildEntity.builder()
+                .id(otherChild.getId())
+                .name(otherChild.getName())
+                .gender(otherChild.getGender())
+                .school(otherChild.getSchool())
+                .grade(otherChild.getGrade())
+                .profileAnimon(AnimonEntity.of(otherChild.getProfileAnimon()))
                 .build();
     }
 

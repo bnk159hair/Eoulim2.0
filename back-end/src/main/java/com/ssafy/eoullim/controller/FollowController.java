@@ -18,14 +18,14 @@ import javax.validation.Valid;
 @RequestMapping("/api/v1/follows")
 @RestController
 public class FollowController {
+
     private final FollowService followService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     public SuccessResponse<?> create(@Valid @RequestBody FollowRequest request, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        followService.create(request.getChildId(), request.getFollowingChildId(), user);
+        followService.create(request.getChildId(), request.getFollowingChildId(), authentication);
         return new SuccessResponse<>(HttpStatus.CREATED, null);
     }
 }
