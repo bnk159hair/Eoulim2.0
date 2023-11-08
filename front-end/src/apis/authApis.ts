@@ -71,12 +71,6 @@ const saveToken = (token: string) => {
   }
 };
 
-const removeToken = () => {
-  if (!isAccessTokenEmpty) {
-    localStorage.removeItem(TOKEN);
-  }
-};
-
 export const postLogin = async ({ loginData, onSuccess, onError }: LoginParams) => {
   try {
     const response = await userInstance.post('/login', loginData);
@@ -98,8 +92,7 @@ export const postSignup = async ({ signupData, onSuccess, onError }: SignupParam
 
 export const getLogout = async ({ fcmToken, onSuccess, onError }: LogoutParams) => {
   try {
-    await userInstance.post('/logout', fcmToken);
-    removeToken();
+    await instance.post('/users/logout', fcmToken);
     onSuccess();
   } catch (error) {
     onError();

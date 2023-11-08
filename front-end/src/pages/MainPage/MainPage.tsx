@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { childLogin, childLogout, getChildInfo } from 'apis/profileApis';
+import { childLogout, getChildInfo } from 'apis/profileApis';
 import { fcmTokenState } from 'atoms/Firebase';
 import {
   MainPageContainer,
@@ -32,22 +32,7 @@ const MainPage: React.FC = () => {
   const [userName] = useState<string>('');
 
   useEffect(() => {
-    let childLoginoutData;
-
-    if (fcmToken) {
-      childLoginoutData = { childId: profileId, fcmToken };
-    } else {
-      childLoginoutData = { childId: profileId, fcmToken: 'null' };
-    }
-    childLogin({
-      childLoginData: childLoginoutData,
-      onSuccess: () => {
-        console.log('프로필 로그인에 성공했습니다.');
-      },
-      onError: () => {
-        console.log('프로필 로그인에 실패하였습니다.');
-      },
-    });
+    getChild();
   }, [profileId, token, navigate]);
 
   const getNewFriend = () => {

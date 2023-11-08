@@ -115,10 +115,7 @@ export const childLogin = async ({ childLoginData, onSuccess, onError }: ChildLo
 
 export const childLogout = async ({ childLogoutData, onSuccess, onError }: ChildLogoutParams) => {
   try {
-    await instance.post('/children/logout', {
-      childId: childLogoutData.childId,
-      fcmToken: childLogoutData.fcmToken,
-    });
+    await instance.post('/children/logout', childLogoutData);
     onSuccess();
   } catch (error) {
     onError();

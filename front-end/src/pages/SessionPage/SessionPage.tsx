@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
@@ -22,7 +22,6 @@ import {
   CharacterContainer,
 } from './SessionPageStyles';
 import { Profile, Profilekey } from '../../atoms/Profile';
-import { tokenState } from '../../atoms/Auth';
 import { IsAnimonLoaded, guideSeq } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
@@ -49,7 +48,6 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-  const [, setUserToken] = useRecoilState(tokenState);
 
   const publisherId = useRecoilValue(Profilekey);
   const [subscriberId, setSubscriberId] = useState(0);
@@ -86,12 +84,24 @@ const SessionPage = () => {
 
   const [micStatus, setMicStatus] = useState(true);
 
+  const TOKEN = 'accessToken';
+  const isAccessTokenEmpty = localStorage.getItem(TOKEN) === null;
+
+  const saveToken = (token: string) => {
+    if (isAccessTokenEmpty) {
+      localStorage.setItem(TOKEN, token);
+    } else {
+      localStorage.removeItem(TOKEN);
+      localStorage.setItem(TOKEN, token);
+    }
+  };
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window.getTokenFromApp = async (message: Message) => {
     console.log(`Flutter to Web : ${message}`);
     if (message.token !== 'null') {
-      await setUserToken(message.token);
+      saveToken(message.token);
     }
   };
 

@@ -24,6 +24,7 @@ const Login = () => {
       return;
     }
     let loginData;
+
     if (fcmToken) {
       loginData = { username, password, fcmToken };
     } else {
