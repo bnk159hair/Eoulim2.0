@@ -1,19 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/widgets/profile/createprofile_form.dart';
 
-
-class CreateProfile extends StatefulWidget {
+class CreateProfile extends StatelessWidget {
   const CreateProfile({super.key});
 
   @override
-  State<CreateProfile> createState() => _CreateProfileState();
-}
-
-
-class _CreateProfileState extends State<CreateProfile>{
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -22,14 +16,15 @@ class _CreateProfileState extends State<CreateProfile>{
             opacity: 0.5,
           ),
         ),
-        child: SafeArea(
+        child: const SafeArea(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.all(20.0),
+                padding: EdgeInsets.all(20.0),
                 child: Text(
-                  '프로필 생성', 
+                  '프로필 생성',
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
@@ -46,4 +41,3 @@ class _CreateProfileState extends State<CreateProfile>{
     );
   }
 }
-
