@@ -39,8 +39,6 @@ const MainPage: React.FC = () => {
     } else {
       childLoginoutData = { childId: profileId, fcmToken: 'null' };
     }
-
-    getChild();
     childLogin({
       childLoginData: childLoginoutData,
       onSuccess: () => {

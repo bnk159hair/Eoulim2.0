@@ -38,10 +38,15 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
   const [, setChildId] = useRecoilState(Profilekey);
   const fcmToken = useRecoilValue(fcmTokenState);
   const [, setUserName] = useRecoilState(userState);
-  const childLoginoutData = { childId, fcmToken };
 
   const handleChildLogin = () => {
-    console.log(childId, name);
+    let childLoginoutData;
+    if (fcmToken) {
+      childLoginoutData = { childId, fcmToken };
+    } else {
+      childLoginoutData = { childId, fcmToken: 'null' };
+    }
+
     childLogin({
       childLoginData: childLoginoutData,
       onSuccess: () => {
