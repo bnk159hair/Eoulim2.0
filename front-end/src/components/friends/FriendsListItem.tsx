@@ -1,60 +1,41 @@
 import React from 'react';
-import axios from 'axios';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
+import { getInvitationToken } from 'apis/openViduApis';
 import { FriendCard, FriendImg, FrinedInfo, InviteButton } from './FriendsListItemStyles';
-import { tokenState, userState } from '../../atoms/Auth';
 import { invitationToken, invitationSessionId } from '../../atoms/Ivitation';
 import { Profilekey } from '../../atoms/Profile';
-import { API_BASE_URL } from '../../apis/urls';
 
 interface FriendsListItemProps {
   friendId: number;
   friendName: string;
   animon: string;
-  status: string;
 }
 
-const FriendsListItem: React.FC<FriendsListItemProps> = ({
-  friendId,
-  friendName,
-  animon,
-  status,
-}) => {
+const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName, animon }) => {
   const [, setSessionToken] = useRecoilState(invitationToken);
   const [, setInvitationId] = useRecoilState(invitationSessionId);
 
   const IMGURL = `/${animon}.png`;
   const navigate = useNavigate();
 
-  const myName = useRecoilValue(userState);
-  const token = useRecoilValue(tokenState);
-  const profileKey = useRecoilValue(Profilekey);
+  const childId = useRecoilValue(Profilekey);
 
   const handleInvite = () => {
-    console.log(friendId, myName);
-    axios
-      .post(
-        `${API_BASE_URL}/meetings/friend/start`,
-        {
-          childId: profileKey,
-          friendId, // 친구 아이디
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(response => {
-        const { sessionId, token } = response.data;
+    const invitationSessionData = { childId, friendId };
+    getInvitationToken({
+      invitationSessionData,
+      onSuccess: data => {
+        const { sessionId, token } = data;
         setInvitationId(sessionId);
         setSessionToken(token);
-        console.log(sessionId, token);
-
-        navigate(`/friendsession`);
-      })
-      .catch(error => console.log(error));
+        console.log('초대에 보내는데 성공했습니다.');
+        navigate(`/session`, { state: { invitation: true } });
+      },
+      onError: () => {
+        console.log('초대에 실패하였습니다.');
+      },
+    });
   };
 
   return (
@@ -65,7 +46,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
           {'친구 이름 : '}
           {friendName}
         </div>
-        {status === 'ON' && <InviteButton onClick={handleInvite} />}
+        <InviteButton onClick={handleInvite} />
       </FrinedInfo>
     </FriendCard>
   );

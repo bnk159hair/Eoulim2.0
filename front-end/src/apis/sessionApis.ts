@@ -6,8 +6,8 @@ interface ApiResponse {
 }
 
 interface FollowingData {
-  myId: number;
-  friendId: number;
+  childId: number;
+  followingChildId: number;
 }
 
 interface VideoData {
@@ -53,11 +53,11 @@ export const changeVideo = async ({ videoData, onSuccess, onError }: ChangeVideo
 
 export const follow = async ({ followingData, onSuccess, onError }: FollowingParams) => {
   try {
-    await instance.post(`/friendship`, {
-      followingData,
-    });
+    console.log(followingData);
+    await instance.post(`/follows`, followingData);
     onSuccess();
   } catch (error) {
+    console.log(error);
     onError();
   }
 };

@@ -1,86 +1,105 @@
-import axios from 'axios';
-import { Session } from 'openvidu-browser';
 import instance from './instance';
 
-interface User {
-  childId: number;
-  name: string;
-  gender: string;
-  school: string;
-  grade: number;
+interface ApiResponse {
+  onSuccess: () => void;
+  onError: () => void;
 }
 
-export const getUserInfo = async (userId: number) => {
+interface UserData {
+  childId: number;
+  gender: string;
+  grade: number;
+  name: string;
+  school: string;
+}
+
+interface InvitationSessionData {
+  childId: number;
+  friendId?: number;
+  sessionId?: string;
+}
+interface SessionData {
+  sessionId: string;
+  guideScript: number[];
+  timeStamp: string[];
+}
+
+interface GetUserParams {
+  childId: number;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface GetTokenParams {
+  userData: UserData;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface InvitationSessionParams {
+  invitationSessionData: InvitationSessionData;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface SessionParams extends ApiResponse {
+  sessionData: SessionData;
+}
+
+interface DestryInvitationSessionParams extends ApiResponse {
+  sessionId: string;
+}
+
+export const getUserInfo = async ({ childId, onSuccess, onError }: GetUserParams) => {
   try {
-    const response = await instance.get(`/children/${userId}`);
-    console.log('유저 정보 가져오기 성공!');
-    console.log(response);
-    return response.data.data;
+    const response = await instance.get(`/children/${childId}`);
+    onSuccess(response.data.data);
   } catch (error) {
-    console.log('유저 정보 가져오기 실패ㅠ');
-    console.log(error);
-    throw error;
+    onError();
   }
 };
 
-export const getToken = async (userInfo: User) => {
-  console.log('토큰 가져오기');
-  console.log(userInfo);
+export const getToken = async ({ userData, onSuccess, onError }: GetTokenParams) => {
   try {
-    const response = await instance.post(`/meetings/random/start`, userInfo);
-    console.log('토큰 가져오기 성공!');
-    console.log(response);
-    return response.data.data;
+    const response = await instance.post(`/meetings/random/start`, userData);
+    onSuccess(response.data.data);
   } catch (error) {
-    console.log('토큰 가져오기 실패ㅠ');
-    console.log(error);
-    throw error;
+    onError();
   }
 };
 
-export const getFriendSessionToken = async (childId: string, sessionId: string) => {
-  console.log('초대 토큰 가져오기');
-
+export const getInvitationToken = async ({
+  invitationSessionData,
+  onSuccess,
+  onError,
+}: InvitationSessionParams) => {
   try {
-    const response = await axios.post(`/meetings/friend/start`, {
-      childId,
-      sessionId,
-    });
-    console.log('초대 토큰 가져오기 성공!');
-    console.log(response);
-    return response.data.token;
+    const response = await instance.post(`/meetings/friend/start`, invitationSessionData);
+    onSuccess(response.data.data);
   } catch (error) {
-    console.log('초대 토큰 가져오기 실패ㅠ');
     console.log(error);
-    throw error;
+    onError();
   }
 };
 
-export const destroySession = async (
-  session: Session,
-  guideScript: number[],
-  timeStamp: string[],
-) => {
-  console.log('세션 파괴!!!!!!');
-  console.log(session.sessionId, guideScript, timeStamp);
+export const destroySession = async ({ sessionData, onSuccess, onError }: SessionParams) => {
   try {
-    const response = await axios.post(`/meetings/random/stop`, {
-      sessionId: session.sessionId,
-      guideSeq: guideScript,
-      timeline: timeStamp,
-    });
-    console.log(response);
+    await instance.post(`/meetings/random/stop`, sessionData);
+    onSuccess();
   } catch (error) {
-    console.log(error);
+    onError();
   }
 };
 
-export const destroyFriendSession = async (sessionId: string) => {
-  console.log('친구 세션 녹화 종료');
+export const destroyInvitationSession = async ({
+  sessionId,
+  onSuccess,
+  onError,
+}: DestryInvitationSessionParams) => {
   try {
-    const response = await axios.post(`/meetings/friend/stop`, { sessionId });
-    console.log(response);
+    await instance.post(`/meetings/friend/stop`, { sessionId });
+    onSuccess();
   } catch (error) {
-    console.log(error);
+    onError();
   }
 };

@@ -33,7 +33,7 @@ import {
 import { WS_BASE_URL } from '../../apis/urls';
 import { WebSocketApis } from '../../apis/webSocketApis';
 import EndModal from '../../components/stream/EndModal';
-import { destroySession } from '../../apis/openViduApis';
+// import { destroySession } from '../../apis/openViduApis';
 
 interface FriendsProfile {
   id: number;
@@ -248,7 +248,7 @@ const FriendSessionPage = () => {
       });
       console.log('메시지 전송:', message);
     }
-    destroySession(session, [], []);
+    // destroySession(session, [], []);
     session.disconnect();
     navigate('/');
   };

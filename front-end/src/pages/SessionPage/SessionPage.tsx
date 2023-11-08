@@ -267,13 +267,23 @@ const SessionPage = () => {
       });
       console.log('메시지 전송:', message);
     }
-    destroySession(session, guideScript, timeStamp);
+    const sessionData = { sessionId: session.sessionId, guideScript, timeStamp };
+    destroySession({
+      sessionData,
+      onSuccess: () => {
+        console.log('세션 페이지에서 세션 접속을 종료하였습니다.');
+      },
+      onError: () => {
+        console.log('세션 페이지에서 세션 접속 종료에 실패했습니다.');
+      },
+    });
     session.disconnect();
     navigate('/');
   };
 
   const addFriend = () => {
-    const followingData = { myId: publisherId, friendId: subscriberId };
+    console.log(publisherId, subscriberId);
+    const followingData = { childId: publisherId, followingChildId: subscriberId };
     follow({
       followingData,
       onSuccess: () => {
@@ -398,7 +408,7 @@ const SessionPage = () => {
             <Loading isAnimonLoaded={false} />
           )}
         </MyVideo>
-        {!state.invitaion ? (
+        {state.invitaion ? (
           <CharacterContainer>
             <Character onClick={nextGuidance} isPlaying={isPlaying}>
               {clickEnabled ? <Click /> : null}

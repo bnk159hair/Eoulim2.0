@@ -20,7 +20,6 @@ import {
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import AnimonModal from '../../components/main/AnimonModal';
-import { API_BASE_URL } from '../../apis/urls';
 import AlarmModal from '../../components/main/AlarmModal';
 
 const MainPage: React.FC = () => {
@@ -29,26 +28,18 @@ const MainPage: React.FC = () => {
   const token = useRecoilValue(tokenState);
   const fcmToken = useRecoilValue(fcmTokenState);
   const [profile, setProfile] = useRecoilState(Profile);
-  // const [_, setProfile] = useRecoilState(Profile);
-  const [eventSource, setEventSource] = useState<EventSource | null>(null);
-  const [sessionId, setSessionId] = useState<string>('');
-  const [userName, setUserName] = useState<string>('');
-  const childLoginoutData = { childId: profileId, fcmToken };
+  const [sessionId] = useState<string>('');
+  const [userName] = useState<string>('');
 
   useEffect(() => {
-    const source = new EventSource(`${API_BASE_URL}/alarms/subscribe/${profileId}`);
-    setEventSource(source);
-    console.log(source, eventSource);
-    return () => {
-      if (source) {
-        source.close();
-        setEventSource(null);
-        console.log('이벤트 종료');
-      }
-    };
-  }, [navigate]);
+    let childLoginoutData;
 
-  useEffect(() => {
+    if (fcmToken) {
+      childLoginoutData = { childId: profileId, fcmToken };
+    } else {
+      childLoginoutData = { childId: profileId, fcmToken: 'null' };
+    }
+
     getChild();
     childLogin({
       childLoginData: childLoginoutData,
@@ -60,28 +51,6 @@ const MainPage: React.FC = () => {
       },
     });
   }, [profileId, token, navigate]);
-
-  useEffect(() => {
-    if (eventSource) {
-      const eventListener = (event: any) => {
-        if (event.data === 'connect completed') {
-          console.log('SSE와 연결');
-        } else if (event) {
-          console.log(event);
-          const message = JSON.parse(event.data);
-          console.log(message.sessionId);
-          setSessionId(message.sessionId);
-          setUserName(message.userName);
-          setAlarmOpen(true);
-        }
-      };
-      eventSource.addEventListener('sse', eventListener);
-
-      return () => {
-        eventSource.removeEventListener('sse', eventListener);
-      };
-    }
-  });
 
   const getNewFriend = () => {
     navigate('/session', { state: { invitation: false } });
@@ -109,6 +78,14 @@ const MainPage: React.FC = () => {
   };
 
   const logout = () => {
+    let childLoginoutData;
+
+    if (fcmToken) {
+      childLoginoutData = { childId: profileId, fcmToken };
+    } else {
+      childLoginoutData = { childId: profileId, fcmToken: 'null' };
+    }
+
     childLogout({
       childLogoutData: childLoginoutData,
       onSuccess: () => {

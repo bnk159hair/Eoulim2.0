@@ -1,56 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { getFollowings } from 'apis/followingApis';
 import FriendsListItem from './FriendsListItem';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState } from '../../atoms/Auth';
 import { Profilekey } from '../../atoms/Profile';
 import { EmptyFriend, BeforeButton, AfterButton, FriendsListContent } from './FriendsListStyles';
 
 interface FriendsProfile {
+  gender: string;
+  grade: number;
   id: number;
   name: string;
-  birth: number;
-  gender: string;
+  profileAnimon: { bodyImagePath: string; id: number; maskImagePath: string; name: string };
   school: string;
-  grade: number;
-  status: string;
-  animon: { id: number; imagePath: string; name: string };
 }
 
 const FriendsList = () => {
-  const navigate = useNavigate();
-  const profileId = useRecoilValue(Profilekey);
-  const token = useRecoilValue(tokenState);
+  const childId = useRecoilValue(Profilekey);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const friendsPerPage = 3; // 페이지당 보여줄 친구 수 설정
 
-  const getFriends = () => {
-    axios
-      .get(`${API_BASE_URL}/friendship/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(response => {
-        const data = response.data.result;
+  useEffect(() => {
+    getFollowings({
+      childId,
+      onSuccess: data => {
         setFriends(data);
         console.log(data);
-      })
-      .catch(error => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('친구목록불러오기오류', error);
-        }
-      });
-  };
-
-  useEffect(() => {
-    getFriends();
-  }, [profileId]);
+      },
+      onError: () => {
+        console.log('친구목록 불러오기 오류');
+      },
+    });
+  }, [childId]);
 
   const indexOfLastFriend = currentPage * friendsPerPage;
   const indexOfFirstFriend = indexOfLastFriend - friendsPerPage;
@@ -81,8 +62,7 @@ const FriendsList = () => {
               key={friend.id}
               friendId={friend.id}
               friendName={friend.name}
-              animon={friend.animon.name}
-              status={friend.status}
+              animon={friend.profileAnimon.name}
             />
           ))
         ) : (
