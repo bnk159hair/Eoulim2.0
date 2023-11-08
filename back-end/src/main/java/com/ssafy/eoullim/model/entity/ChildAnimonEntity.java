@@ -6,6 +6,8 @@ import com.ssafy.eoullim.model.ChildAnimon;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -21,10 +23,12 @@ public class ChildAnimonEntity extends BaseEntity {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "child_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private ChildEntity child;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "animon_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   private AnimonEntity animon;
 
   @Builder

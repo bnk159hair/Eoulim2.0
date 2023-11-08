@@ -1,6 +1,8 @@
 package com.ssafy.eoullim.model.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -19,10 +21,11 @@ public class RecordEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="master_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ChildEntity master;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="participant_id", nullable = false)
+    @JoinColumn(name="participant_id")    // 상대방 아이가 삭제 되면? -> null로
     private ChildEntity participant;
 
     @Builder

@@ -3,6 +3,8 @@ package com.ssafy.eoullim.model.entity;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.OtherChild;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
@@ -36,6 +38,7 @@ public class ChildEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)

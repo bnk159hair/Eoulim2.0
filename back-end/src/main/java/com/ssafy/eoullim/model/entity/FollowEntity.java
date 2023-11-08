@@ -1,6 +1,8 @@
 package com.ssafy.eoullim.model.entity;
 
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -16,10 +18,12 @@ public class FollowEntity extends BaseEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "child_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ChildEntity child;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "following_child_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ChildEntity followingChild;
 
     @Builder
