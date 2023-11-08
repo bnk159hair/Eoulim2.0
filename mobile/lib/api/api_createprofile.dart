@@ -14,9 +14,13 @@ class ApiCreateprofile {
       'Authorization': "Bearer ${authKey}",
       'Content-Type': 'application/json; charset=UTF-8',
     }, body: jsonEncode(requestModel.toJson()));
+    if (response.statusCode == 401) {
+      return generalResponse(response.statusCode.toString(), response.reasonPhrase); // 에러 메시지를 원하는 내용으로 수정
+    }else{
       generalResponse profileInfo= generalResponse.fromJson(json.decode(response.body));
       print(response.body);
       print("++++++++++++++++++++++++++++++++++++++++");
       return generalResponse(profileInfo.code, profileInfo.status);
+    }
   }
 }
