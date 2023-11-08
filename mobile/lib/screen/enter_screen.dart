@@ -63,9 +63,6 @@ class _EnterState extends State<Enter> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 50,
-              ),
             ],
           ),
         ),

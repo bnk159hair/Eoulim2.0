@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/api/api_profilelogout.dart';
 import 'package:mobile/model/response_models/general_response.dart';
-import 'package:mobile/screen/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
-
+import 'package:mobile/util/logout_logic.dart';
 
 
 class Settings extends StatefulWidget {
@@ -19,13 +18,9 @@ class _SettingsState extends State<Settings> {
   generalResponse? profileloginAuth;
   ApiprofileLogout apiProfileLogout = ApiprofileLogout();
 
-  void Logout() async {
-    final storage = new FlutterSecureStorage();
-    await storage.delete(key: 'Authkey');
-    Get.offAll(() => Login());
-  }
+
   void profileLogout() async {
-    // await apiProfileLogout.postProfileLogoutAPI();
+    await apiProfileLogout.postProfileLogoutAPI();
     final storage = new FlutterSecureStorage();
     await storage.delete(key: 'childId');
     Get.offAll(() => Profiles());
