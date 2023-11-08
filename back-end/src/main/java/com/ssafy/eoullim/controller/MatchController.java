@@ -44,7 +44,7 @@ public class MatchController {
   public SuccessResponse<?> stopRandom(@RequestBody MatchStopRequest matchStopRequest) {
 
     String sessionId = matchStopRequest.getSessionId();
-    List<Integer> guideSeq = matchStopRequest.getGuideSeq();
+    List<Integer> guideSeq = matchStopRequest.getGuideScript();
     List<String> timeline = matchStopRequest.getTimeline();
     log.info("Random Stop Called " + sessionId);
 

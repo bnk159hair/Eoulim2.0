@@ -11,6 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 public class MatchStopRequest {
     private String sessionId;
-    private List<Integer> guideSeq;
+    private List<Integer> guideScript;
     private List<String> timeline;
 }
