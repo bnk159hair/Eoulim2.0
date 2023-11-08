@@ -9,9 +9,9 @@ import org.springframework.lang.NonNull;
 
 public interface FcmTokenRepository extends JpaRepository<FcmTokenEntity, Long> {
 
-  Optional<FcmTokenEntity> findByChildIdAndToken(@NonNull Long childId, @NonNull String token);
+  FcmTokenEntity findByChildIdAndToken(@NonNull Long childId, @NonNull String token);
 
-  Optional<FcmTokenEntity> findByUserIdAndToken(@NonNull Long userId, @NonNull String token);
+  FcmTokenEntity findByUserIdAndToken(@NonNull Long userId, @NonNull String token);
 
   List<FcmTokenEntity> findAllByChildId(@NonNull Long childId);
 }
