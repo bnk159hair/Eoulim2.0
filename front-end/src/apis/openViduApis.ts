@@ -21,7 +21,7 @@ interface InvitationSessionData {
 interface SessionData {
   sessionId: string;
   guideScript: number[];
-  timeStamp: string[];
+  timeline: string[];
 }
 
 interface GetUserParams {
@@ -87,6 +87,7 @@ export const destroySession = async ({ sessionData, onSuccess, onError }: Sessio
     await instance.post(`/meetings/random/stop`, sessionData);
     onSuccess();
   } catch (error) {
+    console.log(error);
     onError();
   }
 };

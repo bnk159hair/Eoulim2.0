@@ -1,6 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from 'react';
 import { Client, Frame } from '@stomp/stompjs';
+import { useRecoilValue } from 'recoil';
+import { SessionId } from 'atoms/Session';
 import { WS_BASE_URL } from '../apis/urls';
 import { WebSocketApis } from '../apis/webSocketApis';
 
@@ -12,6 +14,7 @@ interface Param {
 
 export const useWebSocket = (param: Param) => {
   const [connected, setConnected] = useState<boolean>(false);
+  const sessionId = useRecoilValue(SessionId);
 
   useEffect(() => {
     const client = new Client({
@@ -38,7 +41,7 @@ export const useWebSocket = (param: Param) => {
     return () => {
       client?.deactivate();
     };
-  }, []);
+  }, [sessionId]);
 
   return { connected };
 };

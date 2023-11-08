@@ -3,7 +3,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { getInvitationToken } from 'apis/openViduApis';
 import { FriendCard, FriendImg, FrinedInfo, InviteButton } from './FriendsListItemStyles';
-import { invitationToken, invitationSessionId } from '../../atoms/Ivitation';
+import { InvitationToken, InvitationSessionId } from '../../atoms/Ivitation';
 import { Profilekey } from '../../atoms/Profile';
 
 interface FriendsListItemProps {
@@ -13,8 +13,8 @@ interface FriendsListItemProps {
 }
 
 const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName, animon }) => {
-  const [, setSessionToken] = useRecoilState(invitationToken);
-  const [, setInvitationId] = useRecoilState(invitationSessionId);
+  const [, setSessionToken] = useRecoilState(InvitationToken);
+  const [, setInvitationId] = useRecoilState(InvitationSessionId);
 
   const IMGURL = `/${animon}.png`;
   const navigate = useNavigate();

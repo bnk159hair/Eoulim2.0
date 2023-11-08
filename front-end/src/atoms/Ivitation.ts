@@ -1,11 +1,11 @@
 import { atom } from 'recoil';
 
-export const invitationToken = atom<string>({
+export const InvitationToken = atom<string>({
   key: 'invitationToken',
   default: '',
 });
 
-export const invitationSessionId = atom<string>({
+export const InvitationSessionId = atom<string>({
   key: 'invitationSessionId',
   default: '',
 });

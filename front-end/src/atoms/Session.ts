@@ -1,5 +1,10 @@
 import { atom } from 'recoil';
 
+export const SessionId = atom<string>({
+  key: 'sessionId',
+  default: '',
+});
+
 export const PublisherId = atom<number>({
   key: 'publisherId',
   default: 0,

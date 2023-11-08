@@ -7,7 +7,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import { changeVideo, follow, getAnimon, getFriends } from 'apis/sessionApis';
 import { useWebSocket } from 'hooks/useWebSocket';
-import { invitationSessionId, invitationToken } from 'atoms/Ivitation';
+import { InvitationSessionId, InvitationToken } from 'atoms/Ivitation';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -22,7 +22,7 @@ import {
   CharacterContainer,
 } from './SessionPageStyles';
 import { Profile, Profilekey } from '../../atoms/Profile';
-import { IsAnimonLoaded, guideSeq } from '../../atoms/Session';
+import { IsAnimonLoaded, guideSeq, SessionId } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
 import { S3_SOUND_BASE_URL } from '../../apis/urls';
@@ -72,14 +72,15 @@ const SessionPage = () => {
 
   const guideScript: number[] = [];
   const startTime: number = Date.now();
-  const timeStamp: string[] = [];
+  const timeline: string[] = [];
 
-  const sessionId = useRecoilValue(invitationSessionId);
-  const sessionToken = useRecoilValue(invitationToken);
+  const sessionId = useRecoilValue(SessionId);
+  const invitationSessionId = useRecoilValue(InvitationSessionId);
+  const sessionToken = useRecoilValue(InvitationToken);
 
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
     profileId,
-    sessionId,
+    invitationSessionId,
     sessionToken,
   );
 
@@ -198,8 +199,8 @@ const SessionPage = () => {
       if (nextIndex <= 4) {
         // const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
         guideScript.push(guideSequence[nextIndex]);
-        // const nextTime = `${timeStamp + String(Date.now() - startTime)} `;
-        timeStamp.push(String(Date.now() - startTime));
+        // const nextTime = `${timeline + String(Date.now() - startTime)} `;
+        timeline.push(String(Date.now() - startTime));
         guidance.play();
       }
       setIsPlaying(true);
@@ -208,7 +209,7 @@ const SessionPage = () => {
       guidance.addEventListener('ended', () => {
         setIsPlaying(false);
         if (nextIndex === 4) {
-          console.log(guideScript, timeStamp);
+          console.log(guideScript, timeline);
           sessionOver();
         }
       });
@@ -220,9 +221,9 @@ const SessionPage = () => {
 
   useWebSocket({
     onConnect(_, client) {
-      console.log('++++++++++++++++++++++++++++++++++++++', session.sessionId);
+      console.log('++++++++++++++++++++++++++++++++++++++', sessionId);
       setClient(client);
-      client.subscribe(`/topic/${session.sessionId}/animon`, response => {
+      client.subscribe(`/topic/${sessionId}/animon`, response => {
         console.log('메시지 수신:', response.body);
         const message = JSON.parse(response.body);
         if (message.childId !== String(publisherId)) {
@@ -233,7 +234,7 @@ const SessionPage = () => {
         }
       });
       if (!state.invitation) {
-        client.subscribe(`/topic/${session.sessionId}/guide`, response => {
+        client.subscribe(`/topic/${sessionId}/guide`, response => {
           const message = JSON.parse(response.body);
           console.log(message);
           if (message.childId !== String(publisherId)) {
@@ -242,7 +243,7 @@ const SessionPage = () => {
           }
         });
       }
-      client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
+      client.subscribe(`/topic/${sessionId}/leave-session`, response => {
         const message = JSON.parse(response.body);
         console.log(message);
         if (message.childId !== String(publisherId)) {
@@ -273,12 +274,12 @@ const SessionPage = () => {
       };
       const message = JSON.stringify(jsonMessage);
       client.publish({
-        destination: `/app/${session.sessionId}/leave-session`,
+        destination: `/app/${sessionId}/leave-session`,
         body: message,
       });
       console.log('메시지 전송:', message);
     }
-    const sessionData = { sessionId: session.sessionId, guideScript, timeStamp };
+    const sessionData = { sessionId, guideScript, timeline };
     destroySession({
       sessionData,
       onSuccess: () => {
@@ -311,10 +312,10 @@ const SessionPage = () => {
     changeVideo({
       videoData,
       onSuccess: (isAnimonOn, message) => {
-        console.log(session.sessionId);
+        console.log(sessionId);
         setPublisherVideoStatus(isAnimonOn);
         client?.publish({
-          destination: `/app/${session.sessionId}/animon`,
+          destination: `/app/${sessionId}/animon`,
           body: message,
         });
       },
@@ -340,7 +341,7 @@ const SessionPage = () => {
         };
         const message = JSON.stringify(jsonMessage);
         client.publish({
-          destination: `/app/${session.sessionId}/guide`,
+          destination: `/app/${sessionId}/guide`,
           body: message,
         });
         console.log('가이드 전송:', message);
@@ -356,7 +357,7 @@ const SessionPage = () => {
     return false;
   };
 
-  // const [checkVideo, setCheckVideo] = useState(false);
+  const [checkVideo, setCheckVideo] = useState(false);
 
   if (open) {
     if (streamList.length !== 2) {
@@ -382,25 +383,25 @@ const SessionPage = () => {
       />
     );
   }
-  // if (!checkVideo) {
-  //   return (
-  //     <SessionPageContainer>
-  //       <Container>
-  //         <MyVideo>
-  //           {streamList[1]?.streamManager && (
-  //             <StreamCanvas
-  //               streamManager={streamList[1]?.streamManager}
-  //               name={subscriberName}
-  //               avatarPath={subscriberAnimonURL}
-  //               videoState={subscriberVideoStatus}
-  //             />
-  //           )}
-  //         </MyVideo>
-  //         <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
-  //       </Container>
-  //     </SessionPageContainer>
-  //   );
-  // }
+  if (!checkVideo) {
+    return (
+      <SessionPageContainer>
+        <Container>
+          <MyVideo>
+            {streamList[1]?.streamManager && (
+              <StreamCanvas
+                streamManager={streamList[1]?.streamManager}
+                name={subscriberName}
+                avatarPath={subscriberAnimonURL}
+                videoState={subscriberVideoStatus}
+              />
+            )}
+          </MyVideo>
+          <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
+        </Container>
+      </SessionPageContainer>
+    );
+  }
   return (
     <SessionPageContainer>
       <Container>
@@ -419,7 +420,8 @@ const SessionPage = () => {
             <Loading isAnimonLoaded={false} />
           )}
         </MyVideo>
-        {state.invitaion ? (
+
+        {!state.invitation ? (
           <CharacterContainer>
             <Character onClick={nextGuidance} isPlaying={isPlaying}>
               {clickEnabled ? <Click /> : null}

@@ -15,8 +15,14 @@ const ProfilePage = () => {
   const fcmToken = useRecoilValue(fcmTokenState);
 
   const handleLogout = () => {
+    let token;
+    if (fcmToken) {
+      token = fcmToken;
+    } else {
+      token = 'null';
+    }
     getLogout({
-      fcmToken,
+      fcmToken: token,
       onSuccess: () => {
         navigate('/login');
       },

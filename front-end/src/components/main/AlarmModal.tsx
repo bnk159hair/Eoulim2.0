@@ -11,7 +11,7 @@ import {
   AlarmMessage,
 } from './AlarmModalStyles';
 import { Profilekey } from '../../atoms/Profile';
-import { invitationSessionId } from '../../atoms/Ivitation';
+import { InvitationSessionId } from '../../atoms/Ivitation';
 import { WebSocketApis } from '../../apis/webSocketApis';
 import { WS_BASE_URL } from '../../apis/urls';
 
@@ -24,7 +24,7 @@ interface AlarmModalProps {
 const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose, userName }) => {
   const navigate = useNavigate();
 
-  const [, setInvitationId] = useRecoilState(invitationSessionId);
+  const [, setInvitationId] = useRecoilState(InvitationSessionId);
   const profileId = useRecoilValue(Profilekey);
 
   const [connected, setConnected] = useState<boolean>(false);
