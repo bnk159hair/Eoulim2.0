@@ -24,8 +24,7 @@ class ApiLogout {
     if (response.statusCode == 401) {
       return generalResponse(response.statusCode.toString(), response.reasonPhrase); 
     }else{
-      String responseBody = utf8.decode(response.bodyBytes);
-      generalResponse Logout = generalResponse.fromJson(json.decode(responseBody));
+      generalResponse Logout = generalResponse(response.statusCode.toString(), response.reasonPhrase);
       print("++++++++++++++++++++++++++++++++++++++++");
       print(requestData);
       print(Logout.status);
