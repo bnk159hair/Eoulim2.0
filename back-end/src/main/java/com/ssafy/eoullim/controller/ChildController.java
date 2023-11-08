@@ -110,9 +110,9 @@ public class ChildController {
   @GetMapping("/{childId}/follows")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
-  public SuccessResponse<List<Child>> getFriendsList(
+  public SuccessResponse<List<OtherChild>> getFriendsList(
       @PathVariable @NotBlank Long childId, Authentication authentication) {
-    List<Child> friendList = childService.getFriends(childId, authentication);
+    List<OtherChild> friendList = childService.getFriends(childId, authentication);
     return new SuccessResponse<>(friendList);
   }
 

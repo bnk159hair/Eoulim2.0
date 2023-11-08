@@ -29,6 +29,7 @@ public enum ErrorCode {
   ALREADY_LOGOUT(HttpStatus.NOT_FOUND, "U-004", "이미 로그아웃 되었습니다."),
   // Friend Error
   DUPLICATED_FRIEND(HttpStatus.BAD_REQUEST, "F-001", "이미 등록된 친구 입니다."),
+  FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "F-002", "존재 하지 않는 친구 입니다."),
   // OpenVidu Error
   MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "OV-001", "Match not found. 해당 회의 방이 존재 하지 않습니다."),
   MATCH_CONFLICT(HttpStatus.CONFLICT, "OV-002", "Match Conflict. 이미 존재하는 회의 방입니다."),

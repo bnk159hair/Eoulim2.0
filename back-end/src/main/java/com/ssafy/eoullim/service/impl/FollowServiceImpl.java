@@ -29,12 +29,13 @@ public class FollowServiceImpl implements FollowService {
     return childService.getChild(childId, authentication);
   }
 
-  private OtherChild getFollowingChild(Long followingId) {
-    return childService.getOtherChild(followingId);
+  private Child getFollowingChild(Long followingId) {
+    return childService.getChildWithNoPermission(followingId);
   }
 
+  @Override
   @Transactional
-  public void create(Long childId, Long followingId, Authentication authentication) {
+  public OtherChild create(Long childId, Long followingId, Authentication authentication) {
     // childId와 followingId 같은 경우 예외 처리
     if (childId.equals(followingId))
       throw new IllegalArgumentException("id가 같은 child끼리는 친구 할 수 없음.");
@@ -49,12 +50,25 @@ public class FollowServiceImpl implements FollowService {
               throw new EoullimApplicationException(ErrorCode.DUPLICATED_FRIEND);
             });
     // follow 등록
-    followRepository.save(FollowEntity.of(childEntity, followingChildEntity));
+    FollowEntity followEntity = followRepository.save(FollowEntity.of(childEntity, followingChildEntity));
+    return OtherChild.fromChild(Child.fromEntity(followEntity.getFollowingChild()));
   }
 
+  @Override
   @Transactional
-  public List<Follow> getFollowList(Child child) {
-    List<FollowEntity> followEntities = followRepository.findAllByChild(ChildEntity.of(child));
-    return followEntities.stream().map(Follow::fromEntity).collect(Collectors.toList());
+  public void delete(Long childId, Long followingChildId, Authentication authentication) {
+    // childId와 followingId 같은 경우 예외 처리
+    if (childId.equals(followingChildId))
+      throw new IllegalArgumentException("id가 같은 child끼리는 친구 할 수 없음.");
+
+    ChildEntity childEntity = ChildEntity.of(getChild(childId, authentication));
+    ChildEntity followingChildEntity = ChildEntity.of(getFollowingChild(followingChildId));
+
+    FollowEntity followEntity =
+        followRepository
+            .findByChildAndFollowingChild(childEntity, followingChildEntity)
+            .orElseThrow(
+                () -> new EoullimApplicationException(ErrorCode.FOLLOW_NOT_FOUND, "내 친구가 아니에요."));
+    followRepository.delete(followEntity);
   }
 }
