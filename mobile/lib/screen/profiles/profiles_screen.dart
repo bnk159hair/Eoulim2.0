@@ -90,7 +90,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
   String? fcmToken;
   generalResponse? profileloginAuth;
   ApiprofileLogin apiProfileLogin = ApiprofileLogin();
-
+  
   @override
   void initState() {
     super.initState();
@@ -187,8 +187,8 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                           },
                           child: Stack(
                             children: [
-                              Image.asset(
-                                'assets/bear.png',
+                              Image.network(
+                                '${profile.profileAnimon?.bodyImagePath}',
                                 fit: BoxFit.fitHeight,
                                 height: 400,
                                 width: 400,

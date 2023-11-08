@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mobile/api/api_deletefollowing.dart';
 import 'package:mobile/api/api_followings.dart';
 import 'package:mobile/model/response_models/get_followings.dart';
-
 
 // class Friend {
 //   final String name;
@@ -24,6 +24,8 @@ class Friends extends StatefulWidget {
 
 class _FriendsState extends State<Friends> {
   
+  ApiDeletefollowing apiDeletefollowing = ApiDeletefollowing();
+
   @override
   void initState() {
     super.initState();
@@ -108,8 +110,8 @@ class _FriendsState extends State<Friends> {
                 child: Stack(
                   children: [
                     Center(
-                      child: Image.asset(
-                        'assets/bear.png',
+                      child: Image.network(
+                        '${widget.friends[index].profileAnimon?.bodyImagePath}',
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
                       ),
@@ -139,8 +141,15 @@ class _FriendsState extends State<Friends> {
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
                                           ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
+                                            onPressed: () async{
+                                              final response = await apiDeletefollowing.deletefollowing(widget.friends[index].id);
+                                              if(response.code == '204') {
+                                                await _getFollowing();
+                                                Navigator.of(ctx).pop();
+                                              }
+                                              else{
+                                                Navigator.of(ctx).pop();
+                                              }
                                             },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: const Color(0xffff6347),
