@@ -4,7 +4,7 @@ import "package:mobile/model/response_models/general_response.dart";
 class getProfileinfo extends generalResponse {
   Profile? profile;
 
-  getProfileinfo(String? code, String? status, Profile data)
+  getProfileinfo(String? code, String? status, Profile? data)
       : super(code, status) {
     this.profile = data;
   }

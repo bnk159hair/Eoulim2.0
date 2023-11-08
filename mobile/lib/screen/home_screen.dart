@@ -33,29 +33,10 @@ class _HomeState extends State<Home> {
 
   Future<void> _getProfileInfo() async {
     getProfileinfo? result = await apiProfileinfo.getprofileAPI();
-    if (result == null) {
-      Logout();
-    } else if (result.code == '200') {
+    if (result.code == '200') {
       
     } else {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text('${result.status}'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      Logout();
     }
   }
 
@@ -122,7 +103,7 @@ class _HomeState extends State<Home> {
                 ),
                 Obx(() {
               return Text(
-                '${profileController.selectedProfile.value?.name}님 어서오세요' ?? 'No Name',
+                '${profileController.selectedProfile.value?.name}님 어서오세요',
                 style: TextStyle(fontSize: 16),
               );
             }),
