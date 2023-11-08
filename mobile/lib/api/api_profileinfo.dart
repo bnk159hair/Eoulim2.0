@@ -8,7 +8,7 @@ import 'package:mobile/model/response_models/get_porfile.dart';
 
 
 class Apiprofileinfo {
-  Future<getProfileinfo?>  getprofileAPI() async {
+  Future<getProfileinfo>  getprofileAPI() async {
     final storage = new FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
@@ -18,18 +18,17 @@ class Apiprofileinfo {
       'Content-Type': 'application/json; charset=UTF-8',
     });
     if (response.statusCode == 401) {
-      return null; 
+      return getProfileinfo(response.statusCode.toString(), response.reasonPhrase, null); 
     }else{
       String responseBody = utf8.decode(response.bodyBytes);
       getProfileinfo profileInfo= getProfileinfo.fromJson(json.decode(responseBody));
       print(response.body);
       print("++++++++++++++++++++++++++++++++++++++++");
       print(profileInfo);
-
       ProfileController profileController = Get.find();
-    // 응답값을 ProfileController에 저장
-    profileController.updateSelectedProfile(profileInfo.profile);
+      // 응답값을 ProfileController에 저장
+      profileController.updateSelectedProfile(profileInfo.profile);
       return profileInfo;
-  }
+    }
   }
 }
