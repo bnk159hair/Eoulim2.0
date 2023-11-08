@@ -6,7 +6,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:mobile/controller/profile_select.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:mobile/screen/splash_screen.dart';
 
@@ -75,11 +75,14 @@ void initializeNotification() async {
   }
 }
 
-void getMyDeviceToken() async {
+Future<String?> getMyDeviceToken() async {
   final token = await FirebaseMessaging.instance.getToken();
-  final storage = new FlutterSecureStorage();
-  await storage.write(key: 'fcmToken', value: token);
-  print("내 디바이스 토큰: $token");
+  if (token != null) {
+    const storage = FlutterSecureStorage();
+    await storage.write(key: 'fcmToken', value: token);
+    print("내 디바이스 토큰: $token");
+  }
+  return token;
 }
 
 Future<void> main() async {
@@ -88,7 +91,7 @@ Future<void> main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   initializeNotification();
 
-  getMyDeviceToken();
+  await getMyDeviceToken();
 
   runApp(const MyApp());
 }
@@ -106,10 +109,17 @@ class MyApp extends StatelessWidget {
     );
 
     return GetMaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('ko', 'KR'),
+      ],
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       title: 'Eoullim',
-      home: Splash(),
+      home: const Splash(),
       initialBinding: BindingsBuilder(() {
         Get.put(ProfileController());
       }),

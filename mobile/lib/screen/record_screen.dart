@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/auth/signup_form.dart';
+import 'package:mobile/widgets/record/record_form.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+
+
+class Record extends StatefulWidget {
+  const Record({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<Record> createState() => _RecordState();
 }
 
-class _SignupState extends State<Signup> {
+
+class _RecordState extends State<Record>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('assets/login.gif'),
+            image: AssetImage('assets/record.gif'),
             fit: BoxFit.cover,
             opacity: 0.5,
           ),
         ),
         child: SafeArea(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding: const EdgeInsets.all(20.0),
-                child: Image.asset(
-                  'assets/logo.png',
-                  width: 150,
+                child: Text(
+                  '녹화 영상', 
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-              const SignupForm(),
+              Center(
+                child: recordForm()
+              ),
             ],
           ),
         ),
@@ -41,3 +47,4 @@ class _SignupState extends State<Signup> {
     );
   }
 }
+

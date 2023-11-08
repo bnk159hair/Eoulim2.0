@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/api/api_login.dart';
 import 'package:mobile/model/request_models/put_login.dart';
 import 'package:mobile/model/response_models/general_response.dart';
@@ -14,7 +15,8 @@ class Login extends StatefulWidget {
 
 class _LoginScreenState extends State<Login> {
   final loginFormKey = GlobalKey<FormState>();
-
+  final storage = const FlutterSecureStorage();
+  String fcmToken = '';
   String id = '';
   String pw = '';
   generalResponse? loginAuth;
@@ -23,11 +25,17 @@ class _LoginScreenState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    _initializeFCMToken();
+  }
+
+  Future<void> _initializeFCMToken() async {
+    fcmToken = (await storage.read(key: 'fcmToken')) ?? '';
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -164,8 +172,8 @@ class _LoginScreenState extends State<Login> {
                             });
                       } else {
                         loginFormKey.currentState?.save();
-                        loginAuth = await apiLogin
-                            .login(LoginRequestModel(id: id, password: pw));
+                        loginAuth = await apiLogin.login(LoginRequestModel(
+                            id: id, password: pw, fcmToken: fcmToken));
                         if (loginAuth?.status == 'OK') {
                           Navigator.push(
                             context,

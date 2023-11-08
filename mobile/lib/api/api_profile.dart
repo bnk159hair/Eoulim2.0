@@ -15,11 +15,15 @@ class Apiprofile {
       'Authorization': "Bearer ${authKey}",
       'Content-Type': 'application/json; charset=UTF-8',
     });
+    if (response.statusCode == 401) {
+      return getProfiles(response.statusCode.toString(), response.reasonPhrase,[]); 
+    }else{
       String responseBody = utf8.decode(response.bodyBytes);
       getProfiles profileInfo= getProfiles.fromJson(json.decode(responseBody));
       print(response.body);
       print("++++++++++++++++++++++++++++++++++++++++");
       print(profileInfo);
       return profileInfo;
+    }
   }
 }

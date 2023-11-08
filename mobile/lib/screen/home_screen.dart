@@ -9,6 +9,7 @@ import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
+import 'package:mobile/util/logout_logic.dart';
 
 var backButtonPressedOnce = false;
 
@@ -29,48 +30,13 @@ class _HomeState extends State<Home> {
     _getProfileInfo();
   }
 
-  Future<void> _getProfileInfo() async {
-    getProfileinfo result = await apiProfileinfo.getprofileAPI();
-    if (result.code == '200') {
 
-    } else if (result.code == '401') {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: const Text('로그인을 해주세요'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
+  Future<void> _getProfileInfo() async {
+    getProfileinfo? result = await apiProfileinfo.getprofileAPI();
+    if (result.code == '200') {
+      
     } else {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: Text('${result.status}'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      Logout();
     }
   }
 
@@ -99,7 +65,9 @@ class _HomeState extends State<Home> {
         return false;
       },
       child: Scaffold(
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
+          
           leading: IconButton(
             onPressed: () {
               Navigator.push(
@@ -113,6 +81,7 @@ class _HomeState extends State<Home> {
               Icons.notifications,
             ),
             iconSize: 40.0,
+            color: Colors.yellow,
           ),
           actions: [
             Row(
@@ -134,16 +103,17 @@ class _HomeState extends State<Home> {
                 ),
                 Obx(() {
               return Text(
-                profileController.selectedProfile.value?.name ?? 'No Name',
+                '${profileController.selectedProfile.value?.name}님 어서오세요',
                 style: TextStyle(fontSize: 16),
               );
             }),
               ],
             )
           ],
-          // backgroundColor: Colors.black,
-          elevation: 6.0,
-          toolbarHeight: 100.0,
+          
+          backgroundColor: Colors.transparent,
+          elevation: 0.0,
+          toolbarHeight: 70.0,
         ),
         body: const HomeBottomNavBar(),
       ),
@@ -151,13 +121,14 @@ class _HomeState extends State<Home> {
   }
 }
 
+
 PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
 List<Widget> _buildScreens() {
   return [
-    const Enter(),
-    const Friends(),
-    const Settings(),
+    Enter(),
+    Friends(),
+    Settings(),
   ];
 }
 

@@ -4,33 +4,30 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 
-
-class ApiprofileLogout {
-  Future<generalResponse>  postProfileLogoutAPI() async {
-    String url = "https://k9c103.p.ssafy.io/api/v1/children/logout";
+class ApiDeletefollowing {
+  Future<generalResponse>  deletefollowing(followingid) async {
+    String url = "https://k9c103.p.ssafy.io/api/v1/follows";
     final storage = new FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
-    String? fcmToken = await storage.read(key: 'fcmToken');
     final Map<String, String> requestData = {
       'childId': childId ?? '',
-      'fcmToken': fcmToken ?? ''
+      'followingChildId': followingid.toString()
     };
-    final response = await http.post(Uri.parse(url), headers: <String, String>{
+    final response = await http.delete(Uri.parse(url), headers: <String, String>{
       'Authorization': "Bearer ${authKey}",
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(
-        requestData
-      ));
+      requestData
+    )
+    );
     if (response.statusCode == 401) {
-      return generalResponse(response.statusCode.toString(), response.reasonPhrase); 
+      return generalResponse(response.statusCode.toString(), response.reasonPhrase); // 에러 메시지를 원하는 내용으로 수정
     }else{
-      generalResponse Logoutprofile = generalResponse(response.statusCode.toString(), response.reasonPhrase);
+      print(response);
       print("++++++++++++++++++++++++++++++++++++++++");
-      print(requestData);
-      print(Logoutprofile.status);
-      return Logoutprofile;
+      return generalResponse(response.statusCode.toString(), response.reasonPhrase);
     }
   }
 }
