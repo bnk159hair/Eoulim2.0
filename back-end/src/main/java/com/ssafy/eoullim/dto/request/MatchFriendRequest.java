@@ -21,5 +21,5 @@ public class MatchFriendRequest {
       message = "yyyyMMddHHmmss_숫자 형식의 ID 형식입니다.")
   private String sessionId;
 
-  @NotNull private Long friendId;
+  private Long friendId;
 }

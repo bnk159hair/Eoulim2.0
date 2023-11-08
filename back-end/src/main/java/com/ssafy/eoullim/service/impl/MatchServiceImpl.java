@@ -5,17 +5,17 @@ import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Alarm;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
-import com.ssafy.eoullim.service.ChildService;
-import com.ssafy.eoullim.service.MatchService;
-import com.ssafy.eoullim.service.RecordService;
+import com.ssafy.eoullim.service.*;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
 import io.openvidu.java.client.*;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -28,9 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Service
 public class MatchServiceImpl implements MatchService {
+  @Getter
   private final RecordService recordService;
   private final AlarmService alarmservice;
   private final ChildService childService;
+  private final FirebaseMessagingService firebaseMessagingService;
+  private final FcmTokenService fcmTokenService;
 
   @Value("${OPENVIDU_URL}")
   private String OPENVIDU_URL;
@@ -148,6 +151,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
+  @Transactional
   public synchronized Match startRandom(Long childId, Authentication authentication) {
     // Child ID가 현재 User의 Child가 맞는지 체크
     final var child = childService.getChild(childId, authentication);
@@ -185,6 +189,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
+  @Transactional
   public synchronized Match startFriend(
       Long childId,
       Long friendId,
@@ -201,7 +206,17 @@ public class MatchServiceImpl implements MatchService {
       // 알림 서비스
       Alarm alarm = new Alarm(result.getSessionId(), child.getName());
       alarmservice.send(friendId, alarm);
-
+      // push 서비스
+      List<String> targetTokenList = fcmTokenService.getFcmTokenOfFriend(friendId);
+      if (targetTokenList == null)
+        throw new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUND, "친구가 오프라인입니다.");
+      for (String targetToken : targetTokenList) {
+        try {
+          firebaseMessagingService.sendMessageTo(targetToken, result.getSessionId(), child.getName());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
       return result;
     }
     // existSessionId is not null
@@ -224,6 +239,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
+  @Transactional
   public Recording stopRandom(
       String sessionId, List<Integer> guideSeq, List<String> timeline)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
@@ -262,6 +278,7 @@ public class MatchServiceImpl implements MatchService {
   }
 
   @Override
+  @Transactional
   public Recording stopFriend(String sessionId)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
     log.info("sessionId: " + sessionId);
