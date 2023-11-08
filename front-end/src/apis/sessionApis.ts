@@ -74,7 +74,7 @@ export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonPara
 
 export const getFriends = async ({ profileId, onSuccess, onError }: FriendsParams) => {
   try {
-    const response = await instance.get(`/friendship/${profileId}`);
+    const response = await instance.get(`/children/${profileId}/follows`);
     onSuccess(response.data.data);
   } catch (error) {
     onError();

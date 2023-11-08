@@ -3,14 +3,14 @@ import { Session } from 'openvidu-browser';
 import instance from './instance';
 
 interface User {
-  childId: string;
+  childId: number;
   name: string;
   gender: string;
   school: string;
   grade: number;
 }
 
-export const getUserInfo = async (userId: string) => {
+export const getUserInfo = async (userId: number) => {
   try {
     const response = await instance.get(`/children/${userId}`);
     console.log('유저 정보 가져오기 성공!');

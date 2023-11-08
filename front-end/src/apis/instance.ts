@@ -12,10 +12,15 @@ instance.interceptors.request.use(
     config.headers['Content-Type'] = 'application/json';
     config.headers.Authorization = `Bearer ${accessToken}`;
 
+    // if (config.method) {
+    //   config.timeout = 3000;
+    // }
+
     return config;
   },
   error => {
     console.error(error);
+
     return Promise.reject(error);
   },
 );

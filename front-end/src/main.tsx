@@ -9,7 +9,7 @@ tf.env().set('WEBGL_CPU_FORWARD', false);
 
 console.log('tf서버:', tf.getBackend());
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <App />,
+  // <React.StrictMode>
+  // </React.StrictMode>,
 );

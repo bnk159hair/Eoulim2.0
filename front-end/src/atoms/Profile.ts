@@ -10,7 +10,7 @@ interface Animon {
 
 interface ChildProfile {
   profileAnimon: Animon;
-  childId: number;
+  id: number;
   name: string;
   birth: string;
   gender: string;
@@ -30,7 +30,7 @@ export const Profilekey = atom<number>({
 export const Profile = atom<ChildProfile>({
   key: 'profile',
   default: {
-    childId: 1,
+    id: 1,
     name: '짱구아들',
     birth: '1399248000000',
     gender: 'M',

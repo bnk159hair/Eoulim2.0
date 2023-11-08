@@ -42,12 +42,12 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
 
   const handleChildLogin = () => {
     console.log(childId, name);
-    setChildId(childId);
-    setUserName(name);
     childLogin({
       childLoginData: childLoginoutData,
       onSuccess: () => {
         console.log('프로필 로그인에 성공했습니다.');
+        setChildId(childId);
+        setUserName(name);
       },
       onError: () => {
         console.log('프로필 로그인에 실패하였습니다.');
@@ -83,11 +83,7 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
         </ButtonContainer>
       </div>
       {isModalOpen && (
-        <ModifyModal
-          onClose={() => setModalOpen(false)}
-          childId={childId}
-          getChildren={getChildren}
-        />
+        <ModifyModal onClose={() => setModalOpen(false)} id={childId} getChildren={getChildren} />
       )}
       {isRecordOpen && <ToRecordModal onClose={() => setIsRecordOpen(false)} childId={childId} />}
     </ThemeProvider>

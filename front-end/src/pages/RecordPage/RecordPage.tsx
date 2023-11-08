@@ -25,19 +25,15 @@ const RecordPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    } else {
-      getRecord({
-        profileId,
-        onSuccess: data => {
-          setRecords(data);
-        },
-        onError: () => {
-          console.log('녹화 영상 불러오기 오류');
-        },
-      });
-    }
+    getRecord({
+      profileId,
+      onSuccess: data => {
+        setRecords(data);
+      },
+      onError: () => {
+        console.log('녹화 영상 불러오기 오류');
+      },
+    });
   }, [profileId, token]);
 
   const getBack = () => {

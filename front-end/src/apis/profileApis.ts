@@ -19,7 +19,7 @@ interface ChildLoginoutData {
 }
 
 interface ModifyChildData extends ChildData {
-  childId: number;
+  id: number;
   status: string;
 }
 
@@ -36,7 +36,7 @@ interface ModifyChildParams extends ApiResponse {
 }
 
 interface DeleteChildParams extends ApiResponse {
-  childId: number;
+  id: number;
 }
 
 interface ChildLoginParams extends ApiResponse {
@@ -54,7 +54,7 @@ interface CheckSchoolParams {
 }
 
 interface GetChildInfoParams {
-  childId: number;
+  id: number;
   onSuccess: (data: GetChildInfo) => void;
   onError: () => void;
 }
@@ -85,16 +85,16 @@ export const postCheckSchool = async ({ school, onSuccess, onError }: CheckSchoo
 
 export const putModifyChild = async ({ childData, onSuccess, onError }: ModifyChildParams) => {
   try {
-    await instance.put(`/children/${childData.childId}`, childData);
+    await instance.put(`/children/${childData.id}`, childData);
     onSuccess();
   } catch (error) {
     onError();
   }
 };
 
-export const deleteChild = async ({ childId, onSuccess, onError }: DeleteChildParams) => {
+export const deleteChild = async ({ id, onSuccess, onError }: DeleteChildParams) => {
   try {
-    await instance.delete(`/children/${childId}`);
+    await instance.delete(`/children/${id}`);
     onSuccess();
   } catch (error) {
     onError();
@@ -125,9 +125,9 @@ export const childLogout = async ({ childLogoutData, onSuccess, onError }: Child
   }
 };
 
-export const getChildInfo = async ({ childId, onSuccess, onError }: GetChildInfoParams) => {
+export const getChildInfo = async ({ id, onSuccess, onError }: GetChildInfoParams) => {
   try {
-    const response = await instance.get(`/children/${childId}`);
+    const response = await instance.get(`/children/${id}`);
     onSuccess(response.data.data);
   } catch (error) {
     onError();
@@ -137,6 +137,7 @@ export const getChildInfo = async ({ childId, onSuccess, onError }: GetChildInfo
 export const getChildren = async ({ onSuccess }: GetChildrenParams) => {
   try {
     const response = await instance.get('/children');
+    console.log(response);
     onSuccess(response.data.data);
   } catch (error) {
     console.error(error);

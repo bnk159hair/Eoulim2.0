@@ -18,7 +18,7 @@ interface User {
   grade: number;
 }
 
-export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: string) => {
+export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string) => {
   const [session, setSession] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
   const [subscribers, setSubscribers] = useState<any[]>([]);
@@ -69,7 +69,7 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
           ...prev.filter(sub => sub.userId !== data.childId),
           {
             streamManager: subscriber,
-            userId: data.childId,
+            userId: Number(data.childId),
           },
         ];
       });
@@ -92,10 +92,10 @@ export const useOpenVidu = (userId?: any, sessionId?: string, sessionToken?: str
     });
     // mySession.on('exception', (exception) => console.warn(exception));
 
-    if (sessionId === undefined) {
+    if (sessionId === '') {
       getUserInfo(userId).then((userInfo: User) => {
         getToken({
-          childId: String(userId),
+          childId: userId,
           name: userInfo.name,
           gender: userInfo.gender,
           school: userInfo.school,

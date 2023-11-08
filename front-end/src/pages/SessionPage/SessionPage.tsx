@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Client } from '@stomp/stompjs';
@@ -7,6 +7,7 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import { changeVideo, follow, getAnimon, getFriends } from 'apis/sessionApis';
 import { useWebSocket } from 'hooks/useWebSocket';
+import { invitationSessionId, invitationToken } from 'atoms/Ivitation';
 import Loading from '../../components/stream/Loading';
 import { useOpenVidu } from '../../hooks/useOpenVidu';
 import { StreamCanvas } from '../../components/stream/StreamCanvas';
@@ -43,14 +44,15 @@ interface Message {
 
 const SessionPage = () => {
   const navigate = useNavigate();
+  const { state } = useLocation();
   const [open, setOpen] = useState(false);
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
   const [, setUserToken] = useRecoilState(tokenState);
 
-  const [publisherId, setPublisherId] = useState(0);
-  const [subscriberId, setSubscriberId] = useState(-1);
+  const publisherId = useRecoilValue(Profilekey);
+  const [subscriberId, setSubscriberId] = useState(0);
   const [publisherVideoStatus, setPublisherVideoStatus] = useState(false);
   const [subscriberVideoStatus, setSubscriberVideoStatus] = useState(false);
   const [publisherAnimonURL, setPublisherAnimonURL] = useState('');
@@ -73,7 +75,14 @@ const SessionPage = () => {
   const startTime: number = Date.now();
   const timeStamp: string[] = [];
 
-  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(profileId);
+  const sessionId = useRecoilValue(invitationSessionId);
+  const sessionToken = useRecoilValue(invitationToken);
+
+  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
+    profileId,
+    sessionId,
+    sessionToken,
+  );
 
   const [micStatus, setMicStatus] = useState(true);
 
@@ -94,10 +103,11 @@ const SessionPage = () => {
     setOpen(isTrue);
   };
 
+  console.log('초대 세션 : ', state.invitation);
+
   const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
-    setPublisherId(profileId);
     setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
     getFriends({
       profileId,
@@ -114,16 +124,14 @@ const SessionPage = () => {
   useEffect(() => {
     for (const user of streamList) {
       console.log('before', Number(user.userId), Number(publisherId));
-      if (Number(user.userId) !== profileId) {
-        console.log(user);
+      if (Number(user.userId) !== Number(profileId)) {
         console.log(user.userId, publisherId);
-        setSubscriberId(user.userId);
-        console.log(subscriberId);
+        setSubscriberId(Number(user.userId));
       }
     }
     console.log(publisherId, subscriberId);
 
-    if (!open && streamList[0]?.userId && streamList[1]?.userId && first) {
+    if (!state.invitation && !open && streamList[0]?.userId && streamList[1]?.userId && first) {
       setFirst(isFalse);
       setTimeout(() => {
         guidance.play();
@@ -172,7 +180,7 @@ const SessionPage = () => {
   }, [subscriberId]);
 
   useEffect(() => {
-    if (publisherGuideStatus && subscriberGuideStatus) {
+    if (!state.invitation && publisherGuideStatus && subscriberGuideStatus) {
       const nextIndex = index + 1;
       setIndex(nextIndex);
       const guidance = new Audio(`/${guideSequence[nextIndex]}.mp3`);
@@ -201,6 +209,7 @@ const SessionPage = () => {
 
   useWebSocket({
     onConnect(_, client) {
+      console.log('++++++++++++++++++++++++++++++++++++++', session.sessionId);
       setClient(client);
       client.subscribe(`/topic/${session.sessionId}/animon`, response => {
         console.log('메시지 수신:', response.body);
@@ -212,14 +221,16 @@ const SessionPage = () => {
           setSubscriberVideoStatus(message.isAnimonOn);
         }
       });
-      client.subscribe(`/topic/${session.sessionId}/guide`, response => {
-        const message = JSON.parse(response.body);
-        console.log(message);
-        if (message.childId !== String(publisherId)) {
-          // setSubscriberId(message.childId);
-          setSubscriberGuideStatus(message.isNextGuideOn);
-        }
-      });
+      if (!state.invitation) {
+        client.subscribe(`/topic/${session.sessionId}/guide`, response => {
+          const message = JSON.parse(response.body);
+          console.log(message);
+          if (message.childId !== String(publisherId)) {
+            // setSubscriberId(message.childId);
+            setSubscriberGuideStatus(message.isNextGuideOn);
+          }
+        });
+      }
       client.subscribe(`/topic/${session.sessionId}/leave-session`, response => {
         const message = JSON.parse(response.body);
         console.log(message);
@@ -229,7 +240,7 @@ const SessionPage = () => {
       });
     },
     beforeDisconnected() {
-      setClient(null);
+      // setClient(null);
     },
   });
 
@@ -279,6 +290,7 @@ const SessionPage = () => {
     changeVideo({
       videoData,
       onSuccess: (isAnimonOn, message) => {
+        console.log(session.sessionId);
         setPublisherVideoStatus(isAnimonOn);
         client?.publish({
           destination: `/app/${session.sessionId}/animon`,
@@ -296,7 +308,7 @@ const SessionPage = () => {
   };
 
   const nextGuidance = () => {
-    if (clickEnabled) {
+    if (!state.invitation && clickEnabled) {
       setClickEnabled(false); // 클릭 비활성화
       if (client) {
         const isNextGuideOn = !publisherGuideStatus;
@@ -323,105 +335,111 @@ const SessionPage = () => {
     return false;
   };
 
-  const [checkVideo, setCheckVideo] = useState(false);
+  // const [checkVideo, setCheckVideo] = useState(false);
 
-  return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {!open ? (
-        !checkVideo ? (
-          <SessionPageContainer>
-            <Container>
-              <MyVideo>
-                {streamList[1]?.streamManager && (
-                  <StreamCanvas
-                    streamManager={streamList[1]?.streamManager}
-                    name={subscriberName}
-                    avatarPath={subscriberAnimonURL}
-                    videoState={subscriberVideoStatus}
-                  />
-                )}
-              </MyVideo>
-              <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
-            </Container>
-          </SessionPageContainer>
-        ) : (
-          <SessionPageContainer>
-            <Container>
-              <MyVideo>
-                {streamList.length > 1 && streamList[1].streamManager ? (
-                  <>
-                    <StreamCanvas
-                      streamManager={streamList[1].streamManager}
-                      name={subscriberName}
-                      avatarPath={subscriberAnimonURL}
-                      videoState={subscriberVideoStatus}
-                    />
-                    <Loading isAnimonLoaded={isAnimonLoaded} />
-                  </>
-                ) : (
-                  <Loading isAnimonLoaded={false} />
-                )}
-              </MyVideo>
-              <CharacterContainer>
-                <Character onClick={nextGuidance} isPlaying={isPlaying}>
-                  {clickEnabled ? <Click /> : null}
-                </Character>
-              </CharacterContainer>
-              <MyVideo>
-                {streamList.length > 1 && streamList[0].streamManager ? (
-                  <>
-                    <StreamCanvas
-                      streamManager={streamList[0].streamManager}
-                      name={profile.name}
-                      avatarPath={`${publisherAnimonURL}`}
-                      videoState={publisherVideoStatus}
-                    />
-                    <Loading isAnimonLoaded={isAnimonLoaded} />
-                  </>
-                ) : (
-                  <Loading isAnimonLoaded={false} />
-                )}
-              </MyVideo>
-            </Container>
-            <NavContainer>
-              <Buttons>
-                <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
-                  {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
-                </Button>
-                <Button variant={'contained'} onClick={changeAudioStatus}>
-                  {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
-                </Button>
-                <Button
-                  variant={'contained'}
-                  color={'error'}
-                  onClick={sessionOver}
-                  sx={{ fontSize: '30px' }}
-                >
-                  {'나가기'}
-                </Button>
-              </Buttons>
-            </NavContainer>
-          </SessionPageContainer>
-        )
-      ) : streamList.length !== 2 ? (
-        leaveSession()
-      ) : !isFriend ? (
+  if (open) {
+    if (streamList.length !== 2) {
+      leaveSession();
+      return null;
+    }
+    if (!isFriend) {
+      return (
         <EndModal
           onClose={leaveSession}
           message={'친구 조아?'}
           isFriend={isFriend}
           addFriend={addFriend}
         />
-      ) : (
-        <EndModal
-          onClose={leaveSession}
-          message={'통화가 끝났습니다.'}
-          isFriend={isFriend}
-          addFriend={addFriend}
-        />
-      )}
-    </>
+      );
+    }
+    return (
+      <EndModal
+        onClose={leaveSession}
+        message={'통화가 끝났습니다.'}
+        isFriend={isFriend}
+        addFriend={addFriend}
+      />
+    );
+  }
+  // if (!checkVideo) {
+  //   return (
+  //     <SessionPageContainer>
+  //       <Container>
+  //         <MyVideo>
+  //           {streamList[1]?.streamManager && (
+  //             <StreamCanvas
+  //               streamManager={streamList[1]?.streamManager}
+  //               name={subscriberName}
+  //               avatarPath={subscriberAnimonURL}
+  //               videoState={subscriberVideoStatus}
+  //             />
+  //           )}
+  //         </MyVideo>
+  //         <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
+  //       </Container>
+  //     </SessionPageContainer>
+  //   );
+  // }
+  return (
+    <SessionPageContainer>
+      <Container>
+        <MyVideo>
+          {streamList.length > 1 && streamList[1].streamManager ? (
+            <>
+              <StreamCanvas
+                streamManager={streamList[1].streamManager}
+                name={subscriberName}
+                avatarPath={subscriberAnimonURL}
+                videoState={subscriberVideoStatus}
+              />
+              <Loading isAnimonLoaded={isAnimonLoaded} />
+            </>
+          ) : (
+            <Loading isAnimonLoaded={false} />
+          )}
+        </MyVideo>
+        {!state.invitaion ? (
+          <CharacterContainer>
+            <Character onClick={nextGuidance} isPlaying={isPlaying}>
+              {clickEnabled ? <Click /> : null}
+            </Character>
+          </CharacterContainer>
+        ) : null}
+        <MyVideo>
+          {streamList.length > 1 && streamList[0].streamManager ? (
+            <>
+              <StreamCanvas
+                streamManager={streamList[0].streamManager}
+                name={profile.name}
+                avatarPath={`${publisherAnimonURL}`}
+                videoState={publisherVideoStatus}
+              />
+              <Loading isAnimonLoaded={isAnimonLoaded} />
+            </>
+          ) : (
+            <Loading isAnimonLoaded={false} />
+          )}
+        </MyVideo>
+      </Container>
+      <NavContainer>
+        <Buttons>
+          <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
+            {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
+          </Button>
+          <Button variant={'contained'} onClick={changeAudioStatus}>
+            {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
+          </Button>
+          <Button
+            variant={'contained'}
+            color={'error'}
+            onClick={sessionOver}
+            sx={{ fontSize: '30px' }}
+          >
+            {'나가기'}
+          </Button>
+        </Buttons>
+      </NavContainer>
+    </SessionPageContainer>
   );
 };
 

@@ -23,7 +23,12 @@ const Login = () => {
       inputAlert('아이디와 비밀번호를 확인해주세요!');
       return;
     }
-    const loginData = { username, password, fcmToken };
+    let loginData;
+    if (fcmToken) {
+      loginData = { username, password, fcmToken };
+    } else {
+      loginData = { username, password, fcmToken: 'null' };
+    }
     postLogin({
       loginData,
       onSuccess: () => {

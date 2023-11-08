@@ -25,7 +25,7 @@ import {
 } from './ModifyModalStyles';
 
 interface ChildData {
-  childId: number;
+  id: number;
   name: string;
   birth: string;
   gender: string;
@@ -35,14 +35,14 @@ interface ChildData {
 }
 
 interface Props {
-  childId: number;
+  id: number;
   onClose: () => void;
   getChildren: () => void;
 }
 
-const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
+const ModifyModal = ({ id, onClose, getChildren }: Props) => {
   const [childData, setChildData] = useState<ChildData>({
-    childId,
+    id,
     name: '',
     birth: '',
     gender: '',
@@ -60,7 +60,7 @@ const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
 
   useEffect(() => {
     getChildInfo({
-      childId,
+      id,
       onSuccess: data => {
         setChildData(data);
       },
@@ -68,7 +68,7 @@ const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
         inputAlert('아이 프로필을 불러오는데 실패했습니다.');
       },
     });
-  }, [childId]);
+  }, [id]);
 
   const handlePasswordCheck = (
     event: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
@@ -153,7 +153,7 @@ const ModifyModal = ({ childId, onClose, getChildren }: Props) => {
     }).then(result => {
       if (result.isConfirmed) {
         deleteChild({
-          childId,
+          id,
           onSuccess: () => {
             inputAlert('삭제되었습니다!', false).then(() => getChildren());
           },

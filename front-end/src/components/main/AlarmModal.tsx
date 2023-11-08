@@ -63,7 +63,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose, userName })
 
   const acceptInvitation = () => {
     setInvitationId(sessionId);
-    navigate(`/friendsession`);
+    navigate(`/session`, { state: { invitation: true } });
   };
 
   const refuseInvitaion = () => {

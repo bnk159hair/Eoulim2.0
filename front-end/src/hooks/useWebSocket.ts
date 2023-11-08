@@ -17,7 +17,7 @@ export const useWebSocket = (param: Param) => {
     const client = new Client({
       connectHeaders: WebSocketApis.getInstance().header,
       brokerURL: WS_BASE_URL,
-      reconnectDelay: param.reconnectDelay ? param.reconnectDelay : 5000,
+      // reconnectDelay: param.reconnectDelay ? param.reconnectDelay : 5000,
       debug: str => console.log(str),
     });
 

@@ -49,12 +49,8 @@ const FriendsList = () => {
   };
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    } else {
-      getFriends();
-    }
-  }, [profileId, token]);
+    getFriends();
+  }, [profileId]);
 
   const indexOfLastFriend = currentPage * friendsPerPage;
   const indexOfFirstFriend = indexOfLastFriend - friendsPerPage;
