@@ -11,8 +11,10 @@ class ApiprofileLogout {
     final storage = new FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
+    String? fcmToken = await storage.read(key: 'fcmToken');
     final Map<String, String> requestData = {
       'childId': childId ?? '',
+      'fcmToken': fcmToken ?? ''
     };
     final response = await http.post(Uri.parse(url), headers: <String, String>{
       'Authorization': "Bearer ${authKey}",
@@ -21,11 +23,15 @@ class ApiprofileLogout {
     body: jsonEncode(
         requestData
       ));
+    if (response.statusCode == 401) {
+      return generalResponse(response.statusCode.toString(), response.reasonPhrase); 
+    }else{
       String responseBody = utf8.decode(response.bodyBytes);
       generalResponse Logoutprofile = generalResponse.fromJson(json.decode(responseBody));
       print("++++++++++++++++++++++++++++++++++++++++");
       print(requestData);
       print(Logoutprofile.status);
       return Logoutprofile;
+    }
   }
 }

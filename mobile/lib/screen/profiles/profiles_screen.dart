@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/api/api_profilelogin.dart';
 import 'package:mobile/model/request_models/put_profilelogin.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/model/response_models/get_profilelist.dart';
 import 'package:mobile/screen/home_screen.dart';
+import 'package:mobile/screen/login_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,6 +30,12 @@ class _ProfilesState extends State<Profiles> {
     _getProfiles();
   }
 
+  void Logout() async {
+    final storage = new FlutterSecureStorage();
+    await storage.delete(key: 'Authkey');
+    Get.offAll(() => Login());
+    }
+
   Future<void> _getProfiles() async {
     getProfiles result = await widget.apiProfile.getprofilesAPI();
     if (result.code == '200') {
@@ -35,24 +43,7 @@ class _ProfilesState extends State<Profiles> {
         widget.profiles = result.profiles!;
       });
     } else if (result.code == '401') {
-      showDialog(
-        context: context, // 이 부분에 정의가 필요
-        builder: (BuildContext context) {
-          return AlertDialog(
-            content: const Text('로그인을 해주세요'),
-            actions: [
-              Center(
-                child: TextButton(
-                  child: const Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      Logout();
     } else {
       showDialog(
         context: context, // 이 부분에 정의가 필요
@@ -165,18 +156,33 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                 ),
                 Expanded(
                   child: Center(
-                    child: CarouselSlider(
+                    child: widget.profiles.isEmpty
+                        ? GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CreateProfile(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/createprofile.png',
+                            width: 370,
+                          ),
+                        )
+                        : CarouselSlider(
                       carouselController: carouselController,
                       items: widget.profiles.map((profile) {
                         return GestureDetector(
                           onTap: () async {
                             profileloginAuth = await apiProfileLogin.postProfileLoginAPI(
                                 ProfileLoginRequestModel(childId: profile.id, fcmToken: fcmToken ?? ""));
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Home(),
-                              ),
+                                Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Home(),
+                                ),
                             );
                           },
                           child: Stack(
