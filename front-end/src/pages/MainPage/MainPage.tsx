@@ -21,6 +21,7 @@ import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import AnimonModal from '../../components/main/AnimonModal';
 import AlarmModal from '../../components/main/AlarmModal';
+import { S3_SOUND_BASE_URL } from '../../apis/urls';
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const MainPage: React.FC = () => {
   const IMGURL = `/${profile.profileAnimon.name}.png`;
   // const IMGURL = `/dog.png`;
 
-  const audioObjRef = useRef(new Audio('/mainguide.mp3'));
+  const audioObjRef = useRef(new Audio(`${S3_SOUND_BASE_URL}/guide/main.mp3`));
 
   const playAudio = () => {
     const audioObj = audioObjRef.current;

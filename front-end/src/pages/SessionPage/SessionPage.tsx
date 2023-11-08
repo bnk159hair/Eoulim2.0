@@ -25,6 +25,7 @@ import { Profile, Profilekey } from '../../atoms/Profile';
 import { IsAnimonLoaded, guideSeq } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
+import { S3_SOUND_BASE_URL } from '../../apis/urls';
 
 interface FriendsProfile {
   id: number;
@@ -66,7 +67,7 @@ const SessionPage = () => {
   const step = useRecoilValue(guideSeq);
   const [index, setIndex] = useState(-1);
   const guideSequence = [...step, 13];
-  const guidance = new Audio(`/1.mp3`);
+  const guidance = new Audio(`${S3_SOUND_BASE_URL}/guide/1.mp3`);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const guideScript: number[] = [];
@@ -193,7 +194,7 @@ const SessionPage = () => {
     if (!state.invitation && publisherGuideStatus && subscriberGuideStatus) {
       const nextIndex = index + 1;
       setIndex(nextIndex);
-      const guidance = new Audio(`/${guideSequence[nextIndex]}.mp3`);
+      const guidance = new Audio(`${S3_SOUND_BASE_URL}/guide/${guideSequence[nextIndex]}.mp3`);
       if (nextIndex <= 4) {
         // const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
         guideScript.push(guideSequence[nextIndex]);
