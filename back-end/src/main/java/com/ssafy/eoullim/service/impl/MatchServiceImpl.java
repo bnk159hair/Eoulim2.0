@@ -213,8 +213,10 @@ public class MatchServiceImpl implements MatchService {
         throw new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUND, "친구가 오프라인입니다.");
       for (String targetToken : targetTokenList) {
         try {
+          log.info("targetToken "+ targetToken);
           firebaseMessagingService.sendMessageTo(targetToken, result.getSessionId(), child.getName());
         } catch (IOException e) {
+          log.info("예외발생");
           throw new RuntimeException(e);
         }
       }
