@@ -19,6 +19,7 @@ public enum ErrorCode {
   S3_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S-003", "S3 업로드 중에 발생한 문제입니다."),
   // FcmToken Error
   FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM-001", "존재 하지 않는 FcmToken 입니다."),
+  ALREADY_EXIST_FCM_TOKEN(HttpStatus.OK, "FCM-002", "FcmToken이 이미 존재합니다."),
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
   CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "사용자가 소유한 애니몬을 찾을 수 없음."),

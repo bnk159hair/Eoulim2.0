@@ -36,22 +36,21 @@ public class ChildServiceImpl implements ChildService {
     return user;
   }
 
-  public Child getChildWithPermission(Long childId, Authentication authentication) {
-    User user = getUserWithAuth(authentication);
-
-    Child child = getChildById(childId);
-    if (!child.getUser().getId().equals(user.getId()))
-      throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
-
-    return child;
-  }
-
   private Child getChildById(Long childId) {
     ChildEntity childEntity =
         childRepository
             .findById(childId)
             .orElseThrow(() -> new EoullimApplicationException(ErrorCode.CHILD_NOT_FOUND));
     return Child.fromEntity(childEntity);
+  }
+
+  private Child getChildWithPermission(Long childId, Authentication authentication) {
+    User user = getUserWithAuth(authentication);
+    Child child = getChildById(childId);
+    if (!child.getUser().getId().equals(user.getId()))
+      throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
+
+    return child;
   }
 
   private void setOnline(Long childId) {

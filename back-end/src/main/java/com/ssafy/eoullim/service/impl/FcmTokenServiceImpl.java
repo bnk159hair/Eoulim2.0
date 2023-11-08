@@ -42,6 +42,12 @@ public class FcmTokenServiceImpl implements FcmTokenService {
 
   @Transactional
   public void saveFcmTokenOfParent(User user, String token) {
+    fcmTokenRepository
+        .findByUserIdAndToken(user.getId(), token)
+        .ifPresent(
+            it -> {
+              throw new EoullimApplicationException(ErrorCode.ALREADY_EXIST_FCM_TOKEN);
+            });
     fcmTokenRepository.save(
         FcmTokenEntity.builder().user(UserEntity.of(user)).token(token).build());
   }
