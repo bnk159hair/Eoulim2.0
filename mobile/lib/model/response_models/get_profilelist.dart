@@ -26,7 +26,6 @@ class Profile {
   String? gender;
   String? school;
   int? grade;
-  String? status;
   User? user;
   ProfileAnimon? profileAnimon;
 
@@ -37,7 +36,6 @@ class Profile {
     this.gender,
     this.school,
     this.grade,
-    this.status,
     this.user,
     this.profileAnimon,
   });
@@ -49,7 +47,6 @@ class Profile {
     gender = json['gender'];
     school = json['school'];
     grade = json['grade'];
-    status = json['status'];
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     profileAnimon = json['profileAnimon'] != null
         ? ProfileAnimon.fromJson(json['profileAnimon'])
@@ -86,15 +83,15 @@ class User {
 
 class ProfileAnimon {
   late int id;
-  String? headImagePath;
+  String? maskImagePath;
   String? bodyImagePath;
   String? name;
 
-  ProfileAnimon({required this.id,this.headImagePath, this.bodyImagePath, this.name});
+  ProfileAnimon({required this.id,this.maskImagePath, this.bodyImagePath, this.name});
 
   ProfileAnimon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    headImagePath = json['headImagePath'];
+    maskImagePath = json['headImagePath'];
     bodyImagePath = json['bodyImagePath'];
     name = json['name'];
   }

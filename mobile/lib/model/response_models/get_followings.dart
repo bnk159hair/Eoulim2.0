@@ -50,15 +50,15 @@ class Profile {
 
 class ProfileAnimon {
   late int id;
-  String? headImagePath;
+  String? maskImagePath;
   String? bodyImagePath;
   String? name;
 
-  ProfileAnimon({required this.id,this.headImagePath, this.bodyImagePath, this.name});
+  ProfileAnimon({required this.id,this.maskImagePath, this.bodyImagePath, this.name});
 
   ProfileAnimon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    headImagePath = json['headImagePath'];
+    maskImagePath = json['maskImagePath'];
     bodyImagePath = json['bodyImagePath'];
     name = json['name'];
   }
