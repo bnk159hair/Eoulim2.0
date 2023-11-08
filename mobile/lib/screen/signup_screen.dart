@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/widgets/auth/signup_form.dart';
 
-
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
@@ -13,6 +12,7 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -23,6 +23,7 @@ class _SignupState extends State<Signup> {
         ),
         child: SafeArea(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
@@ -32,9 +33,7 @@ class _SignupState extends State<Signup> {
                   width: 150,
                 ),
               ),
-              Center(
-                child: SginupForm(), // Center the SignupForm
-              ),
+              const SignupForm(),
             ],
           ),
         ),
