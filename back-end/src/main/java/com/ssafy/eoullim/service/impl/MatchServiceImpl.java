@@ -204,8 +204,9 @@ public class MatchServiceImpl implements MatchService {
       Match result = createNewMatch(child.getId(), false);
 
       // 알림 서비스
-      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
-      alarmservice.send(friendId, alarm);
+//      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
+//      alarmservice.send(friendId, alarm);
+
       // push 서비스
       List<String> targetTokenList = fcmTokenService.getFcmTokenOfFriend(friendId);
       if (targetTokenList == null)
