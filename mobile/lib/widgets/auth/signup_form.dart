@@ -3,6 +3,7 @@ import 'package:mobile/api/api_signup.dart';
 import 'package:mobile/model/request_models/put_signup.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/login_screen.dart';
+import 'package:mobile/util/custom_text_field.dart';
 
 class SignupForm extends StatefulWidget {
   const SignupForm({super.key});
@@ -60,14 +61,37 @@ class _SignupFormState extends State<SignupForm> {
                       width: 80,
                       height: 58,
                       child: ElevatedButton(
-                          onPressed: () async {
-                            if (username.isEmpty) {
-                              return showDialog(
+                        onPressed: () async {
+                          if (username.isEmpty) {
+                            return showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext ctx) {
+                                return AlertDialog(
+                                  content: const Text('아이디를 입력해 주세요!'),
+                                  actions: [
+                                    Center(
+                                      child: TextButton(
+                                        child: const Text('확인'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            final response =
+                                await apiSignup.checkUsername(username);
+                            if (response.data) {
+                              showDialog(
                                 context: context,
                                 barrierDismissible: false,
                                 builder: (BuildContext ctx) {
                                   return AlertDialog(
-                                    content: const Text('아이디를 입력해 주세요!'),
+                                    content: const Text('사용 가능한 아이디입니다!'),
                                     actions: [
                                       Center(
                                         child: TextButton(
@@ -81,66 +105,44 @@ class _SignupFormState extends State<SignupForm> {
                                   );
                                 },
                               );
+                              setState(() {
+                                isClicked = true;
+                                isValidUsername = response.data;
+                              });
                             } else {
-                              final response =
-                                  await apiSignup.checkUsername(username);
-                              if (response.data) {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext ctx) {
-                                    return AlertDialog(
-                                      content: const Text('사용 가능한 아이디입니다!'),
-                                      actions: [
-                                        Center(
-                                          child: TextButton(
-                                            child: const Text('확인'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext ctx) {
+                                  return AlertDialog(
+                                    content: const Text('이미 사용중인 아이디입니다!'),
+                                    actions: [
+                                      Center(
+                                        child: TextButton(
+                                          child: const Text('확인'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
                                         ),
-                                      ],
-                                    );
-                                  },
-                                );
-                                setState(() {
-                                  isClicked = true;
-                                  isValidUsername = response.data;
-                                });
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext ctx) {
-                                    return AlertDialog(
-                                      content: const Text('이미 사용중인 아이디입니다!'),
-                                      actions: [
-                                        Center(
-                                          child: TextButton(
-                                            child: const Text('확인'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              }
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
                             }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            backgroundColor: Colors.green,
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
-                          child: const Text(
-                            '중복확인',
-                            style: TextStyle(fontSize: 12),
-                          )),
+                          backgroundColor: Colors.green,
+                        ),
+                        child: const Text(
+                          '중복확인',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -378,54 +380,6 @@ class _SignupFormState extends State<SignupForm> {
           ],
         ),
       ],
-    );
-  }
-}
-
-class CustomTextFormField extends StatelessWidget {
-  final String labelText;
-  final ValueChanged<String> onChanged;
-  final IconData icon;
-  final TextInputType keyboardType;
-  final bool obscureText;
-  final EdgeInsetsGeometry padding;
-
-  const CustomTextFormField({
-    super.key,
-    required this.labelText,
-    required this.onChanged,
-    required this.icon,
-    this.padding = const EdgeInsets.only(left: 20, right: 20, bottom: 20),
-    this.keyboardType = TextInputType.text,
-    this.obscureText = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: padding,
-      child: TextFormField(
-        onChanged: onChanged,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: Colors.green,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          labelText: labelText,
-        ),
-      ),
     );
   }
 }
