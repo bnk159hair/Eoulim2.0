@@ -54,6 +54,7 @@ const MainPage: React.FC = () => {
       onSuccess: data => {
         setProfile(data);
         console.log('프로필 가져오기에 성공하였습니다.');
+        console.log(data);
       },
       onError: () => {
         console.log('프로필 가져오기에 실패하였습니다.');
