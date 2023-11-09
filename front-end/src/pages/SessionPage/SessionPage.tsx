@@ -39,7 +39,8 @@ interface FriendsProfile {
 }
 
 interface Message {
-  token: string;
+  childId: string;
+  invitation: boolean;
 }
 
 const SessionPage = () => {
@@ -78,34 +79,25 @@ const SessionPage = () => {
   const invitationSessionId = useRecoilValue(InvitationSessionId);
   const sessionToken = useRecoilValue(InvitationToken);
 
+  let mobileChildId = 0;
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  window.getChildIdFromApp = async (message: Message) => {
+    console.log(`Flutter to Web : ${message}`);
+    if (message.childId !== 'null') {
+      mobileChildId = Number(message.childId);
+    }
+  };
+
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
     profileId,
+    mobileChildId,
     invitationSessionId,
     sessionToken,
   );
 
   const [micStatus, setMicStatus] = useState(true);
-
-  const TOKEN = 'accessToken';
-  const isAccessTokenEmpty = localStorage.getItem(TOKEN) === null;
-
-  const saveToken = (token: string) => {
-    if (isAccessTokenEmpty) {
-      localStorage.setItem(TOKEN, token);
-    } else {
-      localStorage.removeItem(TOKEN);
-      localStorage.setItem(TOKEN, token);
-    }
-  };
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  window.getTokenFromApp = async (message: Message) => {
-    console.log(`Flutter to Web : ${message}`);
-    if (message.token !== 'null') {
-      saveToken(message.token);
-    }
-  };
 
   useEffect(() => {
     onChangeMicStatus(micStatus);

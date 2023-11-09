@@ -10,7 +10,12 @@ import {
 import { SessionId, guideSeq } from '../atoms/Session';
 import { InvitationSessionId, InvitationToken } from '../atoms/Ivitation';
 
-export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string) => {
+export const useOpenVidu = (
+  userId: number,
+  mobileChildId: number,
+  sessionId: string,
+  sessionToken: string,
+) => {
   const [session, setSession] = useState<any>(null);
   const [publisher, setPublisher] = useState<any>(null);
   const [subscribers, setSubscribers] = useState<any[]>([]);
@@ -20,6 +25,14 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
   const [, setSessionId] = useRecoilState(SessionId);
   const [, setInvitationSessionId] = useRecoilState(InvitationSessionId);
   const [, setSessionToken] = useRecoilState(InvitationToken);
+
+  let childId: number;
+
+  if (userId) {
+    childId = userId;
+  } else if (mobileChildId) {
+    childId = mobileChildId;
+  }
 
   console.log('session, publisher, subscribers 생성');
 
@@ -92,10 +105,10 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
 
     if (sessionId === '') {
       getUserInfo({
-        childId: userId,
+        childId,
         onSuccess: data => {
           const userData = {
-            childId: userId,
+            childId,
             ...data,
           };
           getToken({
@@ -106,7 +119,7 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
               setGuide(guideSeq);
               console.log(`가져온 토큰 ${token}으로 세션에 연결`);
               mySession
-                .connect(token, { childId: String(userId) })
+                .connect(token, { childId: String(childId) })
                 .then(async () => {
                   await navigator.mediaDevices.getUserMedia({
                     audio: true,
@@ -148,9 +161,9 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
           console.log('유저 정보를 가져오는데 실패했습니다.');
         },
       });
-    } else if (userId && sessionId && sessionToken) {
+    } else if (childId && sessionId && sessionToken) {
       mySession
-        .connect(sessionToken, { childId: String(userId) })
+        .connect(sessionToken, { childId: String(childId) })
         .then(async () => {
           await navigator.mediaDevices.getUserMedia({
             audio: true,
@@ -178,15 +191,15 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
           console.log('초대 세션 연결을 실패했다!');
           console.log('There was an error connecting to the session:', error.code, error.message);
         });
-    } else if (userId && sessionId && sessionToken === '') {
-      const invitationSessionData = { childId: userId, sessionId };
+    } else if (childId && sessionId && sessionToken === '') {
+      const invitationSessionData = { childId, sessionId };
       getInvitationToken({
         invitationSessionData,
         onSuccess: data => {
           const { token, sessionId } = data;
           setSessionId(sessionId);
           mySession
-            .connect(token, { childId: String(userId) })
+            .connect(token, { childId: String(childId) })
             .then(async () => {
               await navigator.mediaDevices.getUserMedia({
                 audio: true,
@@ -278,8 +291,8 @@ export const useOpenVidu = (userId: any, sessionId: string, sessionToken: string
   );
 
   const streamList = useMemo(
-    () => [{ streamManager: publisher, userId }, ...subscribers],
-    [publisher, subscribers, userId],
+    () => [{ streamManager: publisher, childId }, ...subscribers],
+    [publisher, subscribers, userId, mobileChildId],
   );
   console.log(streamList);
   return {
