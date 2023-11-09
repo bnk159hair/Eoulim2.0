@@ -10,19 +10,9 @@ export const PublisherId = atom<number>({
   default: 0,
 });
 
-export const PublisherVideoStatus = atom<boolean>({
-  key: 'publisherVideoStatus',
-  default: false,
-});
-
 export const PublisherAnimonURL = atom<string>({
   key: 'publisherAnimonURL',
   default: '',
-});
-
-export const PublisherGuideStatus = atom<boolean>({
-  key: 'publisherGuideStatus',
-  default: false,
 });
 
 export const SubscriberId = atom<number>({
@@ -30,19 +20,9 @@ export const SubscriberId = atom<number>({
   default: 0,
 });
 
-export const SubscriberVideoStatus = atom<boolean>({
-  key: 'subscirberVideoStatus',
-  default: false,
-});
-
 export const SubscriberAnimonURL = atom<string>({
   key: 'subscriberAnimonURL',
   default: '',
-});
-
-export const SubscriberGuideStatus = atom<boolean>({
-  key: 'subscriberGuideStatus',
-  default: false,
 });
 
 export const IsAnimonLoaded = atom<boolean>({
@@ -55,12 +35,12 @@ export const guideSeq = atom<number[]>({
   default: [],
 });
 
-export const GuideScript = atom<string>({
+export const GuideScript = atom<number[]>({
   key: 'guideScript',
-  default: '',
+  default: [],
 });
 
-export const TimeStamp = atom<string>({
-  key: 'timeStamp',
-  default: '',
+export const Timeline = atom<string[]>({
+  key: 'timeline',
+  default: [],
 });

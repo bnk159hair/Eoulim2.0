@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@mui/material';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
@@ -22,7 +22,7 @@ import {
   CharacterContainer,
 } from './SessionPageStyles';
 import { Profile, Profilekey } from '../../atoms/Profile';
-import { IsAnimonLoaded, guideSeq, SessionId } from '../../atoms/Session';
+import { IsAnimonLoaded, guideSeq, GuideScript, Timeline, SessionId } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
 import { destroySession } from '../../apis/openViduApis';
 import { S3_SOUND_BASE_URL } from '../../apis/urls';
@@ -50,6 +50,7 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
+  const [invitation, setInvitation] = useState(state.invitaion);
 
   const publisherId = useRecoilValue(Profilekey);
   const [subscriberId, setSubscriberId] = useState(0);
@@ -61,7 +62,7 @@ const SessionPage = () => {
   const [subscriberGuideStatus, setSubscriberGuideStatus] = useState(false);
 
   const [clickEnabled, setClickEnabled] = useState(false);
-  const profileId = useRecoilValue(Profilekey);
+  const [profileId, setProfileId] = useRecoilState(Profilekey);
   const profile = useRecoilValue(Profile);
   const [subscriberName, setSubscriberName] = useState('');
   const isAnimonLoaded = useRecoilValue(IsAnimonLoaded);
@@ -71,28 +72,28 @@ const SessionPage = () => {
   const guidance = new Audio(`${S3_SOUND_BASE_URL}/guide/1.mp3`);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const guideScript: number[] = [];
-  const startTime: number = Date.now();
-  const timeline: string[] = [];
+  const [guideScript, setGuideScript] = useRecoilState(GuideScript);
+  const [timeline, setTimeline] = useRecoilState(Timeline);
+  const [startTime, setStartTime] = useState(0);
 
   const sessionId = useRecoilValue(SessionId);
   const invitationSessionId = useRecoilValue(InvitationSessionId);
   const sessionToken = useRecoilValue(InvitationToken);
-
-  let mobileChildId = 0;
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window.getChildIdFromApp = async (message: Message) => {
     console.log(`Flutter to Web : ${message}`);
     if (message.childId !== 'null') {
-      mobileChildId = Number(message.childId);
+      setProfileId(Number(message.childId));
+    }
+    if (message.invitation !== null) {
+      setInvitation(message.invitation);
     }
   };
 
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
     profileId,
-    mobileChildId,
     invitationSessionId,
     sessionToken,
   );
@@ -112,6 +113,8 @@ const SessionPage = () => {
   const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
+    setGuideScript([]);
+    setTimeline([]);
     setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
     getFriends({
       profileId,
@@ -137,6 +140,7 @@ const SessionPage = () => {
 
     if (!state.invitation && !open && streamList[0]?.userId && streamList[1]?.userId && first) {
       setFirst(isFalse);
+      setStartTime(Date.now());
       setTimeout(() => {
         guidance.play();
         setIsPlaying(true);
@@ -189,10 +193,9 @@ const SessionPage = () => {
       setIndex(nextIndex);
       const guidance = new Audio(`${S3_SOUND_BASE_URL}/guide/${guideSequence[nextIndex]}.mp3`);
       if (nextIndex <= 4) {
-        // const nextGuide = `${guideScript + guideSequence[nextIndex]} `;
-        guideScript.push(guideSequence[nextIndex]);
-        // const nextTime = `${timeline + String(Date.now() - startTime)} `;
-        timeline.push(String(Date.now() - startTime));
+        setGuideScript([...guideScript, guideSequence[nextIndex]]);
+        setTimeline([...timeline, String(Date.now() - startTime)]);
+        console.log(guideScript, timeline);
         guidance.play();
       }
       setIsPlaying(true);
@@ -275,6 +278,7 @@ const SessionPage = () => {
     destroySession({
       sessionData,
       onSuccess: () => {
+        console.log(guideScript, timeline);
         console.log('세션 페이지에서 세션 접속을 종료하였습니다.');
       },
       onError: () => {
@@ -413,7 +417,7 @@ const SessionPage = () => {
           )}
         </MyVideo>
 
-        {!state.invitation ? (
+        {invitation ? (
           <CharacterContainer>
             <Character onClick={nextGuidance} isPlaying={isPlaying}>
               {clickEnabled ? <Click /> : null}
