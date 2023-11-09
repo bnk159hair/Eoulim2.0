@@ -50,7 +50,7 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-  const [invitation, setInvitation] = useState(state.invitaion);
+  const [invitation, setInvitation] = useState(state.invitation);
 
   const publisherId = useRecoilValue(Profilekey);
   const [subscriberId, setSubscriberId] = useState(0);
@@ -80,6 +80,12 @@ const SessionPage = () => {
   const invitationSessionId = useRecoilValue(InvitationSessionId);
   const sessionToken = useRecoilValue(InvitationToken);
 
+  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
+    profileId,
+    invitationSessionId,
+    sessionToken,
+  );
+
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   window.getChildIdFromApp = async (message: Message) => {
@@ -91,12 +97,6 @@ const SessionPage = () => {
       setInvitation(message.invitation);
     }
   };
-
-  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
-    profileId,
-    invitationSessionId,
-    sessionToken,
-  );
 
   const [micStatus, setMicStatus] = useState(true);
 
@@ -417,7 +417,7 @@ const SessionPage = () => {
           )}
         </MyVideo>
 
-        {invitation ? (
+        {!invitation ? (
           <CharacterContainer>
             <Character onClick={nextGuidance} isPlaying={isPlaying}>
               {clickEnabled ? <Click /> : null}

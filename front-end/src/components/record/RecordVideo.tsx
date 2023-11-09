@@ -37,7 +37,7 @@ interface RecordInfo {
 interface GuideInfo {
   content: string;
   time: string;
-  seconds: number;
+  second: number;
 }
 
 const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId }) => {
@@ -98,9 +98,10 @@ const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId })
     recordInfo.guideInfo.forEach(({ content, timeline }) => {
       const time = format(timeline);
       if (content && timeline) {
-        info.push({ content, time, seconds: Number(timeline) / 1000 });
+        info.push({ content, time, second: Number(timeline) / 1000 });
       }
     });
+    console.log(info);
   }
 
   const progressHandler = (changeState: any) => {
@@ -138,14 +139,8 @@ const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId })
           <VideoInfo>
             <GuideContainer>
               {info.length ? (
-                info.map(({ content, time, seconds }) => (
-                  <button
-                    className={'timestamp_box'}
-                    key={seconds}
-                    onClick={() => {
-                      videoRef.current.seekTo(seconds);
-                    }}
-                  >
+                info.map(({ content, second, time }) => (
+                  <div className={'timestamp_box'} key={second}>
                     <Button
                       variant={'contained'}
                       color={'primary'}
@@ -155,11 +150,14 @@ const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId })
                         flexDirection: 'column',
                         alignItems: 'center',
                       }}
+                      onClick={() => {
+                        videoRef.current.seekTo(second);
+                      }}
                     >
                       <span>{time}</span>
                     </Button>
                     <GuideInfo>{content}</GuideInfo>
-                  </button>
+                  </div>
                 ))
               ) : (
                 <GuideInfo>{'타임라인이 없습니다'}</GuideInfo>

@@ -34,9 +34,9 @@ const RecordListItem: React.FC<RecordListItemProps> = ({
     setModalOpen(false);
   };
 
-  const formatTime = (timeString: string) => {
-    const date = new Date(timeString);
-    return date.toLocaleString(); // 원하는 형식으로 변환할 수 있습니다.
+  const formatTime = (timeline: number[]) => {
+    const [y, mo, d, h, mi] = timeline;
+    return `${y}. ${mo}. ${d}. ${h} : ${mi}`; // 원하는 형식으로 변환할 수 있습니다.
   };
 
   return (
@@ -52,10 +52,7 @@ const RecordListItem: React.FC<RecordListItemProps> = ({
           {school}
           {'초등학교'}
         </div>
-        <div>
-          {'녹화 날짜 : '}
-          {formatTime(String(createTime[5]))}
-        </div>
+        <div>{`녹화 날짜 : ${formatTime(createTime)}`}</div>
       </OpponentImformation>
       {isModalOpen && <VideoModal onClose={closeModal} recordId={recordId} videoPath={videoPath} />}
       <RecordUrl onClick={openModal} />

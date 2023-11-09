@@ -95,7 +95,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
         childId: userId,
         onSuccess: data => {
           const userData = {
-            userId,
+            childId: userId,
             ...data,
           };
           getToken({
