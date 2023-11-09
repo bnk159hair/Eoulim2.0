@@ -1,5 +1,4 @@
 import React from 'react';
-import { useFireBase } from 'hooks/useFireBase';
 import Login from '../../components/login/Login';
 import {
   LoginPageContainer,
@@ -10,7 +9,6 @@ import {
 } from './LoginPageStyles';
 
 const LoginPage = () => {
-  useFireBase();
   return (
     <LoginPageContainer>
       <LoginContainer>

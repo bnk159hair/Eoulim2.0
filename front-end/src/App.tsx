@@ -9,12 +9,14 @@ import SessionPage from './pages/SessionPage/SessionPage';
 import FriendsPage from './pages/Friendspage/FriendsPage';
 import RecordPage from './pages/RecordPage/RecordPage';
 import BackgroundMusic from './components/main/BackgroundMusic';
+import FireBase from './components/alarm/Alarm';
 
 function App() {
   return (
     <RecoilRoot>
       <Router>
         <BackgroundMusic />
+        <FireBase />
         <Routes>
           <Route path={'/'} element={<MainPage />} />
           <Route path={'/login'} element={<LoginPage />} />
