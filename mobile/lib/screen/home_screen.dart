@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mobile/api/api_profileinfo.dart';
 import 'package:mobile/controller/profile_select.dart';
 import 'package:mobile/model/response_models/get_porfile.dart';
+import 'package:mobile/screen/animon_screen.dart';
 import 'package:mobile/screen/notifications_screen.dart';
 import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
@@ -82,64 +83,76 @@ class _HomeState extends State<Home> {
           actions: [
             Row(
               children: [
-                MaterialButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Hello There!'),
-                          duration: Duration(milliseconds: 1500),
-                        ),
-                      );
-                    },
-                    child: Obx(() {
-                      return Image.network(
-                          '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}');
-                    })),
-                Obx(() {
-                  return Text(
-                    '${profileController.selectedProfile.value?.name}님 어서오세요',
-                    style: const TextStyle(fontSize: 16),
-                  );
-                }),
-                // FutureBuilder<getProfileinfo?>(
-                //   future: apiProfileinfo.getprofileAPI(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.connectionState == ConnectionState.waiting) {
-                //       return const CircularProgressIndicator(
-                //         color: Colors.white,
-                //       ); // 데이터를 기다릴 동안 로딩 표시
-                //     } else if (snapshot.hasError) {
-                //       return Text('에러 발생: ${snapshot.error}');
-                //     } else if (!snapshot.hasData) {
-                //       return const Text('데이터 없음');
-                //     } else {
-                //       final profileInfo = snapshot.data!;
-                //       print('여기서 호출중');
-                //       print(profileInfo.profile?.profileAnimon?.bodyImagePath);
-                //       // final imagePath = profileInfo.profileAnimon?.bodyImagePath;
-
-                //       return Row(
-                //         children: [
-                //           Obx(() {
-                //             return Image.network(
-                //               '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}',
-                //             );
-                //           }),
-                //           Obx(() {
-                //             return Text(
-                //               '${profileController.selectedProfile.value?.name}님 어서오세요',
-                //               style: const TextStyle(fontSize: 16),
-                //             );
-                //           }),
-                //         ],
+                // MaterialButton(
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(30.0),
+                //     ),
+                //     onPressed: () {
+                //       ScaffoldMessenger.of(context).clearSnackBars();
+                //       ScaffoldMessenger.of(context).showSnackBar(
+                //         const SnackBar(
+                //           content: Text('Hello There!'),
+                //           duration: Duration(milliseconds: 1500),
+                //         ),
                 //       );
-                //     }
-                //   },
-                // )
+                //     },
+                //     child: Obx(() {
+                //       return Image.network(
+                //           '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}');
+                //     })),
+                // Obx(() {
+                //   return Text(
+                //     '${profileController.selectedProfile.value?.name}님 어서오세요',
+                //     style: const TextStyle(fontSize: 16),
+                //   );
+                // }),
+                FutureBuilder<getProfileinfo?>(
+                  future: apiProfileinfo.getprofileAPI(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator(
+                        color: Colors.white,
+                      ); // 데이터를 기다릴 동안 로딩 표시
+                    } else if (snapshot.hasError) {
+                      return Text('에러 발생: ${snapshot.error}');
+                    } else if (!snapshot.hasData) {
+                      return const Text('데이터 없음');
+                    } else {
+                      final profileInfo = snapshot.data!;
+                      print('여기서 호출중');
+                      print(profileInfo.profile?.profileAnimon?.bodyImagePath);
+                      // final imagePath = profileInfo.profileAnimon?.bodyImagePath;
+
+                      return Row(
+                        children: [
+                          MaterialButton(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Animons(),
+                                ),
+                            );
+                            },
+                            child: Obx(() {
+                              return Image.network(
+                                  '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}');
+                            }))
+                            ,
+                          Obx(() {
+                            return Text(
+                              '${profileController.selectedProfile.value?.name}님 어서오세요',
+                              style: const TextStyle(fontSize: 16),
+                            );
+                          }),
+                        ],
+                      );
+                    }
+                  },
+                )
               ],
             )
           ],
