@@ -8,6 +8,7 @@ import com.ssafy.eoullim.model.entity.UserEntity;
 import com.ssafy.eoullim.repository.jpa.FcmTokenRepository;
 import com.ssafy.eoullim.service.FcmTokenService;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,9 +56,17 @@ public class FcmTokenServiceImpl implements FcmTokenService {
 
   @Override
   @Transactional
-  public List<String> getFcmTokenOfFriend(Long friendId) {
+  public Set<String> getFcmTokenOfFriend(Long friendId) {
     return fcmTokenRepository.findAllByChildId(friendId).stream()
         .map(FcmTokenEntity::getToken)
-        .collect(Collectors.toList());
+        .collect(Collectors.toSet());
+  }
+
+  @Override
+  @Transactional
+  public Set<String> getFcmTokenOfParent(Long userId) {
+    return fcmTokenRepository.findAllByUserId(userId).stream()
+            .map(FcmTokenEntity::getToken)
+            .collect(Collectors.toSet());
   }
 }

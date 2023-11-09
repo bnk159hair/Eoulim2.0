@@ -37,12 +37,12 @@ public class ChildEntity extends BaseEntity {
     private Short grade;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "animon_id")
+    @JoinColumn(name = "animon_id", nullable = false)
     private AnimonEntity profileAnimon;
 
     @Builder

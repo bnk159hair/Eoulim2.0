@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MatchServiceImpl implements MatchService {
   @Getter
   private final RecordService recordService;
-  private final AlarmService alarmservice;
+//  private final AlarmService alarmservice;
   private final ChildService childService;
   private final FirebaseMessagingService firebaseMessagingService;
   private final FcmTokenService fcmTokenService;
@@ -194,35 +194,48 @@ public class MatchServiceImpl implements MatchService {
       Long friendId,
       String existSessionId,
       Authentication authentication) {
-    // Child ID가 현재 User의 Child가 맞는지 체크
+    // child, friend
     final var child = childService.getChild(childId, authentication);
+    final var friend = childService.getChildWithNoPermission(friendId);
 
-    // 존재 하는 방이 없을 때
+    // 초대할 때
     if (existSessionId == null) {
       // 없는거 확인했으면 세로운 세션 Id 만들기
       Match result = createNewMatch(child.getId(), false);
 
-      // 알림 서비스
+      // sse 알림 서비스
 //      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
 //      alarmservice.send(friendId, alarm);
 
-      // push 서비스
-      List<String> targetTokenList = fcmTokenService.getFcmTokenOfFriend(friendId);
-      log.info(targetTokenList.toString());
-      if (targetTokenList.isEmpty())
+      // fcm push 서비스
+      Set<String> friendTokenSet = fcmTokenService.getFcmTokenOfFriend(friendId);
+      Set<String> parentTokenSet = fcmTokenService.getFcmTokenOfParent(friend.getUser().getId());
+      // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기
+      parentTokenSet.removeAll(friendTokenSet);
+      // 친구가 오프라인 인 경우
+      if (friendTokenSet.isEmpty())
         throw new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUND, "친구가 오프라인입니다.");
-      for (String targetToken : targetTokenList) {
+      // 친구에게 초대 알림 보내기
+      for (String targetToken : friendTokenSet) {
         try {
           log.info("targetToken "+ targetToken);
-          firebaseMessagingService.sendMessageTo(targetToken, result.getSessionId(), child.getName());
+          firebaseMessagingService.invite(targetToken, result.getSessionId(), child, friend);
         } catch (IOException e) {
-          log.info("예외발생");
+          throw new RuntimeException(e);
+        }
+      }
+      // 친구 부모님께 알림 보내기
+      for (String targetToken : parentTokenSet) {
+        try {
+          log.info("targetToken "+ targetToken);
+          firebaseMessagingService.invite(targetToken, null, child, friend);
+        } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
       return result;
     }
-    // existSessionId is not null
+    // 초대 받았을 때
     else {
       String sessionId = existSessionId;
       Room existingRoom = mapRooms.get(sessionId);

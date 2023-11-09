@@ -14,4 +14,6 @@ public interface FcmTokenRepository extends JpaRepository<FcmTokenEntity, Long> 
   FcmTokenEntity findByUserIdAndToken(@NonNull Long userId, @NonNull String token);
 
   List<FcmTokenEntity> findAllByChildId(@NonNull Long childId);
+
+  List<FcmTokenEntity> findAllByUserId(@NonNull Long userId);
 }
