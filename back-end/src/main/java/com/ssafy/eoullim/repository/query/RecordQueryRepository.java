@@ -34,7 +34,7 @@ public class RecordQueryRepository {
     public Record findRecordById(Long id){
         return queryFactory.select(Projections.fields(Record.class,
                         recordEntity.id, recordEntity.createdAt.as("createTime"), recordEntity.videoPath,
-                        recordEntity.participant.name, recordEntity.participant.school, recordEntity.participant.profileAnimon.name))
+                        recordEntity.participant.name, recordEntity.participant.school, recordEntity.participant.profileAnimon.name.as("animonName")))
                 .from(recordEntity)
                 .join(childEntity).on(childEntity.id.eq(recordEntity.participant.id))
                 .where(recordEntity.id.eq(id))
