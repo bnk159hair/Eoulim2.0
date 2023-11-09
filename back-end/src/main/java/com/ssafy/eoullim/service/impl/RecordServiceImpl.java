@@ -166,7 +166,7 @@ public class RecordServiceImpl implements RecordService {
             List<Integer> order = room.getGuideSeq();
             List<String> timeline = room.getTimeline();
             for(int idx=0; idx< order.size(); idx++){
-                GuideEntity guide = guideRepository.findById(order.get(idx).longValue()).orElseThrow();
+                GuideEntity guide = guideRepository.findById(order.get(idx)).orElseThrow();
                 RecordGuideEntity recordGuide = RecordGuideEntity.builder().record(record).guide(guide).sequence(idx).timeline(timeline.get(idx)).build();
                 recordGuideRepository.save(recordGuide);
             }
