@@ -42,7 +42,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
   }
 
   private String makeMessage(String targetToken, String sessionId, String childName) throws JsonProcessingException {
-    String title = childName + "님이 보낸 초대장이 도착했습니다.";
+    String title = childName + " 님이 보낸 초대장이 도착했습니다.";
     String body = "세션 ID: " + sessionId;
     FcmMessage fcmMessage =
         FcmMessage.builder()

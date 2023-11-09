@@ -17,10 +17,10 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class AlarmController {
 
-    private final AlarmService alarmService;
+//    private final AlarmService alarmService;
 
-    @GetMapping(value = "/subscribe/{childId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(@PathVariable @NotBlank Long childId) {
-        return alarmService.subscribe(childId);
-    }
+//    @GetMapping(value = "/subscribe/{childId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+//    public SseEmitter subscribe(@PathVariable @NotBlank Long childId) {
+//        return alarmService.subscribe(childId);
+//    }
 }

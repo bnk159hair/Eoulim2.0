@@ -2,7 +2,6 @@ package com.ssafy.eoullim.service.impl;
 
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
-import com.ssafy.eoullim.model.Alarm;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.service.*;
@@ -209,7 +208,8 @@ public class MatchServiceImpl implements MatchService {
 
       // push 서비스
       List<String> targetTokenList = fcmTokenService.getFcmTokenOfFriend(friendId);
-      if (targetTokenList == null)
+      log.info(targetTokenList.toString());
+      if (targetTokenList.isEmpty())
         throw new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUND, "친구가 오프라인입니다.");
       for (String targetToken : targetTokenList) {
         try {
