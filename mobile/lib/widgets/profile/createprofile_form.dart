@@ -120,7 +120,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                                       child: TextButton(
                                         child: const Text('확인'),
                                         onPressed: () {
-                                          Navigator.of(context).pop();
+                                          Navigator.of(ctx).pop();
                                         },
                                       ),
                                     ),
