@@ -172,7 +172,7 @@ List<Widget> _buildScreens() {
   return [
     const Enter(),
     Friends(),
-    const Settings(),
+    Settings(),
   ];
 }
 
