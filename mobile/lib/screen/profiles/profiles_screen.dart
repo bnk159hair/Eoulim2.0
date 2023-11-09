@@ -7,11 +7,17 @@ import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/model/response_models/get_profilelist.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/login_screen.dart';
+import 'package:mobile/screen/profiles/change_password.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/screen/record_screen.dart';
+import 'package:mobile/util/logout_logic.dart';
 
+enum MenuOption {
+  changePassword,
+  logout,
+}
 
 class Profiles extends StatefulWidget {
   List<Profile> profiles = List.empty();
@@ -30,12 +36,6 @@ class _ProfilesState extends State<Profiles> {
     _getProfiles();
   }
 
-  void Logout() async {
-    final storage = new FlutterSecureStorage();
-    await storage.delete(key: 'Authkey');
-    Get.offAll(() => Login());
-    }
-
   Future<void> _getProfiles() async {
     getProfiles result = await widget.apiProfile.getprofilesAPI();
     if (result.code == '200') {
@@ -45,6 +45,7 @@ class _ProfilesState extends State<Profiles> {
     } else if (result.code == '401') {
       Logout();
     } else {
+      if (!mounted) return;
       showDialog(
         context: context, // 이 부분에 정의가 필요
         builder: (BuildContext context) {
@@ -90,7 +91,8 @@ class _CarouselWidgetState extends State<CarouselWidget> {
   String? fcmToken;
   generalResponse? profileloginAuth;
   ApiprofileLogin apiProfileLogin = ApiprofileLogin();
-  
+  MenuOption? selectedMenu;
+
   @override
   void initState() {
     super.initState();
@@ -98,7 +100,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
   }
 
   Future<void> _initializeFCMToken() async {
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     fcmToken = (await storage.read(key: 'fcmToken'));
   }
 
@@ -108,47 +110,98 @@ class _CarouselWidgetState extends State<CarouselWidget> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/login.gif"), 
+                image: AssetImage("assets/login.gif"),
                 fit: BoxFit.cover,
               ),
             ),
             child: Column(
               children: [
                 AppBar(
-                  elevation: 0, 
-                  backgroundColor: Colors.transparent, 
+                  elevation: 0,
+                  backgroundColor: Colors.transparent,
                   leading: IconButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('알림목록으로 이동'),
-                          duration: Duration(milliseconds: 1500),
-                        ),
-                      );
-                    },
+                    onPressed: () {},
                     icon: const Icon(
                       Icons.notifications_none,
-                      color: Color(0xff000000),
                     ),
                   ),
                   actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CreateProfile(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: PopupMenuButton<MenuOption>(
+                        color: Colors.transparent,
+                        initialValue: selectedMenu,
+                        onSelected: (MenuOption item) {
+                          setState(() {
+                            selectedMenu = item;
+                          });
+                          if (selectedMenu == MenuOption.changePassword) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ChangePassword(),
+                              ),
+                            );
+                          } else {
+                            return Logout();
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem(
+                            value: MenuOption.changePassword,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                // Add your background image or color here
+                                image: DecorationImage(
+                                  image: AssetImage('assets/dialog.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: const ListTile(
+                                trailing: Icon(
+                                  Icons.change_circle_outlined,
+                                ),
+                                title: Text(
+                                  '비밀번호 수정',
+                                ),
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                      child: const Text(
-                        "계정 설정",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Color(0xff000000),
+                          PopupMenuItem(
+                            value: MenuOption.logout,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                // Add your background image or color here
+                                image: DecorationImage(
+                                  image: AssetImage('assets/dialog.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              child: const ListTile(
+                                trailing: Icon(
+                                  Icons.login_rounded,
+                                ),
+                                title: Text(
+                                  ' 로그아웃',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        position: PopupMenuPosition.under,
+                        child: const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(8),
+                            child: Text(
+                              '설정',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -158,120 +211,134 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                   child: Center(
                     child: widget.profiles.isEmpty
                         ? GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CreateProfile(),
-                              ),
-                            );
-                          },
-                          child: Image.asset(
-                            'assets/createprofile.png',
-                            width: 370,
-                          ),
-                        )
-                        : CarouselSlider(
-                      carouselController: carouselController,
-                      items: widget.profiles.map((profile) {
-                        return GestureDetector(
-                          onTap: () async {
-                            profileloginAuth = await apiProfileLogin.postProfileLoginAPI(
-                                ProfileLoginRequestModel(childId: profile.id, fcmToken: fcmToken ?? ""));
-                                Navigator.push(
+                            onTap: () {
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Home(),
+                                  builder: (context) => const CreateProfile(),
                                 ),
-                            );
-                          },
-                          child: Stack(
-                            children: [
-                              Image.network(
-                                '${profile.profileAnimon?.bodyImagePath}',
-                                fit: BoxFit.fitHeight,
-                                height: 400,
-                                width: 400,
-                                alignment: Alignment.center,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/dialog.png',
-                                      width: 170,
+                              );
+                            },
+                            child: Image.asset(
+                              'assets/createprofile.png',
+                              width: 370,
+                            ),
+                          )
+                        : CarouselSlider(
+                            carouselController: carouselController,
+                            items: widget.profiles.map((profile) {
+                              return GestureDetector(
+                                onTap: () async {
+                                  profileloginAuth =
+                                      await apiProfileLogin.postProfileLoginAPI(
+                                    ProfileLoginRequestModel(
+                                      childId: profile.id,
+                                      fcmToken: fcmToken ?? "",
                                     ),
-                                    Text(
-                                      '${profile.name}',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: Color(0xff000000),
+                                  );
+                                  if (!mounted) return;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const Home(),
+                                    ),
+                                  );
+                                },
+                                child: Stack(
+                                  children: [
+                                    Image.network(
+                                      '${profile.profileAnimon?.bodyImagePath}',
+                                      fit: BoxFit.fitHeight,
+                                      height: 400,
+                                      width: 400,
+                                      alignment: Alignment.center,
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Image.asset(
+                                            'assets/dialog.png',
+                                            width: 170,
+                                          ),
+                                          Text(
+                                            '${profile.name}',
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              color: Color(0xff000000),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          const storage =
+                                              FlutterSecureStorage();
+                                          await storage.write(
+                                            key: 'childId',
+                                            value: profile.id.toString(),
+                                          );
+                                          if (!mounted) return;
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const Record(),
+                                            ),
+                                          );
+                                        },
+                                        child: Container(
+                                          width: 100,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.red,
+                                          ),
+                                          child: const Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(
+                                                Icons.videocam,
+                                                size: 30,
+                                                color: Colors.white,
+                                              ),
+                                              Text(
+                                                '녹화영상',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: GestureDetector(
-                                  onTap: ()async {
-                                    final storage = FlutterSecureStorage();
-                                    await storage.write(key: 'childId', value: profile.id.toString());
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => Record(),
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 100,
-                                    height: 40,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.red,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.videocam,
-                                          size: 30,
-                                          color: Colors.white,
-                                        ),
-                                        Text(
-                                          '녹화영상',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                              );
+                            }).toList(),
+                            options: CarouselOptions(
+                              height: 350,
+                              aspectRatio: 16 / 9,
+                              viewportFraction: 0.8,
+                              initialPage: 0,
+                              enableInfiniteScroll: false,
+                              reverse: false,
+                              autoPlay: false,
+                              enlargeCenterPage: true,
+                              onPageChanged: (index, reason) {},
+                              scrollDirection: Axis.horizontal,
+                            ),
                           ),
-                        );
-                      }).toList(),
-                      options: CarouselOptions(
-                        height: 350,
-                        aspectRatio: 16 / 9,
-                        viewportFraction: 0.8,
-                        initialPage: 0,
-                        enableInfiniteScroll: false,
-                        reverse: false,
-                        autoPlay: false,
-                        enlargeCenterPage: true,
-                        onPageChanged: (index, reason) {},
-                        scrollDirection: Axis.horizontal,
-                      ),
-                    ),
                   ),
                 ),
               ],
