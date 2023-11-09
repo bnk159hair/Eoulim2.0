@@ -15,7 +15,7 @@ var backButtonPressedOnce = false;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
-  
+
   @override
   _HomeState createState() => _HomeState();
 }
@@ -30,11 +30,9 @@ class _HomeState extends State<Home> {
     _getProfileInfo();
   }
 
-
   Future<void> _getProfileInfo() async {
     getProfileinfo? result = await apiProfileinfo.getprofileAPI();
     if (result.code == '200') {
-      
     } else {
       Logout();
     }
@@ -42,7 +40,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
       onWillPop: () async {
         // 첫 번째 뒤로가기 버튼 누를 때
@@ -67,7 +64,6 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          
           leading: IconButton(
             onPressed: () {
               Navigator.push(
@@ -87,30 +83,66 @@ class _HomeState extends State<Home> {
             Row(
               children: [
                 MaterialButton(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Hello There!'),
-                        duration: Duration(milliseconds: 1500),
-                      ),
-                    );
-                  },
-                  child: Image.asset('assets/bear.png'),
-                ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                    ),
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Hello There!'),
+                          duration: Duration(milliseconds: 1500),
+                        ),
+                      );
+                    },
+                    child: Obx(() {
+                      return Image.network(
+                          '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}');
+                    })),
                 Obx(() {
-              return Text(
-                '${profileController.selectedProfile.value?.name}님 어서오세요',
-                style: TextStyle(fontSize: 16),
-              );
-            }),
+                  return Text(
+                    '${profileController.selectedProfile.value?.name}님 어서오세요',
+                    style: const TextStyle(fontSize: 16),
+                  );
+                }),
+                // FutureBuilder<getProfileinfo?>(
+                //   future: apiProfileinfo.getprofileAPI(),
+                //   builder: (context, snapshot) {
+                //     if (snapshot.connectionState == ConnectionState.waiting) {
+                //       return const CircularProgressIndicator(
+                //         color: Colors.white,
+                //       ); // 데이터를 기다릴 동안 로딩 표시
+                //     } else if (snapshot.hasError) {
+                //       return Text('에러 발생: ${snapshot.error}');
+                //     } else if (!snapshot.hasData) {
+                //       return const Text('데이터 없음');
+                //     } else {
+                //       final profileInfo = snapshot.data!;
+                //       print('여기서 호출중');
+                //       print(profileInfo.profile?.profileAnimon?.bodyImagePath);
+                //       // final imagePath = profileInfo.profileAnimon?.bodyImagePath;
+
+                //       return Row(
+                //         children: [
+                //           Obx(() {
+                //             return Image.network(
+                //               '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}',
+                //             );
+                //           }),
+                //           Obx(() {
+                //             return Text(
+                //               '${profileController.selectedProfile.value?.name}님 어서오세요',
+                //               style: const TextStyle(fontSize: 16),
+                //             );
+                //           }),
+                //         ],
+                //       );
+                //     }
+                //   },
+                // )
               ],
             )
           ],
-          
           backgroundColor: Colors.transparent,
           elevation: 0.0,
           toolbarHeight: 70.0,
@@ -121,14 +153,13 @@ class _HomeState extends State<Home> {
   }
 }
 
-
 PersistentTabController _controller = PersistentTabController(initialIndex: 0);
 
 List<Widget> _buildScreens() {
   return [
-    Enter(),
+    const Enter(),
     Friends(),
-    Settings(),
+    const Settings(),
   ];
 }
 
@@ -197,10 +228,4 @@ class HomeBottomNavBar extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Home(),
-  ));
 }
