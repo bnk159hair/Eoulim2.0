@@ -17,7 +17,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName,
   const [, setSessionToken] = useRecoilState(InvitationToken);
   const [, setInvitationId] = useRecoilState(InvitationSessionId);
 
-  const IMGURL = `/${animon}.png`;
+  const IMGURL = `${animon}`;
   const navigate = useNavigate();
 
   const childId = useRecoilValue(Profilekey);
