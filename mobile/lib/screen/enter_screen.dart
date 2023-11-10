@@ -31,7 +31,7 @@ class _EnterState extends State<Enter> {
             children: [
               Obx(() {
                             return Image.network(
-                              '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}',
+                             '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
                             );
                           }),
               const SizedBox(
