@@ -34,22 +34,22 @@ import javax.validation.Valid;
 public class MatchController {
   private final MatchService matchService;
 
-//  @PostMapping("/random/start")
-//  @ResponseStatus(HttpStatus.OK)
-//  @Transactional
-//  public synchronized SuccessResponse<?> startRandom(
-//      @Valid @RequestBody MatchStartRequest request, Authentication authentication) {
-//    Match result = matchService.startRandom(request.getChildId(), authentication);
-//    return new SuccessResponse<>(result);
-//  }
-
-
-  @MessageMapping("/random/start")        // client가 publish한 Msg Mapping
-  public SuccessResponse<?> startRandom(MatchStartRequest request) {
-    matchService.startRandom_01(request);
-
-    return new SuccessResponse<>(HttpStatus.OK);
+  @PostMapping("/random/start")
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  public synchronized SuccessResponse<?> startRandom(
+      @Valid @RequestBody MatchStartRequest request, Authentication authentication) {
+    Match result = matchService.startRandom(request.getChildId(), authentication);
+    return new SuccessResponse<>(result);
   }
+
+
+//  @MessageMapping("/random/start")        // client가 publish한 Msg Mapping
+//  public SuccessResponse<?> startRandom(MatchStartRequest request) {
+//    matchService.startRandom_01(request);
+//
+//    return new SuccessResponse<>(HttpStatus.OK);
+//  }
 
   @PostMapping("/random/stop")
   @ResponseStatus(HttpStatus.OK)
