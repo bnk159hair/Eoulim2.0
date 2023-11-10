@@ -7,17 +7,17 @@ export const Mobile = () => {
   useEffect(() => {
     // @ts-ignore
     window.changePage = message => {
-      const data = JSON.parse(message);
-      console.log(data);
-      if (data.invitation === false) {
+      console.log(`invitation: ${message.invitation}, childId: ${message.childId}`);
+      if (message.invitation === false) {
         console.log('모바일에서 새 친구 세션으로 이동합니다.');
-        navigate('/session', { state: { childId: data.childId, invitation: false } });
-      } else if (data.invitation === true) {
+        navigate('/session', { state: { childId: message.childId, invitation: false } });
+      } else if (message.invitation === true) {
         console.log('모바일에서 내 친구 세션으로 이동합니다.');
-        navigate('/session', { state: { childId: data.childId, invitation: true } });
+        navigate('/session', { state: { childId: message.childId, invitation: true } });
       } else {
         console.log('모바일에서 웹 세션으로 접속에 실패하였습니다.');
         console.log(message);
+        console.log(typeof message);
       }
     };
   }, []);
