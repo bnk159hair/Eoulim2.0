@@ -11,7 +11,12 @@ import RecordPage from './pages/RecordPage/RecordPage';
 import BackgroundMusic from './components/main/BackgroundMusic';
 import FireBase from './components/alarm/Alarm';
 
+import { generateSignedUrl } from './aws/s3Client';
+
 function App() {
+  const tmp = generateSignedUrl('body/cat_body.png');
+  console.log(tmp);
+
   return (
     <RecoilRoot>
       <Router>

@@ -4,8 +4,11 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import checker from 'vite-plugin-checker';
 import reactRefresh from '@vitejs/plugin-react-refresh';
 import * as path from 'node:path';
+import dotenv from 'dotenv'; // dotenv 라이브러리 추가
 
-// https://vitejs.dev/config/
+// .env 파일을 로드
+dotenv.config();
+
 export default defineConfig({
   build: {
     outDir: 'build',
