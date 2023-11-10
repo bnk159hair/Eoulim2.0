@@ -96,7 +96,7 @@ const MainPage: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
-  const IMGURL = `/${profile.profileAnimon.name}.png`;
+  const IMGURL = `${profile.profileAnimon.bodyImagePath}`;
   // const IMGURL = `/dog.png`;
 
   const audioObjRef = useRef(new Audio(`${S3_SOUND_BASE_URL}/guide/main.mp3`));
