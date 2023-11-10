@@ -49,7 +49,6 @@ public class ChildServiceImpl implements ChildService {
     Child child = getChildById(childId);
     if (!child.getUser().getId().equals(user.getId()))
       throw new EoullimApplicationException(ErrorCode.FORBIDDEN_NO_PERMISSION);
-
     return child;
   }
 
