@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:mobile/controller/profile_select.dart';
 import 'package:mobile/screen/session_screen.dart';
+
 
 class Enter extends StatefulWidget {
   const Enter({super.key});
@@ -9,6 +12,8 @@ class Enter extends StatefulWidget {
 }
 
 class _EnterState extends State<Enter> {
+  final ProfileController profileController = Get.find<ProfileController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +29,11 @@ class _EnterState extends State<Enter> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/bear.png'),
+              Obx(() {
+                            return Image.network(
+                             '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
+                            );
+                          }),
               const SizedBox(
                 height: 50,
               ),

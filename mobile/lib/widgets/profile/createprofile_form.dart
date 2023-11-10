@@ -24,8 +24,9 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
   String gender = 'M';
   int? grade = 1;
   generalResponse? profileCreate;
-  ApiCreateprofile apiProfile = ApiCreateprofile();
   bool isSelected = false;
+  bool isClicked = false;
+  bool isValidSchool = false;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +107,79 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                       width: 100,
                       height: 58,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          if (school.isEmpty) {
+                            return showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext ctx) {
+                                return AlertDialog(
+                                  content: const Text('학교명을 입력해 주세요!'),
+                                  actions: [
+                                    Center(
+                                      child: TextButton(
+                                        child: const Text('확인'),
+                                        onPressed: () {
+                                          Navigator.of(ctx).pop();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            final response =
+                                await ApiCreateprofile.postCheckShool(school);
+                            if (response.data) {
+                              if (!mounted) return;
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext ctx) {
+                                  return AlertDialog(
+                                    content: const Text('확인되었습니다!'),
+                                    actions: [
+                                      Center(
+                                        child: TextButton(
+                                          child: const Text('확인'),
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                              setState(() {
+                                isClicked = true;
+                                isValidSchool = response.data;
+                              });
+                            } else {
+                              if (!mounted) return;
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext ctx) {
+                                  return AlertDialog(
+                                    content: const Text('올바른 학교명을 입력해 주세요!'),
+                                    actions: [
+                                      Center(
+                                        child: TextButton(
+                                          child: const Text('확인'),
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
@@ -234,7 +307,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
             ),
             onPressed: () async {
               if (name.isEmpty || school.isEmpty || !isSelected) {
-                showDialog(
+                return showDialog(
                   context: context,
                   barrierDismissible: false,
                   builder: (BuildContext ctx) {
@@ -253,63 +326,87 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                     );
                   },
                 );
-              } else {
-                createprofileFormkey.currentState?.save();
-                profileCreate = await apiProfile.createprofile(
-                  CreateprofileRequestModel(
-                    name: name,
-                    birth: birth.toString().split(' ')[0],
-                    gender: gender,
-                    school: school,
-                    grade: grade,
-                  ),
+              }
+
+              if (!isValidSchool) {
+                return showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext ctx) {
+                    return AlertDialog(
+                      content: const Text('학교를 확인해 주세요'),
+                      actions: [
+                        Center(
+                          child: TextButton(
+                            child: const Text('확인'),
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 );
-                if (profileCreate?.status == 'CREATED') {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext ctx) {
-                      return AlertDialog(
-                        content: const Text('프로필 생성이 완료되었습니다'),
-                        actions: [
-                          Center(
-                            child: TextButton(
-                              child: const Text('프로필 선택창'),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Profiles(),
-                                  ),
-                                );
-                              },
-                            ),
+              }
+
+              createprofileFormkey.currentState?.save();
+              profileCreate = await ApiCreateprofile.createprofile(
+                CreateprofileRequestModel(
+                  name: name,
+                  birth: birth.toString().split(' ')[0],
+                  gender: gender,
+                  school: school,
+                  grade: grade,
+                ),
+              );
+              if (profileCreate?.status == 'CREATED') {
+                if (!mounted) return;
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext ctx) {
+                    return AlertDialog(
+                      content: const Text('프로필 생성이 완료되었습니다'),
+                      actions: [
+                        Center(
+                          child: TextButton(
+                            child: const Text('프로필 선택창'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Profiles(),
+                                ),
+                              );
+                            },
                           ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext ctx) {
-                      return AlertDialog(
-                        content: const Text('알 수 없는 오류'),
-                        actions: [
-                          Center(
-                            child: TextButton(
-                              child: const Text('확인'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                if (!mounted) return;
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext ctx) {
+                    return AlertDialog(
+                      content: const Text('알 수 없는 오류'),
+                      actions: [
+                        Center(
+                          child: TextButton(
+                            child: const Text('확인'),
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                            },
                           ),
-                        ],
-                      );
-                    },
-                  );
-                }
+                        ),
+                      ],
+                    );
+                  },
+                );
               }
             },
             child: const Text(
