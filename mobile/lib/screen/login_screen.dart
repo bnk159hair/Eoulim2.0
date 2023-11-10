@@ -165,7 +165,7 @@ class _LoginScreenState extends State<Login> {
                                       child: TextButton(
                                           child: const Text('확인'),
                                           onPressed: () {
-                                            Navigator.of(context).pop();
+                                            Navigator.of(ctx).pop();
                                           }))
                                 ],
                               );

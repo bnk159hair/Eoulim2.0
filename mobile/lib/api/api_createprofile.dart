@@ -3,7 +3,7 @@ import 'package:mobile/model/response_models/general_response.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile/model/response_models/post_check_school.dart';
+import 'package:mobile/model/response_models/post_check_info.dart';
 
 const baseUrl = 'https://k9c103.p.ssafy.io/api/v1';
 const createChildPath = 'children';
@@ -43,7 +43,7 @@ class ApiCreateprofile {
     }
   }
 
-  static Future<PostCheckSchool> postCheckShool(String school) async {
+  static Future<PostCheckInfo> postCheckShool(String school) async {
     const storage = FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
     final response = await http.post(
@@ -56,6 +56,6 @@ class ApiCreateprofile {
         {"keyword": school},
       ),
     );
-    return PostCheckSchool.fromJson(jsonDecode(response.body));
+    return PostCheckInfo.fromJson(jsonDecode(response.body));
   }
 }

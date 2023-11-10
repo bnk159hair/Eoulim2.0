@@ -111,7 +111,7 @@ class _FriendsState extends State<Friends> {
                   children: [
                     Center(
                       child: Image.network(
-                        '${widget.friends[index].profileAnimon?.bodyImagePath}',
+                        '${widget.friends[index].profileAnimon?.bodyImagePath ?? ''}',
                         fit: BoxFit.cover,
                         alignment: Alignment.center,
                       ),

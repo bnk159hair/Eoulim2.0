@@ -138,13 +138,14 @@ class _HomeState extends State<Home> {
                             );
                             },
                             child: Obx(() {
+        
                               return Image.network(
-                                  '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}');
+                                  '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}');
                             }))
                             ,
                           Obx(() {
                             return Text(
-                              '${profileController.selectedProfile.value?.name}님 어서오세요',
+                              '${profileController.selectedProfile.value?.name ?? ''}님 어서오세요',
                               style: const TextStyle(fontSize: 16),
                             );
                           }),

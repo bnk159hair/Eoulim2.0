@@ -109,7 +109,7 @@ class _AnimonState extends State<Animons> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Obx(() => Image.network(
-                                '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath}',
+                                '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
                                 width: 100,
                                 height: 100,) 
                               ),
