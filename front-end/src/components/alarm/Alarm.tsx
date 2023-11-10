@@ -12,8 +12,8 @@ export const FireBase = () => {
   const [userName, setUserName] = useState('');
 
   isSupported().then(response => {
-    if (response) {
-      return null;
+    if (response === false) {
+      return <div style={{ visibility: 'hidden' }} />;
     }
   });
 
