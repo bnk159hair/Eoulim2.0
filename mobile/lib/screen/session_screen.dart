@@ -69,11 +69,10 @@ class _SessionState extends State<Session> {
         NavigationDelegate(
           onProgress: (int progress) {
             _controller.currentUrl().then((result) => {print(result)});
-            print('profileId: $childId');
-            sendChildId();
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) {
+            sendChildId();
             debugPrint('Page Finished');
           },
           onWebResourceError: (WebResourceError error) {
