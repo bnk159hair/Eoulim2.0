@@ -20,12 +20,12 @@ import {
 import { Profile, Profilekey } from '../../atoms/Profile';
 import { tokenState } from '../../atoms/Auth';
 import AnimonModal from '../../components/main/AnimonModal';
-import AlarmModal from '../../components/main/AlarmModal';
+import AlarmModal from '../../components/alarm/AlarmModal';
 import { S3_SOUND_BASE_URL } from '../../apis/urls';
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
-  const profileId = useRecoilValue(Profilekey);
+  const childId = useRecoilValue(Profilekey);
   const token = useRecoilValue(tokenState);
   const fcmToken = useRecoilValue(fcmTokenState);
   const [profile, setProfile] = useRecoilState(Profile);
@@ -34,7 +34,7 @@ const MainPage: React.FC = () => {
 
   useEffect(() => {
     getChild();
-  }, [profileId, token, navigate]);
+  }, [childId, token, navigate]);
 
   const getNewFriend = () => {
     navigate('/session', { state: { invitation: false } });
@@ -50,7 +50,7 @@ const MainPage: React.FC = () => {
 
   const getChild = () => {
     getChildInfo({
-      id: profileId,
+      id: childId,
       onSuccess: data => {
         setProfile(data);
         console.log('프로필 가져오기에 성공하였습니다.');
@@ -66,9 +66,9 @@ const MainPage: React.FC = () => {
     let childLoginoutData;
 
     if (fcmToken) {
-      childLoginoutData = { childId: profileId, fcmToken };
+      childLoginoutData = { childId, fcmToken };
     } else {
-      childLoginoutData = { childId: profileId, fcmToken: 'null' };
+      childLoginoutData = { childId, fcmToken: 'null' };
     }
 
     childLogout({

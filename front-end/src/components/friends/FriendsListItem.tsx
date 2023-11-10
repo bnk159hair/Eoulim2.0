@@ -1,7 +1,8 @@
 import React from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import { getInvitationToken } from 'apis/openViduApis';
+import { invite } from 'apis/openViduApis';
+import inputAlert from 'utils/inputAlert';
 import { FriendCard, FriendImg, FrinedInfo, InviteButton } from './FriendsListItemStyles';
 import { InvitationToken, InvitationSessionId } from '../../atoms/Ivitation';
 import { Profilekey } from '../../atoms/Profile';
@@ -23,7 +24,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName,
 
   const handleInvite = () => {
     const invitationSessionData = { childId, friendId };
-    getInvitationToken({
+    invite({
       invitationSessionData,
       onSuccess: data => {
         const { sessionId, token } = data;
@@ -33,7 +34,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName,
         navigate(`/session`, { state: { invitation: true } });
       },
       onError: () => {
-        console.log('초대에 실패하였습니다.');
+        inputAlert('상대방이 현재 온라인 상태가 아닙니다.');
       },
     });
   };

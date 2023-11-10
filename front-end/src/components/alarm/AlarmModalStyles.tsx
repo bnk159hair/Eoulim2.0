@@ -1,8 +1,8 @@
 import styled from 'styled-components';
-import box from '../../assets/box/woodbox.jpg'
-import accept from '../../assets/ecc/accept.png'
-import refuse from '../../assets/ecc/refuse.png'
-import message from '../../assets/box/alam.png'
+import box from '../../assets/box/woodbox.jpg';
+import accept from '../../assets/ecc/accept.png';
+import refuse from '../../assets/ecc/refuse.png';
+import message from '../../assets/box/alam.png';
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -18,7 +18,6 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
-  
   width: 500px;
   height: 300px;
   // background-color: white;
@@ -38,22 +37,22 @@ export const Accept = styled.div`
   height: 150px;
   background-image: url(${accept});
   background-size: cover;
-  cursor:pointer;
+  cursor: pointer;
   &:hover {
     transform: scale(1.25);
   }
-` 
+`;
 
 export const Refuse = styled.div`
   width: 150px;
   height: 150px;
   background-image: url(${refuse});
   background-size: cover;
-  cursor:pointer;
+  cursor: pointer;
   &:hover {
     transform: scale(1.25);
   }
-` 
+`;
 
 export const FlexContent = styled.div`
   width: 500px;
@@ -61,8 +60,7 @@ export const FlexContent = styled.div`
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-
-`
+`;
 export const AlarmMessage = styled.div`
   width: 400px;
   height: 60px;
@@ -73,4 +71,4 @@ export const AlarmMessage = styled.div`
   background-size: cover;
   font-family: 'HakgyoansimBunpilR';
   font-size: 30px;
-`
+`;

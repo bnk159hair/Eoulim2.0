@@ -47,7 +47,6 @@ const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId })
     getRecordInfo({
       recordId,
       onSuccess: data => {
-        console.log(data);
         setRecordInfo(data);
       },
       onError: () => {
@@ -101,7 +100,6 @@ const VideoModal: React.FC<VideoModalProps> = ({ onClose, videoPath, recordId })
         info.push({ content, time, second: Number(timeline) / 1000 });
       }
     });
-    console.log(info);
   }
 
   const progressHandler = (changeState: any) => {

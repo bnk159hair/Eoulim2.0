@@ -1,12 +1,7 @@
 import { OpenVidu } from 'openvidu-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import {
-  getUserInfo,
-  getToken,
-  getInvitationToken,
-  destroyInvitationSession,
-} from '../apis/openViduApis';
+import { getUserInfo, getToken, invite, destroyInvitationSession } from '../apis/openViduApis';
 import { SessionId, guideSeq } from '../atoms/Session';
 import { InvitationSessionId, InvitationToken } from '../atoms/Ivitation';
 
@@ -180,7 +175,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
         });
     } else if (userId && sessionId && sessionToken === '') {
       const invitationSessionData = { childId: userId, sessionId };
-      getInvitationToken({
+      invite({
         invitationSessionData,
         onSuccess: data => {
           const { token, sessionId } = data;

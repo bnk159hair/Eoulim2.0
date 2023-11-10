@@ -68,7 +68,7 @@ export const getToken = async ({ userData, onSuccess, onError }: GetTokenParams)
   }
 };
 
-export const getInvitationToken = async ({
+export const invite = async ({
   invitationSessionData,
   onSuccess,
   onError,
@@ -76,9 +76,12 @@ export const getInvitationToken = async ({
   try {
     const response = await instance.post(`/meetings/friend/start`, invitationSessionData);
     onSuccess(response.data.data);
-  } catch (error) {
-    console.log(error);
-    onError();
+  } catch (error: any) {
+    if (error.response.data.status === '404 NOT_FOUND') {
+      onError();
+    } else {
+      console.log('초대에 실패했습니다.', error);
+    }
   }
 };
 

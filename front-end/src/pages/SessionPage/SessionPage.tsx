@@ -41,11 +41,11 @@ interface FriendsProfile {
 const SessionPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const { invitation } = state;
   const [open, setOpen] = useState(false);
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-  const [invitation] = useState(state.invitation);
 
   const publisherId = useRecoilValue(Profilekey);
   const [subscriberId, setSubscriberId] = useState(0);
@@ -90,8 +90,6 @@ const SessionPage = () => {
   const sessionOver = () => {
     setOpen(isTrue);
   };
-
-  console.log('초대 세션 : ', state.invitation);
 
   const [client, setClient] = useState<Client | null>(null);
 

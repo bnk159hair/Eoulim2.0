@@ -3,7 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { fcmTokenState } from 'atoms/Firebase';
 import { useRecoilState } from 'recoil';
-import AlarmModal from 'components/main/AlarmModal';
+import AlarmModal from 'components/alarm/AlarmModal';
 
 export const FireBase = () => {
   const [fcmToken, setFcmToken] = useRecoilState(fcmTokenState);
