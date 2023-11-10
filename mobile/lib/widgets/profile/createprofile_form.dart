@@ -373,6 +373,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                           child: TextButton(
                             child: const Text('프로필 선택창'),
                             onPressed: () {
+                              Navigator.of(ctx).pop();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
