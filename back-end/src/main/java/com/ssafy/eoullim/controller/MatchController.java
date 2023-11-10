@@ -3,6 +3,7 @@ package com.ssafy.eoullim.controller;
 import com.ssafy.eoullim.dto.request.MatchFriendRequest;
 import com.ssafy.eoullim.dto.request.MatchStartRequest;
 import com.ssafy.eoullim.dto.request.MatchStopRequest;
+import com.ssafy.eoullim.dto.request.WSAnimonOnOffRequest;
 import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.service.MatchService;
@@ -17,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +34,21 @@ import javax.validation.Valid;
 public class MatchController {
   private final MatchService matchService;
 
-  @PostMapping("/random/start")
-  @ResponseStatus(HttpStatus.OK)
-  @Transactional
-  public synchronized SuccessResponse<?> startRandom(
-      @Valid @RequestBody MatchStartRequest request, Authentication authentication) {
-    Match result = matchService.startRandom(request.getChildId(), authentication);
-    return new SuccessResponse<>(result);
+//  @PostMapping("/random/start")
+//  @ResponseStatus(HttpStatus.OK)
+//  @Transactional
+//  public synchronized SuccessResponse<?> startRandom(
+//      @Valid @RequestBody MatchStartRequest request, Authentication authentication) {
+//    Match result = matchService.startRandom(request.getChildId(), authentication);
+//    return new SuccessResponse<>(result);
+//  }
+
+
+  @MessageMapping("/random/start")        // client가 publish한 Msg Mapping
+  public SuccessResponse<?> startRandom(MatchStartRequest request) {
+    matchService.startRandom_01(request);
+
+    return new SuccessResponse<>(HttpStatus.OK);
   }
 
   @PostMapping("/random/stop")

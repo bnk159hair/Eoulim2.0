@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.service.impl;
 
+import com.ssafy.eoullim.dto.request.MatchStartRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
@@ -7,6 +8,7 @@ import com.ssafy.eoullim.exception.ErrorCode;
 import com.ssafy.eoullim.model.Child;
 import com.ssafy.eoullim.model.FcmMessage;
 import com.ssafy.eoullim.model.Match;
+import com.ssafy.eoullim.model.MatchWait;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.service.*;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
@@ -16,12 +18,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.sql.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -35,6 +41,8 @@ public class MatchServiceImpl implements MatchService {
   private final RecordService recordService;
   //  private final AlarmService alarmservice;
   private final ChildService childService;
+  private final SimpMessageSendingOperations simpMessageSendingOperations;
+
   private final FirebaseMessagingService firebaseMessagingService;
   private final FcmTokenService fcmTokenService;
   private final NotificationService notificationService;
@@ -57,10 +65,113 @@ public class MatchServiceImpl implements MatchService {
   private Map<String, String> sessionRecordings = new ConcurrentHashMap<>();
   private Map<String, Room> mapRooms = new ConcurrentHashMap<>();
 
+  private final Queue<MatchWait> matchList = new LinkedList<>();
+
   @PostConstruct
   public void init() {
     this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
   }
+
+  @Override
+  public void startRandom_01(MatchStartRequest matchStartRequest){
+    // Child ID가 현재 User의 Child가 맞는지 체크
+    matchList.add(MatchWait.builder().childId(matchStartRequest.getChildId()).grade(matchStartRequest.getGrade()).priority((short)0).build());
+  }
+
+  @Scheduled(fixedDelay = 10000)
+  public void makeMatch(){
+    int initLen = matchList.size(); // 현재 큐에 있는 값만 빼기 위해서 - 함수 실행 중 큐에 들어오는 애들은 다음 스케쥴 때 진행할거여서 상관없음
+    List<MatchWait> curList = new ArrayList<>(); // 큐에서 뺀 애들 저장하기 위해
+    List<MatchWait> leftList = new ArrayList<>();
+
+    boolean [] visited = new boolean[initLen];
+    Arrays.fill(visited, false);
+    int []cntNum = new int[4];
+    int startIdx = 0;
+
+    for(int i = 0; i < initLen; i++){
+      curList.add(matchList.poll()); // 큐에서는 현재 개수만큼 빼고 새로 옮기기
+    }
+    Collections.sort(curList); // 학년 -> 우선순위, 둘다 내림차순 정렬
+    for (MatchWait match : curList){
+      cntNum[(int)match.getGrade()]++; // 학년 개수 count
+    }
+
+    for(int i=1; i< 4; i++){
+      if (cntNum[i] < 2){ // 학년 인원이 2인 아래면 넘기기
+        startIdx += cntNum[i];
+        continue;
+      }
+      for(int j=0; j < cntNum[i]; j++){ // 짝수 인원만큼 매칭
+        if(j == cntNum[j] - 1){
+          MatchWait left = curList.get(startIdx+j);
+          short newPriority = (short)(left.getGrade()+1);
+          left.setPriority(newPriority);
+          leftList.add(left);
+          continue;
+        }
+        Long childOne = curList.get(startIdx+j).getChildId();
+        Long childTwo = curList.get(startIdx+j+1).getChildId();
+        j += 1;
+        sendMatchResult(childOne, childTwo);
+      }
+
+      startIdx += cntNum[i];
+    }
+    //------------------------------------------------------------//
+//    for(int i =0; i< visited.length ; i++){
+//      if(visited[i])continue;
+//      MatchWait left = curList.get(i);
+//      short newPriority = (short)(left.getGrade()+1);
+//      left.setPriority(newPriority);
+//      leftList.add(left);
+//    }
+    leftList.sort(new Comparator<MatchWait>() { // 우선순위로 정렬
+      @Override
+      public int compare(MatchWait o1, MatchWait o2) {
+        return o2.getPriority()- o1.getPriority();
+      }
+    });
+    
+    for(int i = 0; i < leftList.size(); i++){
+      if(i == leftList.size()-1){
+        matchList.add(leftList.get(i));
+        continue;
+      }
+      MatchWait left = leftList.get(i);
+      if(left.getPriority()>5){
+        sendMatchResult(left.getChildId(), leftList.get(i+1).getChildId());
+        i += 1; // 두 개 읽었으므로 인덱스 하나 건너뜀
+      }
+      else{
+        matchList.add(left);
+      }
+    }
+  }
+
+
+  public void sendMatchResult(Long childOne, Long childTwo){
+    // session ID 짓기
+    String sessionId = buildSessionId(childOne);
+    // Session Id를 통해 Open Vidu Session 생성
+    Session session = createNewOpenViduSession(sessionId);
+    mapSessions.put(sessionId, session);
+    // Connection Token 생성
+    String tokenOne = creatConnectionToken(session);
+    String tokenTwo = creatConnectionToken(session);
+
+    Room newRoom = newMakeNewRoom(sessionId, true, childOne, childTwo);
+    mapRooms.put(sessionId, newRoom);
+
+    simpMessageSendingOperations.convertAndSend("/topic/random/start"+childOne, new Match(sessionId, tokenOne, newRoom.getRandom()));
+    simpMessageSendingOperations.convertAndSend("/topic/random/start"+childTwo, new Match(sessionId, tokenTwo, newRoom.getRandom()));
+
+  }
+
+
+
+  //--------------------------------------------------------------------------------------//
+
 
   private Match createNewMatch(Long childId, Boolean isRandom) {
     // session ID 짓기
@@ -92,11 +203,21 @@ public class MatchServiceImpl implements MatchService {
   }
 
   private Session createNewOpenViduSession(String sessionId) {
+    RecordingProperties recordingProperties =
+            new RecordingProperties.Builder() // 녹화 설정
+                    .outputMode(Recording.OutputMode.INDIVIDUAL)
+                    .resolution("1280x960")
+                    .frameRate(30)
+                    .name("VideoInfo")
+                    .build();
+
     SessionProperties sessionProperties =
         new SessionProperties.Builder()
             .customSessionId(sessionId)
-            .recordingMode(RecordingMode.MANUAL)
-            .build();
+                .recordingMode(RecordingMode.MANUAL)
+                .defaultRecordingProperties(recordingProperties)
+                .build();
+
     try {
       return openvidu.createSession(sessionProperties);
     } catch (OpenViduJavaClientException | OpenViduHttpException e) {
@@ -126,6 +247,19 @@ public class MatchServiceImpl implements MatchService {
     }
     newRoom.setSessionId(sessionId);
     newRoom.setChildOne(childId); // 첫 입장자 아이디 저장
+    return newRoom;
+  }
+
+  private Room newMakeNewRoom(String sessionId, Boolean isRandom, Long childOneId, Long childTwoId) {
+    Room newRoom = new Room();
+    if (isRandom) {
+      List<Integer> random = RandomGeneratorUtils.generateRandomNumbers(2, 12, 4);
+      log.info("[EMPTY] randomNum is created - sessionId : " + sessionId);
+      newRoom.setRandom(random); // random 일 때만
+    }
+    newRoom.setSessionId(sessionId);
+    newRoom.setChildOne(childOneId); // 첫 입장자 아이디 저장
+    newRoom.setChildTwo(childTwoId);
     return newRoom;
   }
 

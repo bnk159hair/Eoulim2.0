@@ -1,5 +1,6 @@
 package com.ssafy.eoullim.service;
 
+import com.ssafy.eoullim.dto.request.MatchStartRequest;
 import com.ssafy.eoullim.model.Match;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public interface MatchService {
   Match startRandom(Long childId, Authentication authentication);
-
+  void startRandom_01(MatchStartRequest matchStartRequest);
   Match startFriend(
           Long childId,
           Long friendId,
