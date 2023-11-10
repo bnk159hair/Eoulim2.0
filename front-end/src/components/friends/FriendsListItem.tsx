@@ -10,14 +10,19 @@ import { Profilekey } from '../../atoms/Profile';
 interface FriendsListItemProps {
   friendId: number;
   friendName: string;
-  animon: string;
+  animonImgPath: string;
 }
 
-const FriendsListItem: React.FC<FriendsListItemProps> = ({ friendId, friendName, animon }) => {
+const FriendsListItem: React.FC<FriendsListItemProps> = ({
+  friendId,
+  friendName,
+  animonImgPath,
+}) => {
   const [, setSessionToken] = useRecoilState(InvitationToken);
   const [, setInvitationId] = useRecoilState(InvitationSessionId);
 
-  const IMGURL = `${animon}`;
+  const IMGURL = `${animonImgPath}`;
+  console.log(IMGURL);
   const navigate = useNavigate();
 
   const childId = useRecoilValue(Profilekey);

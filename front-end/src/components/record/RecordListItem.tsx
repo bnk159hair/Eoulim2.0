@@ -25,6 +25,7 @@ const RecordListItem: React.FC<RecordListItemProps> = ({
   recordId,
 }) => {
   const IMGURL = `${animonName}`;
+  console.log(IMGURL);
   const [isModalOpen, setModalOpen] = useState(false);
   const openModal = () => {
     setModalOpen(true);
