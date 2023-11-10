@@ -36,7 +36,7 @@ export const Mobile = () => {
         console.log(invitation, childId, token);
       }
     };
-  }, []);
+  }, [localStorage.getItem(TOKEN)]);
 
   return <div style={{ visibility: 'hidden' }} />;
 };
