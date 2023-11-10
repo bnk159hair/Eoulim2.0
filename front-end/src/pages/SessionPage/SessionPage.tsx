@@ -43,6 +43,7 @@ const SessionPage = () => {
   const { state } = useLocation();
   const { invitation } = state;
   const [open, setOpen] = useState(false);
+  const [refuse, setRefuse] = useState(false);
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
@@ -243,29 +244,33 @@ const SessionPage = () => {
 
   const leaveSession = () => {
     setOpen(false);
-    if (client) {
-      const jsonMessage = {
-        childId: String(publisherId),
-        isLeft: true,
-      };
-      const message = JSON.stringify(jsonMessage);
-      client.publish({
-        destination: `/app/${sessionId}/leave-session`,
-        body: message,
+    if (invitation) {
+      if (client) {
+        const jsonMessage = {
+          childId: String(publisherId),
+          isLeft: true,
+        };
+        const message = JSON.stringify(jsonMessage);
+        client.publish({
+          destination: `/app/${sessionId}/leave-session`,
+          body: message,
+        });
+        console.log('메시지 전송:', message);
+      }
+      const sessionData = { sessionId, guideScript, timeline };
+      destroySession({
+        sessionData,
+        onSuccess: () => {
+          console.log(guideScript, timeline);
+          console.log('세션 페이지에서 세션 접속을 종료하였습니다.');
+        },
+        onError: () => {
+          console.log('세션 페이지에서 세션 접속 종료에 실패했습니다.');
+        },
       });
-      console.log('메시지 전송:', message);
+    } else {
+      setRefuse(true);
     }
-    const sessionData = { sessionId, guideScript, timeline };
-    destroySession({
-      sessionData,
-      onSuccess: () => {
-        console.log(guideScript, timeline);
-        console.log('세션 페이지에서 세션 접속을 종료하였습니다.');
-      },
-      onError: () => {
-        console.log('세션 페이지에서 세션 접속 종료에 실패했습니다.');
-      },
-    });
     session.disconnect();
     navigate('/');
   };
@@ -338,8 +343,18 @@ const SessionPage = () => {
 
   if (open) {
     if (streamList.length !== 2) {
-      leaveSession();
-      return null;
+      if (!refuse) {
+        leaveSession();
+        return null;
+      }
+      return (
+        <EndModal
+          onClose={leaveSession}
+          message={'친구가 지금 바쁜 상태입니다.'}
+          isFriend
+          addFriend={addFriend}
+        />
+      );
     }
     if (!isFriend) {
       return (
@@ -365,9 +380,9 @@ const SessionPage = () => {
       <SessionPageContainer>
         <Container>
           <MyVideo>
-            {streamList[1]?.streamManager && (
+            {streamList[0]?.streamManager && (
               <StreamCanvas
-                streamManager={streamList[1]?.streamManager}
+                streamManager={streamList[0]?.streamManager}
                 name={subscriberName}
                 avatarPath={subscriberAnimonURL}
                 videoState={subscriberVideoStatus}

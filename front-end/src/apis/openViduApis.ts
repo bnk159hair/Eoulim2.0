@@ -15,7 +15,7 @@ interface UserData {
 
 interface InvitationSessionData {
   childId: number;
-  friendId?: number;
+  friendId: number;
   sessionId?: string;
 }
 interface SessionData {
@@ -64,6 +64,7 @@ export const getToken = async ({ userData, onSuccess, onError }: GetTokenParams)
     const response = await instance.post(`/meetings/random/start`, userData);
     onSuccess(response.data.data);
   } catch (error) {
+    console.log(error);
     onError();
   }
 };
@@ -104,6 +105,7 @@ export const destroyInvitationSession = async ({
     await instance.post(`/meetings/friend/stop`, { sessionId });
     onSuccess();
   } catch (error) {
+    console.log(error);
     onError();
   }
 };

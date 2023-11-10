@@ -4,12 +4,15 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { fcmTokenState } from 'atoms/Firebase';
 import { useRecoilState } from 'recoil';
 import AlarmModal from 'components/alarm/AlarmModal';
+import { useLocation } from 'react-router';
 
 export const FireBase = () => {
+  const location = useLocation();
   const [fcmToken, setFcmToken] = useRecoilState(fcmTokenState);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [userName, setUserName] = useState('');
+  const exception: string[] = ['/session', '/mobile', '/match', '/profile', '/login'];
 
   const config = {
     // 프로젝트 설정 > 일반 > 하단의 내앱에서 확인
@@ -55,14 +58,16 @@ export const FireBase = () => {
     console.log('Message received. ', payload);
     if (payload.notification) {
       if (payload.notification.title) {
-        console.log(payload.notification.title.split(' ')[0]);
         setUserName(payload.notification.title.split(' ')[0]);
       }
       if (payload.notification.body) {
-        console.log(payload.notification.body.split(' ')[2]);
         setSessionId(payload.notification.body.split(' ')[2]);
       }
-      setAlarmOpen(true);
+      if (exception.includes(location.pathname)) {
+        setAlarmOpen(false);
+      } else {
+        setAlarmOpen(true);
+      }
     }
     // ...
   });

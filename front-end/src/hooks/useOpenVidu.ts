@@ -174,7 +174,8 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
           console.log('There was an error connecting to the session:', error.code, error.message);
         });
     } else if (userId && sessionId && sessionToken === '') {
-      const invitationSessionData = { childId: userId, sessionId };
+      const friendId = Number(sessionId.split('_')[0]);
+      const invitationSessionData = { childId: userId, sessionId, friendId };
       invite({
         invitationSessionData,
         onSuccess: data => {
