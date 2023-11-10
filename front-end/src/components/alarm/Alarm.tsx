@@ -55,10 +55,12 @@ export const FireBase = () => {
     console.log('Message received. ', payload);
     if (payload.notification) {
       if (payload.notification.title) {
+        console.log(payload.notification.title.split(' ')[0]);
         setUserName(payload.notification.title.split(' ')[0]);
       }
       if (payload.notification.body) {
-        setSessionId(payload.notification.body.split(' ')[-1]);
+        console.log(payload.notification.body.split(' ')[2]);
+        setSessionId(payload.notification.body.split(' ')[2]);
       }
       setAlarmOpen(true);
     }
