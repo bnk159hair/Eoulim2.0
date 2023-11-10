@@ -38,11 +38,6 @@ interface FriendsProfile {
   animon: { id: number; imagePath: string; name: string };
 }
 
-interface Message {
-  childId: string;
-  invitation: boolean;
-}
-
 const SessionPage = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -50,7 +45,7 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-  const [invitation, setInvitation] = useState(state.invitation);
+  const [invitation] = useState(state.invitation);
 
   const publisherId = useRecoilValue(Profilekey);
   const [subscriberId, setSubscriberId] = useState(0);
@@ -62,7 +57,7 @@ const SessionPage = () => {
   const [subscriberGuideStatus, setSubscriberGuideStatus] = useState(false);
 
   const [clickEnabled, setClickEnabled] = useState(false);
-  const [profileId, setProfileId] = useRecoilState(Profilekey);
+  const [profileId] = useRecoilState(Profilekey);
   const profile = useRecoilValue(Profile);
   const [subscriberName, setSubscriberName] = useState('');
   const isAnimonLoaded = useRecoilValue(IsAnimonLoaded);
