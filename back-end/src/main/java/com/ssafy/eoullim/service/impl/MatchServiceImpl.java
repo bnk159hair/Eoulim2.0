@@ -1,7 +1,11 @@
 package com.ssafy.eoullim.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
 import com.ssafy.eoullim.exception.ErrorCode;
+import com.ssafy.eoullim.model.Child;
+import com.ssafy.eoullim.model.FcmMessage;
 import com.ssafy.eoullim.model.Match;
 import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.service.*;
@@ -27,12 +31,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 @Service
 public class MatchServiceImpl implements MatchService {
-  @Getter
+
   private final RecordService recordService;
-//  private final AlarmService alarmservice;
+  //  private final AlarmService alarmservice;
   private final ChildService childService;
   private final FirebaseMessagingService firebaseMessagingService;
   private final FcmTokenService fcmTokenService;
+  private final NotificationService notificationService;
+  private final ObjectMapper objectMapper;
 
   @Value("${OPENVIDU_URL}")
   private String OPENVIDU_URL;
@@ -68,7 +74,7 @@ public class MatchServiceImpl implements MatchService {
     Room newRoom = makeNewRoom(sessionId, isRandom, childId);
     mapRooms.put(sessionId, newRoom);
     // Random 매치이면 매칭 큐에 넣기
-    if(isRandom) matchingQueue.add(newRoom);  
+    if (isRandom) matchingQueue.add(newRoom);
     // 랜덤 미팅이면 가이드 순서 넣기
     return isRandom
         ? new Match(sessionId, token, newRoom.getRandom())
@@ -92,7 +98,7 @@ public class MatchServiceImpl implements MatchService {
             .recordingMode(RecordingMode.MANUAL)
             .build();
     try {
-        return openvidu.createSession(sessionProperties);
+      return openvidu.createSession(sessionProperties);
     } catch (OpenViduJavaClientException | OpenViduHttpException e) {
       throw new EoullimApplicationException(ErrorCode.OPENVIDU_SERVER_ERROR, "Session 생성 실패");
     }
@@ -149,6 +155,36 @@ public class MatchServiceImpl implements MatchService {
     return existingSession;
   }
 
+  private FcmMessage createFcmMessage(String token, String title, String body) {
+    return FcmMessage.builder()
+        .message(
+            FcmMessage.Message.builder()
+                .token(token)
+                .notification(
+                    FcmMessage.Notification.builder().title(title).body(body).image(null).build())
+                .build())
+        .validate_only(false)
+        .build();
+  }
+
+  private String createInvitationMessageForFriend(
+      String targetToken, String sessionId, String childName) throws JsonProcessingException {
+    String title = childName + " 님이 보낸 초대장이 도착했습니다.";
+    String body = "세션 ID: " + sessionId;
+    return objectMapper.writeValueAsString(createFcmMessage(targetToken, title, body));
+  }
+
+  private String createInvitationMessageForParent(
+      String targetToken, String childName, String friendName) throws JsonProcessingException {
+    String title = friendName + " 님이 초대를 받았습니다.";
+    String body = friendName + " 님이 " + childName + " 님께 초대를 받았습니다.";
+    return objectMapper.writeValueAsString(createFcmMessage(targetToken, title, body));
+  }
+
+  private String createText(String childName, String friendName) {
+    return friendName + " 님이 " + childName + " 님께 초대를 받았습니다.";
+  }
+
   @Override
   @Transactional
   public synchronized Match startRandom(Long childId, Authentication authentication) {
@@ -161,7 +197,7 @@ public class MatchServiceImpl implements MatchService {
       return result;
     }
     // 매칭 큐 - Not Empty
-    else { 
+    else {
       Room existingRoom = matchingQueue.poll();
       String sessionId = existingRoom.getSessionId();
 
@@ -190,10 +226,7 @@ public class MatchServiceImpl implements MatchService {
   @Override
   @Transactional
   public synchronized Match startFriend(
-      Long childId,
-      Long friendId,
-      String existSessionId,
-      Authentication authentication) {
+      Long childId, Long friendId, String existSessionId, Authentication authentication) {
     // child, friend
     final var child = childService.getChild(childId, authentication);
     final var friend = childService.getChildWithNoPermission(friendId);
@@ -204,35 +237,45 @@ public class MatchServiceImpl implements MatchService {
       Match result = createNewMatch(child.getId(), false);
 
       // sse 알림 서비스
-//      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
-//      alarmservice.send(friendId, alarm);
+      //      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
+      //      alarmservice.send(friendId, alarm);
 
       // fcm push 서비스
       Set<String> friendTokenSet = fcmTokenService.getFcmTokenOfFriend(friendId);
       Set<String> parentTokenSet = fcmTokenService.getFcmTokenOfParent(friend.getUser().getId());
-      // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기
+      // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기 (아이가 부모님 폰을 사용하는 경우)
       parentTokenSet.removeAll(friendTokenSet);
+
       // 친구가 오프라인 인 경우
       if (friendTokenSet.isEmpty())
         throw new EoullimApplicationException(ErrorCode.FCM_TOKEN_NOT_FOUND, "친구가 오프라인입니다.");
+
       // 친구에게 초대 알림 보내기
       for (String targetToken : friendTokenSet) {
         try {
-          log.info("targetToken "+ targetToken);
-          firebaseMessagingService.invite(targetToken, result.getSessionId(), child, friend);
+          log.info("friendToken " + targetToken);
+          String message =
+              createInvitationMessageForFriend(targetToken, result.getSessionId(), child.getName());
+          firebaseMessagingService.invite(message);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
-      // 친구 부모님께 알림 보내기
+
+      // 친구 부모님께 알림 DB에 저장하고 보내기
+      notificationService.save(friend.getUser(), createText(child.getName(), friend.getName()));
+
       for (String targetToken : parentTokenSet) {
         try {
-          log.info("targetToken "+ targetToken);
-          firebaseMessagingService.invite(targetToken, null, child, friend);
+          log.info("parentToken " + targetToken);
+          String message =
+              createInvitationMessageForParent(targetToken, child.getName(), friend.getName());
+          firebaseMessagingService.invite(message);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
+
       return result;
     }
     // 초대 받았을 때
@@ -256,8 +299,7 @@ public class MatchServiceImpl implements MatchService {
 
   @Override
   @Transactional
-  public Recording stopRandom(
-      String sessionId, List<Integer> guideSeq, List<String> timeline)
+  public Recording stopRandom(String sessionId, List<Integer> guideSeq, List<String> timeline)
       throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException {
 
     if (mapSessions.get(sessionId) != null && mapRooms.get(sessionId) != null) {
