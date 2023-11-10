@@ -356,7 +356,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                   name: name,
                   birth: birth.toString().split(' ')[0],
                   gender: gender,
-                  school: school,
+                  school: '$school초등학교',
                   grade: grade,
                 ),
               );
