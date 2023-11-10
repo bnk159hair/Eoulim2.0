@@ -315,8 +315,32 @@ public class MatchServiceImpl implements MatchService {
     return objectMapper.writeValueAsString(createFcmMessage(targetToken, title, body));
   }
 
-  private String createText(String childName, String friendName) {
+  private String createStartMessageForParent(
+          String targetToken, String childName, String friendName) throws JsonProcessingException {
+    String title = childName + " 님이 미팅을 시작했습니다.";
+    String body = childName + " 님이 " + friendName + " 님과 미팅을 시작했습니다.";
+    return objectMapper.writeValueAsString(createFcmMessage(targetToken, title, body));
+  }
+
+  private String invitationText(String childName, String friendName) {
     return friendName + " 님이 " + childName + " 님께 초대를 받았습니다.";
+  }
+
+  private String meetingStartText(String childName, String friendName) {
+    return childName + " 님이 " + friendName + " 님과 미팅을 시작했습니다.";
+  }
+
+  private void sendStartMessage(Child child, Child friend, Set<String> parentTokenSet) {
+    for (String targetToken : parentTokenSet) {
+      try {
+        log.info("parentToken " + targetToken);
+        String message =
+                createStartMessageForParent(targetToken, child.getName(), friend.getName());
+        firebaseMessagingService.send(message);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   @Override
@@ -365,7 +389,16 @@ public class MatchServiceImpl implements MatchService {
     final var child = childService.getChild(childId, authentication);
     final var friend = childService.getChildWithNoPermission(friendId);
 
-    // 초대할 때
+    // fcm token 가져오기
+    Set<String> childTokenSet = fcmTokenService.getFcmTokenOfChild(childId);
+    Set<String> childParentTokenSet = fcmTokenService.getFcmTokenOfParent(child.getUser().getId());
+    Set<String> friendTokenSet = fcmTokenService.getFcmTokenOfChild(friendId);
+    Set<String> friendParentTokenSet = fcmTokenService.getFcmTokenOfParent(friend.getUser().getId());
+    // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기 (아이가 부모님 폰을 사용하는 경우)
+    childParentTokenSet.removeAll(childTokenSet);
+    friendParentTokenSet.removeAll(friendTokenSet);
+
+    // 초대 보낼 때
     if (existSessionId == null) {
       // 없는거 확인했으면 세로운 세션 Id 만들기
       Match result = createNewMatch(child.getId(), false);
@@ -373,12 +406,6 @@ public class MatchServiceImpl implements MatchService {
       // sse 알림 서비스
       //      Alarm alarm = new Alarm(result.getSessionId(), child.getName());
       //      alarmservice.send(friendId, alarm);
-
-      // fcm push 서비스
-      Set<String> friendTokenSet = fcmTokenService.getFcmTokenOfFriend(friendId);
-      Set<String> parentTokenSet = fcmTokenService.getFcmTokenOfParent(friend.getUser().getId());
-      // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기 (아이가 부모님 폰을 사용하는 경우)
-      parentTokenSet.removeAll(friendTokenSet);
 
       // 친구가 오프라인 인 경우
       if (friendTokenSet.isEmpty())
@@ -390,29 +417,29 @@ public class MatchServiceImpl implements MatchService {
           log.info("friendToken " + targetToken);
           String message =
               createInvitationMessageForFriend(targetToken, result.getSessionId(), child.getName());
-          firebaseMessagingService.invite(message);
+          firebaseMessagingService.send(message);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
 
-      // 친구 부모님께 알림 DB에 저장하고 보내기
-      notificationService.save(friend.getUser(), createText(child.getName(), friend.getName()));
-
-      for (String targetToken : parentTokenSet) {
+      // 친구 부모님께 알림 보내고 DB에 저장하기
+      for (String targetToken : friendParentTokenSet) {
         try {
           log.info("parentToken " + targetToken);
           String message =
               createInvitationMessageForParent(targetToken, child.getName(), friend.getName());
-          firebaseMessagingService.invite(message);
+          firebaseMessagingService.send(message);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }
       }
+      notificationService.save(friend.getUser(), invitationText(child.getName(), friend.getName()));
 
       return result;
     }
-    // 초대 받았을 때
+
+    // 초대 수락했을 때
     else {
       String sessionId = existSessionId;
       Room existingRoom = mapRooms.get(sessionId);
@@ -426,6 +453,13 @@ public class MatchServiceImpl implements MatchService {
 
       existingRoom.setRecordingId(recordingId);
       existingRoom.setChildTwo(child.getId()); // 두번째 입장자 아이디 저장
+
+      // 아이와 친구 부모님 모두에게 미팅 시작 알림 보내고 저장하기
+      sendStartMessage(child, friend, childParentTokenSet);
+      sendStartMessage(friend, child, friendParentTokenSet);
+
+      notificationService.save(child.getUser(), meetingStartText(child.getName(), friend.getName()));
+      notificationService.save(friend.getUser(), meetingStartText(friend.getName(), child.getName()));
 
       return result;
     }

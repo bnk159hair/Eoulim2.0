@@ -17,7 +17,7 @@ public interface FcmTokenService {
 
     void deleteFcmTokenOfParent(User user, String token);
 
-    Set<String> getFcmTokenOfFriend(Long friendId);
+    Set<String> getFcmTokenOfChild(Long childId);
 
     Set<String> getFcmTokenOfParent(Long friendId);
 }

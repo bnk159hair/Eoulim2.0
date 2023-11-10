@@ -23,7 +23,7 @@ public class FirebaseMessagingServiceImpl implements FirebaseMessagingService {
       "https://fcm.googleapis.com/v1/projects/eoullim-7e5fb/messages:send";
   private final ObjectMapper objectMapper;
 
-  public void invite(String message) throws IOException {
+  public void send(String message) throws IOException {
     OkHttpClient client = new OkHttpClient();
     RequestBody requestBody =
         RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));

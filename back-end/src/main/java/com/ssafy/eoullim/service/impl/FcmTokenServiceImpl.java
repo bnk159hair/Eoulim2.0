@@ -56,8 +56,8 @@ public class FcmTokenServiceImpl implements FcmTokenService {
 
   @Override
   @Transactional
-  public Set<String> getFcmTokenOfFriend(Long friendId) {
-    return fcmTokenRepository.findAllByChildId(friendId).stream()
+  public Set<String> getFcmTokenOfChild(Long childId) {
+    return fcmTokenRepository.findAllByChildId(childId).stream()
         .map(FcmTokenEntity::getToken)
         .collect(Collectors.toSet());
   }
