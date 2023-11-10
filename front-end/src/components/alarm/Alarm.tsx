@@ -11,11 +11,11 @@ export const FireBase = () => {
   const [sessionId, setSessionId] = useState('');
   const [userName, setUserName] = useState('');
 
-  isSupported().then(response => {
-    if (response === false) {
-      return <div style={{ visibility: 'hidden' }} />;
-    }
-  });
+  // isSupported().then(response => {
+  //   if (response === false) {
+  //     return <div style={{ visibility: 'hidden' }} />;
+  //   }
+  // });
 
   const config = {
     // 프로젝트 설정 > 일반 > 하단의 내앱에서 확인
