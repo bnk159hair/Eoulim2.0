@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 import './App.css';
+import Mobile from 'components/mobile/Mobile';
 import MainPage from './pages/MainPage/MainPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
@@ -12,30 +13,12 @@ import BackgroundMusic from './components/main/BackgroundMusic';
 import FireBase from './components/alarm/Alarm';
 
 function App() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // @ts-ignore
-    window.changePage = (message: Message) => {
-      switch (message.invitation) {
-        case false:
-          navigate('/session', { state: { childId: message.childId, invitation: false } });
-          break;
-        case true:
-          navigate('/session', { state: { childId: message.childId, invitation: true } });
-          break;
-        default:
-          console.log('값이 존재하지 않습니다.');
-          break;
-      }
-    };
-  });
-
   return (
     <RecoilRoot>
       <Router>
         <BackgroundMusic />
         <FireBase />
+        <Mobile />
         <Routes>
           <Route path={'/'} element={<MainPage />} />
           <Route path={'/login'} element={<LoginPage />} />
