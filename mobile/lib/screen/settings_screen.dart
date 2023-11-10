@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/api/api_child.dart';
 import 'package:mobile/api/api_profilelogout.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:get/get.dart';
+import 'package:mobile/screen/profiles/modify_child_screen.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
 import 'package:mobile/util/logout_logic.dart';
 
@@ -33,61 +35,88 @@ class Settings extends StatelessWidget {
             ),
           ),
           child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  ),
-                  child: const Text(
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 40.0, horizontal: 30.0),
+              child: Column(
+                children: [
+                  _buildButtonRow(
                     '프로필 정보 수정',
-                    style: TextStyle(color: Colors.white),
+                    onPressed: () {
+                      Get.offAll(() => const ModifyChild());
+                    },
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  ),
-                  child: const Text(
+                  _buildButtonRow(
                     '프로필 정보 삭제',
-                    style: TextStyle(color: Colors.white),
+                    onPressed: () async {
+                      final response = await ApiChild.deleteChild();
+                      if (response == 204) {
+                        profileLogout();
+                      } else if (response == 401) {
+                        Logout();
+                      } else {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (BuildContext ctx) {
+                            return AlertDialog(
+                              content: const Text('알 수 없는 오류'),
+                              actions: [
+                                Center(
+                                  child: TextButton(
+                                    child: const Text('확인'),
+                                    onPressed: () {
+                                      profileLogout();
+                                      Logout();
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    profileLogout();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.blue),
-                  ),
-                  child: const Text(
+                  _buildButtonRow(
                     '프로필 전환',
-                    style: TextStyle(color: Colors.white),
+                    onPressed: profileLogout,
                   ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Logout();
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.transparent),
-                  ),
-                  child: Text(
-                    '로그아웃',
-                    style: TextStyle(
-                      color: Colors.black.withOpacity(0.4),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+Widget _buildButtonRow(String buttonText, {VoidCallback? onPressed}) {
+  return InkWell(
+    onTap: onPressed,
+    splashColor: Colors.transparent,
+    highlightColor: Colors.transparent,
+    child: Padding(
+      padding: const EdgeInsets.only(
+        bottom: 50.0,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            buttonText,
+            style: TextStyle(
+              color: Colors.black.withOpacity(0.7),
+              fontSize: 24,
+            ),
+          ),
+          Icon(
+            Icons.chevron_right,
+            color: Colors.black.withOpacity(0.7),
+          ),
+        ],
+      ),
+    ),
+  );
 }
