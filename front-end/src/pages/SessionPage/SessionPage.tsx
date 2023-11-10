@@ -96,7 +96,7 @@ const SessionPage = () => {
   useEffect(() => {
     setGuideScript([]);
     setTimeline([]);
-    setPublisherAnimonURL(`${profile.profileAnimon.name}mask.png`);
+    setPublisherAnimonURL(`${profile.profileAnimon.maskImagePath}`);
     getFriends({
       profileId,
       onSuccess: data => {
@@ -158,7 +158,7 @@ const SessionPage = () => {
       getAnimon({
         subscriberId,
         onSuccess: data => {
-          setSubscriberAnimonURL(`${data.profileAnimon.name}mask.png`);
+          setSubscriberAnimonURL(`${data.profileAnimon.maskImagePath}`);
           setSubscriberName(data.name);
         },
         onError: () => {
