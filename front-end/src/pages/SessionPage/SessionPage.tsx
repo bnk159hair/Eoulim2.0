@@ -86,18 +86,6 @@ const SessionPage = () => {
     sessionToken,
   );
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  window.getChildIdFromApp = async (message: Message) => {
-    console.log(`Flutter to Web : ${message}`);
-    if (message.childId !== 'null') {
-      setProfileId(Number(message.childId));
-    }
-    if (message.invitation !== null) {
-      setInvitation(message.invitation);
-    }
-  };
-
   const [micStatus, setMicStatus] = useState(true);
 
   useEffect(() => {
