@@ -62,7 +62,7 @@ const FriendsList = () => {
               key={friend.id}
               friendId={friend.id}
               friendName={friend.name}
-              animon={friend.profileAnimon.name}
+              animonImgPath={friend.profileAnimon.bodyImagePath}
             />
           ))
         ) : (
