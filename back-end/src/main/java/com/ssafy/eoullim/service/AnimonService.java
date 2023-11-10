@@ -1,13 +1,9 @@
 package com.ssafy.eoullim.service;
 
-import com.ssafy.eoullim.model.Animon;
+import org.springframework.security.core.Authentication;
 
-import java.util.List;
 
 public interface AnimonService {
-    List<Animon> getAnimons();
 
-    List<Animon> getAnimonsAtRandom(int limit);
-
-    Animon getMinIdAnimon(List<Animon> animons);
+    void prensentAnimon(Long childId, Long otherChildId, Authentication authentication);
 }

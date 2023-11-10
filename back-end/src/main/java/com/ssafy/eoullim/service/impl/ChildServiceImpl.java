@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,14 +23,15 @@ import java.util.stream.Collectors;
 @Service
 public class ChildServiceImpl implements ChildService {
   // Service
-  private final AnimonService animonService;
   private final ChildAnimonService childAnimonService;
   private final FcmTokenService fcmTokenService;
   // Repos
   private final ChildRepository childRepository;
+  private final AnimonRepository animonRepository;
   private final FollowRepository followRepository;
   private final ChildCacheRepository childCacheRepository;
 
+  // Auth
   private User getUserWithAuth(Authentication authentication) {
     User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
     if (user == null) throw new EoullimApplicationException(ErrorCode.AUTHENTICATION_NOT_FOUND);
@@ -52,6 +54,7 @@ public class ChildServiceImpl implements ChildService {
     return child;
   }
 
+  // Redis
   private void setOnline(Long childId) {
     childCacheRepository.setOnline(childId);
   }
@@ -60,6 +63,7 @@ public class ChildServiceImpl implements ChildService {
     childCacheRepository.setOffline(childId);
   }
 
+  // FCM
   private void saveFcmToken(Child child, String token) {
     fcmTokenService.saveFcmTokenOfChild(child, token);
   }
@@ -68,16 +72,27 @@ public class ChildServiceImpl implements ChildService {
     fcmTokenService.deleteFcmTokenOfChild(child, token);
   }
 
+  // Animon Repo
   private List<Animon> getRandomAnimons(int count) {
-    return animonService.getAnimonsAtRandom(count);
+    return animonRepository
+            .findRandomAnimals(count)
+            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "))
+            .stream()
+            .map(Animon::fromEntity)
+            .collect(Collectors.toList());
+//    return animonService.getAnimonsAtRandom(count);
   }
 
-  private AnimonEntity getDefaultProfileAnimon(List<Animon> animons) {
-    return AnimonEntity.of(animonService.getMinIdAnimon(animons));
+  private Animon getDefaultProfileAnimon(List<Animon> animons) {
+    return animons.stream()
+            .min(Comparator.comparing(Animon::getId))
+            .orElseThrow(() -> new EoullimApplicationException(ErrorCode.DB_NOT_FOUND, "애니몬 없다. "));
+//    return AnimonEntity.of(animonService.getMinIdAnimon(animons));
   }
 
+  // CHIlD ANIMON
   private void saveChildAnimon(ChildEntity childEntity, List<Animon> randomAnimons) {
-    childAnimonService.saveChildAnimon(Child.fromEntity(childEntity), randomAnimons);
+    childAnimonService.saveChildAnimons(Child.fromEntity(childEntity), randomAnimons);
   }
 
   private List<ChildAnimon> getChildAnimonList(Long childId) {
@@ -88,6 +103,7 @@ public class ChildServiceImpl implements ChildService {
     return childAnimonService.getChildAnimon(childId, animonId);
   }
 
+  // FOLLOW
   private List<Follow> getFollowList(Child child) {
     List<FollowEntity> followEntities = followRepository.findAllByChild(ChildEntity.of(child));
     return followEntities.stream().map(Follow::fromEntity).collect(Collectors.toList());
@@ -102,6 +118,7 @@ public class ChildServiceImpl implements ChildService {
     return child;
   }
 
+  // Override (Service Impl)
   @Override
   @Transactional
   public void logout(Long childId, String token, Authentication authentication) {
@@ -121,8 +138,8 @@ public class ChildServiceImpl implements ChildService {
     // 애니몬 랜덤으로 2개 가져오기
     List<Animon> randomAnimons = getRandomAnimons(2);
     // 가져온 애니몬 중에 가장 작은 ID 가진 애니몬을 기본 프로필 애니몬으로 선택
-    AnimonEntity profileAnimon = getDefaultProfileAnimon(randomAnimons);
-    childEntity.setProfileAnimon(profileAnimon);
+    Animon profileAnimon = getDefaultProfileAnimon(randomAnimons);
+    childEntity.setProfileAnimon(AnimonEntity.of(profileAnimon));
 
     // child 저장
     ChildEntity savedChild = childRepository.save(childEntity);

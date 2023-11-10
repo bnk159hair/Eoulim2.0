@@ -23,8 +23,17 @@ public class ChildAnimonServiceImpl implements ChildAnimonService {
 
   private final ChildAnimonRepository childAnimonRepository;
 
+  @Override
   @Transactional
-  public void saveChildAnimon(Child child, List<Animon> animons) {
+  public void saveChildAnimon(Child child, Animon animon) {
+    ChildAnimonEntity childAnimonEntity = ChildAnimonEntity.builder()
+            .child(child).animon(animon).build();
+    childAnimonRepository.save(childAnimonEntity);
+  }
+
+  @Override
+  @Transactional
+  public void saveChildAnimons(Child child, List<Animon> animons) {
     List<ChildAnimonEntity> childAnimonEntities =
         animons.stream()
             .map(animon -> ChildAnimonEntity.builder().animon(animon).child(child).build())
@@ -32,7 +41,7 @@ public class ChildAnimonServiceImpl implements ChildAnimonService {
     childAnimonRepository.saveAll(childAnimonEntities);
   }
 
-  @Transactional
+  @Override
   public List<ChildAnimon> getChildAnimonList(Long childId) {
     List<ChildAnimonEntity> childAnimonEntities =
         childAnimonRepository
@@ -44,7 +53,7 @@ public class ChildAnimonServiceImpl implements ChildAnimonService {
     return childAnimonEntities.stream().map(ChildAnimon::fromEntity).collect(Collectors.toList());
   }
 
-  @Transactional
+  @Override
   public ChildAnimon getChildAnimon(Long childId, Long animonId) {
     ChildAnimonEntity childAnimonEntity =
         childAnimonRepository
@@ -52,7 +61,7 @@ public class ChildAnimonServiceImpl implements ChildAnimonService {
             .orElseThrow(
                 () ->
                     new EoullimApplicationException(
-                        ErrorCode.CHILD_ANIMON_NOT_FOUND, "사용자가 소유한 애니몬이 없습니다."));
+                        ErrorCode.CHILD_ANIMON_NOT_FOUND, "사용자가 소유한 애니몬이 아닙니다."));
     return ChildAnimon.fromEntity(childAnimonEntity);
   }
 }

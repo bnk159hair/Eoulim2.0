@@ -22,7 +22,6 @@ public enum ErrorCode {
   ALREADY_EXIST_FCM_TOKEN(HttpStatus.OK, "FCM-002", "FcmToken이 이미 존재합니다."),
   // Child Error
   CHILD_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-001", "존재 하지 않는 Child 입니다."),
-  CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CH-002", "사용자가 소유한 애니몬을 찾을 수 없음."),
   // User Error
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U-001", "존재 하지 않는 User 입니다."),
   DUPLICATED_NAME(HttpStatus.BAD_REQUEST, "U-002", "이미 사용 중인 ID 입니다."),
@@ -31,6 +30,9 @@ public enum ErrorCode {
   // Friend Error
   DUPLICATED_FRIEND(HttpStatus.BAD_REQUEST, "F-001", "이미 등록된 친구 입니다."),
   FOLLOW_NOT_FOUND(HttpStatus.NOT_FOUND, "F-002", "존재 하지 않는 친구 입니다."),
+  // Child Animon
+  CHILD_ANIMON_NOT_FOUND(HttpStatus.NOT_FOUND, "CA-001", "사용자가 소유한 애니몬을 찾을 수 없음."),
+  CHILD_ANIMON_DUPLICATED(HttpStatus.CONFLICT, "CA-002", "사용자가 이미 소유한 애니몬 입니다."),
   // OpenVidu Error
   MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "OV-001", "Match not found. 해당 회의 방이 존재 하지 않습니다."),
   MATCH_CONFLICT(HttpStatus.CONFLICT, "OV-002", "Match Conflict. 이미 존재하는 회의 방입니다."),
