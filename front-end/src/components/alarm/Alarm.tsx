@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { initializeApp } from 'firebase/app';
-import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { fcmTokenState } from 'atoms/Firebase';
 import { useRecoilState } from 'recoil';
 import AlarmModal from 'components/main/AlarmModal';
@@ -10,12 +10,6 @@ export const FireBase = () => {
   const [isAlarmOpen, setAlarmOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [userName, setUserName] = useState('');
-
-  // isSupported().then(response => {
-  //   if (response === false) {
-  //     return <div style={{ visibility: 'hidden' }} />;
-  //   }
-  // });
 
   const config = {
     // 프로젝트 설정 > 일반 > 하단의 내앱에서 확인
