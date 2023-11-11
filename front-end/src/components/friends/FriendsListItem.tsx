@@ -36,7 +36,7 @@ const FriendsListItem: React.FC<FriendsListItemProps> = ({
         setInvitationId(sessionId);
         setSessionToken(token);
         console.log('초대에 보내는데 성공했습니다.');
-        navigate(`/session`, { state: { invitation: true } });
+        navigate(`/session`, { state: { childId, invitation: true } });
       },
       onError: () => {
         inputAlert('상대방이 현재 온라인 상태가 아닙니다.');

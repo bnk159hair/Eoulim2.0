@@ -30,7 +30,7 @@ export const Profilekey = atom<number>({
 export const Profile = atom<ChildProfile>({
   key: 'profile',
   default: {
-    id: 1,
+    id: 0,
     name: '짱구아들',
     birth: '1399248000000',
     gender: 'M',

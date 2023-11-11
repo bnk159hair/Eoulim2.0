@@ -43,7 +43,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
     setSubscribers([]);
   }, [session]);
 
-  console.log(userId);
+  console.log('내 아이디 : ', userId);
 
   useEffect(() => {
     console.log('새로운 OV 객체 생성');

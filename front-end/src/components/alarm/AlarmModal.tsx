@@ -25,7 +25,7 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose, userName })
   const navigate = useNavigate();
 
   const [, setInvitationId] = useRecoilState(InvitationSessionId);
-  const profileId = useRecoilValue(Profilekey);
+  const childId = useRecoilValue(Profilekey);
 
   const [connected, setConnected] = useState<boolean>(false);
   const [stompClient, setStompClient] = useState<Client | null>(null);
@@ -63,13 +63,13 @@ const AlarmModal: React.FC<AlarmModalProps> = ({ sessionId, onClose, userName })
 
   const acceptInvitation = () => {
     setInvitationId(sessionId);
-    navigate(`/session`, { state: { invitation: true } });
+    navigate(`/session`, { state: { childId, invitation: true } });
   };
 
   const refuseInvitaion = () => {
     if (connected && stompClient) {
       const jsonMessage = {
-        childId: String(profileId),
+        childId: String(childId),
         isLeft: false,
       };
       const message = JSON.stringify(jsonMessage);

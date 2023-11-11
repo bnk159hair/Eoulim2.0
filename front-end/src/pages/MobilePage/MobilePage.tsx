@@ -2,10 +2,13 @@ import React, { useEffect } from 'react';
 import { MobileChildId } from 'atoms/Mobile';
 import { useNavigate } from 'react-router';
 import { useRecoilState } from 'recoil';
+import { getChildInfo } from 'apis/profileApis';
+import { Profile } from 'atoms/Profile';
 
 export const Mobile = () => {
   const navigate = useNavigate();
   const [childId, setChildId] = useRecoilState(MobileChildId);
+  const [, setProfile] = useRecoilState(Profile);
 
   const TOKEN = 'accessToken';
   const isAccessTokenEmpty = localStorage.getItem(TOKEN) === null;
@@ -31,10 +34,23 @@ export const Mobile = () => {
         if (token) {
           saveToken(token);
         }
+
+        getChildInfo({
+          id: childId,
+          onSuccess: data => {
+            setProfile(data);
+            console.log('프로필 가져오기에 성공하였습니다.');
+            console.log(data);
+          },
+          onError: () => {
+            console.log('프로필 가져오기에 실패하였습니다.');
+          },
+        });
+
         if (childId && token && invitation === false) {
           console.log('모바일에서 새 친구 세션으로 이동합니다.');
           setChildId(data.childId);
-          navigate('/session', { state: { childId: data.childId, invitation: false } });
+          navigate('/session', { state: { childId, invitation: false } });
         } else if (childId && token && invitation === true) {
           console.log('모바일에서 내 친구 세션으로 이동합니다.');
           setChildId(data.childId);

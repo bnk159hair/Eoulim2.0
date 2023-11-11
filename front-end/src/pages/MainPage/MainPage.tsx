@@ -33,11 +33,13 @@ const MainPage: React.FC = () => {
   const [userName] = useState<string>('');
 
   useEffect(() => {
-    getChild();
+    if (profile.id === 0) {
+      getChild();
+    }
   }, [childId, token, navigate]);
 
   const getNewFriend = () => {
-    navigate('/session', { state: { invitation: false } });
+    navigate('/session', { state: { childId, invitation: false } });
   };
 
   const handleFriendsClick = () => {

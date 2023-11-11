@@ -16,7 +16,7 @@ interface VideoData {
 }
 
 interface AnimonParams {
-  subscriberId: number;
+  friendId: number;
   onSuccess: (data: any) => void;
   onError: () => void;
 }
@@ -32,7 +32,7 @@ interface FollowingParams extends ApiResponse {
 }
 
 interface FriendsParams {
-  profileId: number;
+  childId: number;
   onSuccess: (data: any) => void;
   onError: () => void;
 }
@@ -62,9 +62,9 @@ export const follow = async ({ followingData, onSuccess, onError }: FollowingPar
   }
 };
 
-export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonParams) => {
+export const getAnimon = async ({ friendId, onSuccess, onError }: AnimonParams) => {
   try {
-    const response = await instance.get(`/children/participant/${subscriberId}`);
+    const response = await instance.get(`/children/participant/${friendId}`);
     console.log('Success Get Animon');
     onSuccess(response.data.data);
   } catch (error) {
@@ -72,9 +72,9 @@ export const getAnimon = async ({ subscriberId, onSuccess, onError }: AnimonPara
   }
 };
 
-export const getFriends = async ({ profileId, onSuccess, onError }: FriendsParams) => {
+export const getFriends = async ({ childId, onSuccess, onError }: FriendsParams) => {
   try {
-    const response = await instance.get(`/children/${profileId}/follows`);
+    const response = await instance.get(`/children/${childId}/follows`);
     onSuccess(response.data.data);
   } catch (error) {
     onError();
