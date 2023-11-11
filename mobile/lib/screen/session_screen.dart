@@ -1,96 +1,88 @@
-// Copyright 2013 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
-// ignore_for_file: public_member_api_docs
-
-import 'dart:ffi';
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import "package:flutter/material.dart";
+import 'package:mobile/widgets/session/menu.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 
-class Session extends StatefulWidget {
-  const Session({super.key});
+class SessionPage extends StatefulWidget {
+  const SessionPage({super.key});
 
   @override
-  State<Session> createState() => _SessionState();
+  State<SessionPage> createState() => _SessionPageState();
 }
 
-class _SessionState extends State<Session> {
+class _SessionPageState extends State<SessionPage> {
   late final WebViewController _controller;
-  late String childId = '';
-  late String token = '';
-  final bool invitation = false;
-
-  Future<void> getChildInfo() async {
-    const storage = FlutterSecureStorage();
-    String? authKey = await storage.read(key: 'Authkey');
-    String? profileId = await storage.read(key: 'childId');
-    setState(() {
-      if (authKey != null) {
-        token = authKey;
-      } else {
-        print('토큰이 없습니다.');
-        token = '';
-      }
-
-      if (profileId != null) {
-        childId = profileId;
-      } else {
-        print('아이디가 없습니다.');
-        childId = '';
-      }
-    });
-  }
-
-  void sendChildId() async {
-    if (childId != '') {
-      print('웹으로 childId 보내는 중입니다.');
-      String message = json
-          .encode({"childId": childId, "invitation": false, "token": token});
-      await _controller.runJavaScript("changePage('$message')");
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    getChildInfo();
 
-    // #docregion webview_controller
-    _controller = WebViewController()
+    late final PlatformWebViewControllerCreationParams params;
+    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+      params = WebKitWebViewControllerCreationParams(
+        allowsInlineMediaPlayback: true,
+        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+      );
+    } else {
+      params = const PlatformWebViewControllerCreationParams();
+    }
+
+    final WebViewController controller =
+        WebViewController.fromPlatformCreationParams(params);
+
+    controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
       ..setNavigationDelegate(
         NavigationDelegate(
           onProgress: (int progress) {
-            _controller.currentUrl().then((result) => {print(result)});
+            debugPrint('WebView is loading (progress : $progress%)');
           },
-          onPageStarted: (String url) {},
+          onPageStarted: (String url) {
+            debugPrint('Page started loading: $url');
+          },
           onPageFinished: (String url) {
-            sendChildId();
-            debugPrint('Page Finished');
+            debugPrint('Page finished loading: $url');
           },
           onWebResourceError: (WebResourceError error) {
-            print(error);
+            debugPrint('''
+              Page resource error:
+                code: ${error.errorCode}
+                description: ${error.description}
+                errorType: ${error.errorType}
+                isForMainFrame: ${error.isForMainFrame}
+          ''');
           },
         ),
       )
+      ..addJavaScriptChannel(
+        'Toaster',
+        onMessageReceived: (JavaScriptMessage message) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message.message)),
+          );
+        },
+      )
       ..loadRequest(Uri.parse('https://k9c103.p.ssafy.io/mobile'));
-    // #enddocregion webview_controller
+
+    if (controller.platform is AndroidWebViewController) {
+      AndroidWebViewController.enableDebugging(true);
+      (controller.platform as AndroidWebViewController)
+          .setMediaPlaybackRequiresUserGesture(false);
+    }
+
+    _controller = controller;
   }
 
-  // #docregion webview_widget
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Simple Example')),
-      body: WebViewWidget(controller: _controller),
+      appBar: AppBar(actions: [Menu(controller: _controller)]),
+      body: SafeArea(
+        bottom: false,
+        child: WebViewWidget(controller: _controller),
+      ),
     );
   }
-  // #enddocregion webview_widget
 }
