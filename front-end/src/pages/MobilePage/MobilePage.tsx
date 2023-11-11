@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
+import { MobileChildId } from 'atoms/Mobile';
 import { useNavigate } from 'react-router';
+import { useRecoilState } from 'recoil';
 
 export const Mobile = () => {
   const navigate = useNavigate();
+  const [childId, setChildId] = useRecoilState(MobileChildId);
 
   const TOKEN = 'accessToken';
   const isAccessTokenEmpty = localStorage.getItem(TOKEN) === null;
@@ -22,7 +25,7 @@ export const Mobile = () => {
     window.changePage = message => {
       const data = JSON.parse(message);
       console.log(`invitation: ${data.invitation}, childId: ${data.childId}`);
-      if (data.invitation === false) {
+      if (localStorage.getItem(TOKEN) === null && !childId && data.invitation === false) {
         const { invitation, childId, token } = JSON.parse(message);
         console.log(`invitation: ${invitation}, childId: ${childId}, token: ${token}`);
         if (token) {
@@ -30,12 +33,11 @@ export const Mobile = () => {
         }
         if (childId && token && invitation === false) {
           console.log('모바일에서 새 친구 세션으로 이동합니다.');
+          setChildId(data.childId);
           navigate('/session', { state: { childId: data.childId, invitation: false } });
-        } else if (data.invitation === true) {
-          navigate('/session', { state: { childId, invitation } });
         } else if (childId && token && invitation === true) {
           console.log('모바일에서 내 친구 세션으로 이동합니다.');
-          navigate('/session', { state: { childId: data.childId, invitation: true } });
+          setChildId(data.childId);
           navigate('/session', { state: { childId, invitation } });
         } else {
           console.log('모바일에서 웹 세션으로 접속에 실패하였습니다.');
