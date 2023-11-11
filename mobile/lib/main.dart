@@ -49,7 +49,7 @@ void initializeNotification() async {
     RemoteNotification? notification = message.notification;
 
     if (notification != null) {
-      Future.delayed(const Duration(milliseconds: 3000), () {
+      Future.delayed(const Duration(milliseconds: 1000), () {
         flutterLocalNotificationsPlugin.show(
             notification.hashCode,
             notification.title,
