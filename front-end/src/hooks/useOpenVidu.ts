@@ -108,6 +108,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
                     video: true,
                   });
                   const devices = await OV.getDevices();
+                  console.log(devices);
                   const videoDevices = devices.filter(device => device.kind === 'videoinput');
 
                   console.log('나를 publisher라고 하자!');
