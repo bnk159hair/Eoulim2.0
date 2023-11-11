@@ -25,7 +25,7 @@ export const Mobile = () => {
     window.changePage = message => {
       const data = JSON.parse(message);
       console.log(`invitation: ${data.invitation}, childId: ${data.childId}`);
-      if (localStorage.getItem(TOKEN) === null && !childId && data.invitation === false) {
+      if (data) {
         const { invitation, childId, token } = JSON.parse(message);
         console.log(`invitation: ${invitation}, childId: ${childId}, token: ${token}`);
         if (token) {
@@ -47,7 +47,7 @@ export const Mobile = () => {
         }
       }
     };
-  }, []);
+  }, [childId]);
 
   return <div style={{ visibility: 'hidden' }} />;
 };
