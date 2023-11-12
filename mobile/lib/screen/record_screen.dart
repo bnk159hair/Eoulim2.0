@@ -44,7 +44,7 @@ class _RecordState extends State<Record> {
                 ),
               ),
               checkingpassword
-              ? recordForm():
+              ? RecordForm():
               Expanded(
                 child: Center(
                   child: Container(
