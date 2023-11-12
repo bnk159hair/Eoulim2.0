@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:mobile/controller/profile_select.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:mobile/screen/session_screen.dart';
 
 import 'package:mobile/screen/splash_screen.dart';
 
@@ -36,6 +37,11 @@ void initializeNotification() async {
       android: AndroidInitializationSettings("@mipmap/ic_launcher"),
       iOS: DarwinInitializationSettings(),
     ),
+    onDidReceiveNotificationResponse: (NotificationResponse details) {
+      final payload = details.payload!.split(' ');
+      final sessionId = payload[payload.length - 1];
+      Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
+    },
     onDidReceiveBackgroundNotificationResponse: backgroundHandler,
   );
 
@@ -62,7 +68,7 @@ void initializeNotification() async {
               ),
               iOS: DarwinNotificationDetails(),
             ),
-            payload: message.data['test_paremeter1']);
+            payload: notification.body);
         print(notification.body);
         print("수신자 측 메시지 수신");
       });
