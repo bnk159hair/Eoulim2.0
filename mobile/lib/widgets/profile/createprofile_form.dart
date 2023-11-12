@@ -356,7 +356,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                   name: name,
                   birth: birth.toString().split(' ')[0],
                   gender: gender,
-                  school: school,
+                  school: '$school초등학교',
                   grade: grade,
                 ),
               );
@@ -373,6 +373,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                           child: TextButton(
                             child: const Text('프로필 선택창'),
                             onPressed: () {
+                              Navigator.of(ctx).pop();
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(

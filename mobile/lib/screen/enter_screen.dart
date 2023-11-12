@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:mobile/controller/profile_select.dart';
 import 'package:mobile/screen/session_screen.dart';
 
-
 class Enter extends StatefulWidget {
   const Enter({super.key});
 
@@ -30,10 +29,10 @@ class _EnterState extends State<Enter> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Obx(() {
-                            return Image.network(
-                             '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
-                            );
-                          }),
+                return Image.network(
+                  '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
+                );
+              }),
               const SizedBox(
                 height: 50,
               ),
@@ -51,12 +50,7 @@ class _EnterState extends State<Enter> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Session(),
-                      ),
-                    );
+                    Get.to(() => SessionPage(), arguments: {'sessionId': ''});
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
