@@ -80,7 +80,8 @@ class _SessionPageState extends State<SessionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(actions: [Menu(controller: _controller)]),
+      appBar: AppBar(
+          actions: [Menu(controller: _controller, sessionId: sessionId)]),
       body: SafeArea(
         bottom: false,
         child: WebViewWidget(controller: _controller),

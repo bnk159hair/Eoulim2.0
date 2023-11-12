@@ -13,14 +13,18 @@ import 'package:mobile/screen/splash_screen.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // await Firebase.initializeApp();
-  // await setupFlutterNotifications();
+  await Firebase.initializeApp();
+  initializeNotification();
+  print('백그라운드입니다.');
   // showFlutterNotification(message);
 }
 
 @pragma('vm:entry-point')
 void backgroundHandler(NotificationResponse details) {
-  // 액션 추가... 파라미터는 details.payload 방식으로 전달
+  print('현재 백그라운드에서 초대 메시지를 받았습니다.');
+  final payload = details.payload!.split(' ');
+  final sessionId = payload[payload.length - 1];
+  Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
 }
 
 void initializeNotification() async {
@@ -72,6 +76,15 @@ void initializeNotification() async {
         print(notification.body);
         print("수신자 측 메시지 수신");
       });
+    }
+  });
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    RemoteNotification? notification = message.notification;
+    if (notification != null) {
+      final payload = notification.body!.split(' ');
+      final sessionId = payload[payload.length - 1];
+      Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
     }
   });
 
