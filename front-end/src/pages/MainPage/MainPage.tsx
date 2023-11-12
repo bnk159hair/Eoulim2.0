@@ -33,9 +33,7 @@ const MainPage: React.FC = () => {
   const [userName] = useState<string>('');
 
   useEffect(() => {
-    if (profile.id === 0) {
-      getChild();
-    }
+    getChild();
   }, [childId, token, navigate]);
 
   const getNewFriend = () => {

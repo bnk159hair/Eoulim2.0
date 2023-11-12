@@ -4,11 +4,11 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { Button } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { fcmTokenState } from 'atoms/Firebase';
-import { childLogin } from 'apis/profileApis';
+import { childLogin, getChildInfo } from 'apis/profileApis';
 import { ProfileUserContainer, NameTag, ButtonContainer } from './ProfileListItemStyles';
 import ModifyModal from './ModifyModal';
 import { userState } from '../../atoms/Auth';
-import { Profilekey } from '../../atoms/Profile';
+import { Profile, Profilekey } from '../../atoms/Profile';
 import ToRecordModal from './ToRecordModal';
 
 const theme = createTheme({
@@ -38,6 +38,7 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
   const [, setChildId] = useRecoilState(Profilekey);
   const fcmToken = useRecoilValue(fcmTokenState);
   const [, setUserName] = useRecoilState(userState);
+  const [, setProfile] = useRecoilState(Profile);
 
   const handleChildLogin = () => {
     console.log(fcmToken);
@@ -52,14 +53,25 @@ const ProfileListItem: React.FC<ProfileListItemProps> = ({
       childLoginData: childLoginoutData,
       onSuccess: () => {
         console.log('프로필 로그인에 성공했습니다.');
-        setChildId(childId);
-        setUserName(name);
+        getChildInfo({
+          id: childId,
+          onSuccess: data => {
+            setProfile(data);
+            console.log('프로필 가져오기에 성공하였습니다.');
+            console.log(data);
+            setChildId(childId);
+            setUserName(name);
+            navigate('/', { state: { profile: data } });
+          },
+          onError: () => {
+            console.log('프로필 가져오기에 실패하였습니다.');
+          },
+        });
       },
       onError: () => {
         console.log('프로필 로그인에 실패하였습니다.');
       },
     });
-    navigate('/');
   };
 
   return (
