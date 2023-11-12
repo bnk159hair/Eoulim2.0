@@ -50,12 +50,7 @@ class _EnterState extends State<Enter> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SessionPage(),
-                      ),
-                    );
+                    Get.to(() => SessionPage(), arguments: {'sessionId': ''});
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
