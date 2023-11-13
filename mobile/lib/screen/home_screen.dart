@@ -65,21 +65,22 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const Notifications(),
-                ),
-              );
-            },
-            icon: const Icon(
-              Icons.notifications,
-            ),
-            iconSize: 40.0,
-            color: Colors.yellow,
-          ),
+           leading: Container(),
+          // leading: IconButton(
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //         builder: (context) => Notifications(),
+          //       ),
+          //     );
+          //   },
+          //   icon: const Icon(
+          //     Icons.notifications,
+          //   ),
+          //   iconSize: 40.0,
+          //   color: Colors.yellow,
+          // ),
           actions: [
             Row(
               children: [
