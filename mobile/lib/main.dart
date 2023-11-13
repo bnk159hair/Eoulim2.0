@@ -8,6 +8,7 @@ import 'package:mobile/controller/profile_select.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:mobile/screen/session_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'package:mobile/screen/splash_screen.dart';
 
@@ -104,9 +105,44 @@ Future<String?> getMyDeviceToken() async {
   return token;
 }
 
+void _permission() async {
+  Map<Permission, PermissionStatus> requestStatuses = await [
+    Permission.camera,
+    Permission.audio,
+    Permission.microphone,
+  ].request();
+  // 각 권한에 대한 상태를 확인하고 처리할 수 있습니다.
+  if (requestStatuses[Permission.camera] == PermissionStatus.granted) {
+    // Camera 권한이 허용된 경우
+    print('Camera permission granted');
+  } else {
+    // Camera 권한이 거부된 경우
+    print('Camera permission denied');
+  }
+
+  if (requestStatuses[Permission.audio] == PermissionStatus.granted) {
+    // Audio 권한이 허용된 경우
+    print('Audio permission granted');
+  } else {
+    // Audio 권한이 거부된 경우
+    print('Audio permission denied');
+  }
+
+  if (requestStatuses[Permission.microphone] == PermissionStatus.granted) {
+    // Microphone 권한이 허용된 경우
+    print('Microphone permission granted');
+  } else {
+    // Microphone 권한이 거부된 경우
+    print('Microphone permission denied');
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await Permission.audio.request();
+  await Permission.camera.request();
+  await Permission.microphone.request();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   initializeNotification();
 
