@@ -21,7 +21,7 @@ class GetAlarm extends generalResponse {
 
 
 class Alarm {
-  String? createTime;
+  List<dynamic>? createTime;
   String? text;
 
   Alarm({this.createTime, this.text});

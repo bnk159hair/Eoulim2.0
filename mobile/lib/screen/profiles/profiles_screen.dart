@@ -5,6 +5,7 @@ import 'package:mobile/model/request_models/put_profilelogin.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/model/response_models/get_profiles.dart';
 import 'package:mobile/screen/home_screen.dart';
+import 'package:mobile/screen/notifications_screen.dart';
 import 'package:mobile/screen/profiles/change_password_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -93,7 +94,14 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   leading: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Notifications(),
+                        ),
+                      );
+                    },
                     icon: const Icon(
                       Icons.notifications_none,
                     ),
