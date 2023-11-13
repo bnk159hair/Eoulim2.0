@@ -26,7 +26,8 @@ class ApiRecords {
       },
     );
     if (response.statusCode == 200) {
-      final List<dynamic> records = jsonDecode(response.body)['data'];
+      final List<dynamic> records =
+          jsonDecode(utf8.decode(response.bodyBytes))['data'];
       for (var record in records) {
         recordInstances.add(RecordsModel.fromJson(record));
       }
