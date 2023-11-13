@@ -27,7 +27,7 @@ import {
 import { Profile } from '../../atoms/Profile';
 import { IsAnimonLoaded, guideSeq, GuideScript, Timeline, SessionId } from '../../atoms/Session';
 import EndModal from '../../components/stream/EndModal';
-import { destroySession } from '../../apis/openViduApis';
+import { destroyInvitationSession, destroySession } from '../../apis/openViduApis';
 import { S3_SOUND_BASE_URL } from '../../apis/urls';
 
 interface FriendsProfile {
@@ -90,7 +90,7 @@ const SessionPage = () => {
   }, [micStatus]);
 
   const sessionOver = () => {
-    setOpen(isTrue);
+    setOpen(true);
   };
 
   const [client, setClient] = useState<Client | null>(null);
@@ -122,7 +122,7 @@ const SessionPage = () => {
     console.log(childId, friendId);
 
     if (!state.invitation && !open && streamList[0]?.userId && streamList[1]?.userId && first) {
-      setFirst(isFalse);
+      setFirst(false);
       setStartTime(Date.now());
       setTimeout(() => {
         guidance.play();
@@ -147,7 +147,7 @@ const SessionPage = () => {
           console.log(Number(user.id) === Number(friendId));
           if (String(user.id) === String(friendId)) {
             console.log('친구입니다.');
-            setFriend(isTrue);
+            setFriend(true);
           }
         });
       }
@@ -182,8 +182,8 @@ const SessionPage = () => {
         guidance.play();
       }
       setIsPlaying(true);
-      setPublisherGuideStatus(isFalse);
-      setSubscriberGuideStatus(isFalse);
+      setPublisherGuideStatus(false);
+      setSubscriberGuideStatus(false);
       guidance.addEventListener('ended', () => {
         setIsPlaying(false);
         if (nextIndex === 4) {
@@ -225,12 +225,16 @@ const SessionPage = () => {
         const message = JSON.parse(response.body);
         console.log(message);
         if (message.childId !== String(childId)) {
-          setOpen(isTrue);
+          if (message.isLeft === false) {
+            console.log('상대방이 초대를 거절했습니다.');
+            setRefuse(true);
+          }
+          setOpen(true);
         }
       });
     },
     beforeDisconnected() {
-      // setClient(null);
+      setClient(null);
     },
   });
 
@@ -245,19 +249,19 @@ const SessionPage = () => {
 
   const leaveSession = () => {
     setOpen(false);
-    if (invitation) {
-      if (client) {
-        const jsonMessage = {
-          childId: String(childId),
-          isLeft: true,
-        };
-        const message = JSON.stringify(jsonMessage);
-        client.publish({
-          destination: `/app/${sessionId}/leave-session`,
-          body: message,
-        });
-        console.log('메시지 전송:', message);
-      }
+    if (client) {
+      const jsonMessage = {
+        childId: String(childId),
+        isLeft: true,
+      };
+      const message = JSON.stringify(jsonMessage);
+      client.publish({
+        destination: `/app/${sessionId}/leave-session`,
+        body: message,
+      });
+      console.log('메시지 전송:', message);
+    }
+    if (!invitation) {
       const sessionData = { sessionId, guideScript, timeline };
       destroySession({
         sessionData,
@@ -270,7 +274,15 @@ const SessionPage = () => {
         },
       });
     } else {
-      setRefuse(true);
+      destroyInvitationSession({
+        sessionId,
+        onSuccess: () => {
+          console.log('세션 페이지에서 초대 세션 접속을 종료하였습니다.');
+        },
+        onError: () => {
+          console.log('세션 페이지에서 초대 세션 종료에 실패하였습니다.');
+        },
+      });
     }
     session.disconnect();
     navigate('/');
@@ -332,14 +344,6 @@ const SessionPage = () => {
     }
   };
 
-  const isTrue = () => {
-    return true;
-  };
-
-  const isFalse = () => {
-    return false;
-  };
-
   const [checkVideo, setCheckVideo] = useState(false);
 
   if (open) {
@@ -361,7 +365,7 @@ const SessionPage = () => {
       return (
         <EndModal
           onClose={leaveSession}
-          message={'친구 조아?'}
+          message={'다음에 다시 만날래?'}
           isFriend={isFriend}
           addFriend={addFriend}
         />
