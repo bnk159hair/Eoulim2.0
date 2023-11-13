@@ -7,7 +7,7 @@ import { RecordPageContainer, EmptyRecord, Scroll, BackIcon } from './RecordPage
 import { Profilekey } from '../../atoms/Profile';
 
 interface Record {
-  animonName: string;
+  animonPath: string;
   createTime: number[];
   id: number;
   name: string;
@@ -47,7 +47,7 @@ const RecordPage = () => {
               key={record.id}
               recordId={record.id}
               name={record.name}
-              animonName={record.animonName}
+              animonPath={record.animonPath}
               school={record.school}
               videoPath={record.videoPath}
               createTime={record.createTime}

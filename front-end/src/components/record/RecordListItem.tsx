@@ -8,7 +8,7 @@ import {
 import VideoModal from './RecordVideo';
 
 interface RecordListItemProps {
-  animonName: string;
+  animonPath: string;
   createTime: number[];
   school: string;
   videoPath: string;
@@ -18,13 +18,13 @@ interface RecordListItemProps {
 
 const RecordListItem: React.FC<RecordListItemProps> = ({
   name,
-  animonName,
+  animonPath,
   school,
   videoPath,
   createTime,
   recordId,
 }) => {
-  const IMGURL = `${animonName}`;
+  const IMGURL = `${animonPath}`;
   console.log(IMGURL);
   const [isModalOpen, setModalOpen] = useState(false);
   const openModal = () => {
