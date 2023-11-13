@@ -5,12 +5,14 @@ import { useRecoilState } from 'recoil';
 import { getChildInfo } from 'apis/profileApis';
 import { Profile } from 'atoms/Profile';
 import { InvitationSessionId } from 'atoms/Ivitation';
+import { SessionId } from 'atoms/Session';
 
 export const Mobile = () => {
   const navigate = useNavigate();
   const [childId, setChildId] = useRecoilState(MobileChildId);
   const [, setInvitationSessionId] = useRecoilState(InvitationSessionId);
   const [, setProfile] = useRecoilState(Profile);
+  const [, setSessionId] = useRecoilState(SessionId);
 
   const TOKEN = 'accessToken';
   const isAccessTokenEmpty = localStorage.getItem(TOKEN) === null;
@@ -58,6 +60,7 @@ export const Mobile = () => {
         } else if (childId && token && invitation === true) {
           console.log('모바일에서 내 친구 세션으로 이동합니다.');
           setChildId(data.childId);
+          setSessionId(sessionId);
           setInvitationSessionId(sessionId);
           navigate('/session', { state: { childId, invitation } });
         } else {
