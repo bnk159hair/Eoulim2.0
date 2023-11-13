@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/api/api_child.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:get/get.dart';
 import 'package:mobile/screen/profiles/modify_profile_screen.dart';
@@ -31,13 +31,13 @@ class SettingsScreen extends StatelessWidget {
                   _buildButtonRow(
                     '프로필 정보 수정',
                     onPressed: () {
-                      Get.offAll(() => const ModifyProfileScreen());
+                      Get.to(() => const ModifyProfileScreen());
                     },
                   ),
                   _buildButtonRow(
                     '프로필 정보 삭제',
                     onPressed: () async {
-                      final response = await ApiChild.deleteChild();
+                      final response = await ApiProfile.deleteProfile();
                       if (response == 204) {
                         profileLogout();
                       } else if (response == 401) {

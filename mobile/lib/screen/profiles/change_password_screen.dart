@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mobile/api/api_change_password.dart';
-import 'package:mobile/screen/login_screen.dart';
 import 'package:mobile/util/custom_text_field.dart';
 import 'package:mobile/util/logout_logic.dart';
 
-class ChangePassword extends StatefulWidget {
-  const ChangePassword({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
 
   @override
-  State<ChangePassword> createState() => _ChangePasswordState();
+  State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _ChangePasswordState extends State<ChangePassword> {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   String curPassword = '';
   String newPassword = '';
   String passwordConfirm = '';
@@ -20,7 +18,19 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text(
+          '비밀번호 변경',
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+        elevation: 1,
+        centerTitle: true,
+        backgroundColor: Colors.black.withOpacity(0.2),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -34,17 +44,16 @@ class _ChangePasswordState extends State<ChangePassword> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Image.asset(
-                  'assets/logo.png',
-                  width: 150,
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(20.0),
+              //   child: Image.asset(
+              //     'assets/logo.png',
+              //     width: 150,
+              //   ),
+              // ),
               Column(
                 children: [
                   Container(
-                    // width: MediaQuery.of(context).size.width / 1.1,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.3),
                       borderRadius: BorderRadius.circular(20),
@@ -58,6 +67,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                           },
                           icon: Icons.lock_open_rounded,
                           obscureText: true,
+                          padding: const EdgeInsets.all(20.0),
                         ),
                         CustomTextFormField(
                           labelText: "새 비밀번호",

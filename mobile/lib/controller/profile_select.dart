@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:mobile/model/response_models/get_porfile.dart';
+import 'package:mobile/model/response_models/get_profile.dart';
 
 class ProfileController extends GetxController {
   // 선택한 프로필을 보유할 Rx<Profile> 변수를 정의합니다.
