@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import box from '../../assets/box/woodbox.jpg';
+import before from '../../assets/ecc/before.png';
+import after from '../../assets/ecc/after.png';
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -36,6 +38,28 @@ export const Animon = styled.div<{ animonurl?: string }>`
   background-color: #87cefa;
   border-radius: 25px;
   border: solid 2px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.25);
+  }
+`;
+
+export const BeforeButton = styled.div`
+  height: 50px;
+  width: 50px;
+  background-image: url(${before});
+  background-size: cover;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.25);
+  }
+`;
+
+export const AfterButton = styled.div`
+  height: 50px;
+  width: 50px;
+  background-image: url(${after});
+  background-size: cover;
   cursor: pointer;
   &:hover {
     transform: scale(1.25);
