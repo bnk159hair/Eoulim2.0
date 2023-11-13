@@ -13,7 +13,7 @@ import javax.validation.Valid;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v2/animons")
+@RequestMapping("api/v1/animons")
 @RequiredArgsConstructor
 public class AnimonController {
 
