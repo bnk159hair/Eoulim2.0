@@ -482,6 +482,7 @@ public class MatchServiceImpl implements MatchService {
         throw new EoullimApplicationException(ErrorCode.MATCH_NOT_FOUND);
 
       } else { // 매치가 된 후 나갔을 경우
+        log.info("매치가 된 후 나갔을 경우");
         String recordId = sessionRecordings.get(sessionId);
         Recording recording = openvidu.stopRecording(recordId);
 
