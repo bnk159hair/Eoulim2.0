@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface MatchService {
   Match startRandom(Long childId, Authentication authentication);
-  void startRandom_01(MatchStartRequest matchStartRequest);
+//  void startRandom_01(MatchStartRequest matchStartRequest);
   Match startFriend(
           Long childId,
           Long friendId,
