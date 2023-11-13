@@ -37,6 +37,17 @@ interface FriendsParams {
   onError: () => void;
 }
 
+interface ReceiveAnimonData {
+  childId: number;
+  otherChildId: number;
+}
+
+interface ReceiveAnimonParams {
+  receiveAnimonData: ReceiveAnimonData;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
 export const changeVideo = async ({ videoData, onSuccess, onError }: ChangeVideoParams) => {
   try {
     const isAnimonOn = !videoData.status;
@@ -59,6 +70,31 @@ export const follow = async ({ followingData, onSuccess, onError }: FollowingPar
   } catch (error) {
     console.log(error);
     onError();
+  }
+};
+
+// 친구 추가를 하면 상대방의 프로필 애니몬을 선물 받음.
+export const receiveAnimon = async ({
+  receiveAnimonData,
+  onSuccess,
+  onError,
+}: ReceiveAnimonParams) => {
+  try {
+    // 얘는 V2임!
+    // const tmp = API_V2_BASE_URL;
+    // console.log(tmp);
+    // instance.defaults.baseURL = API_V2_BASE_URL;
+    // instance.defaults.baseURL = `http://localhost:8081/api/v2`;
+    console.log('여기 왔따 !! TRY');
+    const response = await instance.post(`/animons`, receiveAnimonData);
+    onSuccess(response.data.data);
+  } catch (error) {
+    console.log('여기 왔따 !! ERROR');
+    console.log(error);
+    onError();
+  } finally {
+    console.log('여기 왔따 !! FINALLY');
+    // instance.defaults.baseURL = API_BASE_URL;
   }
 };
 

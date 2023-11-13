@@ -5,7 +5,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
-import { changeVideo, follow, getAnimon, getFriends } from 'apis/sessionApis';
+import { changeVideo, follow, getAnimon, getFriends, receiveAnimon } from 'apis/sessionApis';
 import { useWebSocket } from 'hooks/useWebSocket';
 import { InvitationSessionId, InvitationToken } from 'atoms/Ivitation';
 import Loading from '../../components/stream/Loading';
@@ -289,15 +289,29 @@ const SessionPage = () => {
   };
 
   const addFriend = () => {
+    // 상대방을 친구로 등록
     console.log(childId, friendId);
     const followingData = { childId, followingChildId: friendId };
     follow({
       followingData,
       onSuccess: () => {
+        console.log('친구 추가 성공');
         leaveSession();
       },
       onError: () => {
         console.log('친구 추가를 실패하였습니다.');
+      },
+    });
+    // 상대방의 프로필 애니몬을 선물로 받기
+    const receiveAnimonData = { childId, otherChildId: friendId };
+    receiveAnimon({
+      receiveAnimonData,
+      onSuccess: data => {
+        // 성공적으로 받은 애니몬
+        console.log('선물받기 : ', data);
+      },
+      onError: () => {
+        console.log('친구의 애니몬을 선물 받지 못했어요 ㅜㅜ');
       },
     });
   };
