@@ -30,16 +30,19 @@ public class AnimonServiceImpl implements AnimonService {
   private final ChildAnimonRepository childAnimonRepository;
 
   @Override
-  public void prensentAnimon(Long childId, Long otherChildId, Authentication authentication) {
-    // 나의 프로필 애니몬 가져오기
+  public Animon receiveAnimon(Long childId, Long otherChildId, Authentication authentication) {
+    // 나
     Child child = childService.getChild(childId, authentication);
-    Animon gift = child.getProfileAnimon();
-    log.info("[INFO] My Profile Animon: "+gift.getId());
-    // 상대방에게 내 애니몬이 있는지 체크
-    checkChildAnimon(otherChildId, gift.getId());
-    // 애니몬 저장
+    // 상대방의 프로필 애니몬
     Child otherChild = childService.getChildWithNoPermission(otherChildId);
-    childAnimonService.saveChildAnimon(otherChild, gift);
+    Animon gift = otherChild.getProfileAnimon();
+    log.info("[INFO] Friend's Profile Animon: "+gift.getId());
+    // 나에게 상대방의 애니몬이 있는지 체크
+    checkChildAnimon(childId, gift.getId());
+    // 애니몬 저장
+    ChildAnimon result = childAnimonService.saveChildAnimon(child, gift);
+    log.info(String.format("[SUCCESS] Animon received. Animon name: %s", result.getAnimon().getName()));
+    return result.getAnimon();
   }
 
   private void checkChildAnimon(Long childId, Long animonId) {

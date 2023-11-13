@@ -25,10 +25,11 @@ public class ChildAnimonServiceImpl implements ChildAnimonService {
 
   @Override
   @Transactional
-  public void saveChildAnimon(Child child, Animon animon) {
+  public ChildAnimon saveChildAnimon(Child child, Animon animon) {
     ChildAnimonEntity childAnimonEntity = ChildAnimonEntity.builder()
             .child(child).animon(animon).build();
-    childAnimonRepository.save(childAnimonEntity);
+    final var newChildAnimonEntity = childAnimonRepository.save(childAnimonEntity);
+    return ChildAnimon.fromEntity(newChildAnimonEntity);
   }
 
   @Override

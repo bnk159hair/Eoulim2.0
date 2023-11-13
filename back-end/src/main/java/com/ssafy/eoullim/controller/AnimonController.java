@@ -20,14 +20,14 @@ public class AnimonController {
   private final AnimonService animonService;
 
   /**
-   * 화상 미팅이 끝난 후, 마지막에 내 프로필 애니몬을 상대방에게 선물 할 경우
-   * @param request : childId - 주는 사람, otherChildId - 받는 사람
+   * 화상 미팅이 끝난 후, 상대방을 친구 추가하면 그 사람의 애니몬을 얻을 수 있다.
+   * @param request : childId - 받는 사람, otherChildId - 주는 사람 (새로 친구로 추가한 사람)
    * @return 결과
    */
   @PostMapping
   @ResponseStatus(HttpStatus.OK)
   public SuccessResponse<?> presentAnimon(@Valid @RequestBody AnimonPresentRequest request, Authentication authentication) {
-    animonService.prensentAnimon(request.getChildId(), request.getOtherChildId(), authentication);
-    return new SuccessResponse<>(null);
+    final var receivedAnimon = animonService.receiveAnimon(request.getChildId(), request.getOtherChildId(), authentication);
+    return new SuccessResponse<>(receivedAnimon);
   }
 }
