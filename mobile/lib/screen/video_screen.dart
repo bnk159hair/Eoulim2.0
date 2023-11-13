@@ -16,6 +16,7 @@ class PlayVideo extends StatefulWidget {
 class _PlayVideoState extends State<PlayVideo> {
   late VideoPlayerController _videoPlayerController;
   ChewieController? _chewieController;
+  int? bufferDelay;
 
   @override
   void initState() {
@@ -33,6 +34,9 @@ class _PlayVideoState extends State<PlayVideo> {
       videoPlayerController: _videoPlayerController,
       aspectRatio: 16 / 9,
       autoPlay: true,
+      progressIndicatorDelay:
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+      fullScreenByDefault: true,
     );
 
     setState(() {});

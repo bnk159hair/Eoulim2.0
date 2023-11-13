@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:mobile/screen/animon_screen.dart';
 import 'package:mobile/screen/notifications_screen.dart';
 import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
+import 'package:mobile/screen/session_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:mobile/util/logout_logic.dart';
@@ -29,6 +31,54 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _getProfileInfo();
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      RemoteNotification? notification = message.notification;
+
+      if (notification != null) {
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          Get.defaultDialog(
+            title: '친구가 초대를 보냈어요!',
+            middleText: '만나러 가볼까요?',
+            actions: [
+              IconButton(
+                onPressed: () => Get.to(() => const SessionPage()),
+                icon: const Icon(
+                  Icons.circle_outlined,
+                  size: 40,
+                  color: Colors.green,
+                ),
+              ),
+              IconButton(
+                onPressed: () => Get.back(),
+                icon: const Icon(
+                  Icons.close_rounded,
+                  size: 40,
+                  color: Colors.red,
+                ),
+              ),
+            ],
+          );
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => AlertDialog(
+          //     title: const Text('알림 도착'),
+          //     content: Text(notification.body ?? ''),
+          //     actions: [
+          //       TextButton(
+          //         onPressed: () {
+          //           Navigator.of(context).pop();
+          //         },
+          //         child: const Text('확인'),
+          //       ),
+          //     ],
+          //   ),
+          // );
+          print(notification.body);
+          print("수신자 측 메시지 수신");
+        });
+      }
+    });
   }
 
   Future<void> _getProfileInfo() async {
@@ -65,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
-           leading: Container(),
+          leading: Container(),
           // leading: IconButton(
           //   onPressed: () {
           //     Navigator.push(
