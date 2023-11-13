@@ -24,4 +24,11 @@ public class NotificationController {
     List<Notification> notifications = notificationService.getNotifications(authentication);
     return new SuccessResponse<>(notifications);
   }
+
+  @DeleteMapping
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Void> deleteNotifications(Authentication authentication) {
+    notificationService.deleteNotifications(authentication);
+    return new SuccessResponse<>(null);
+  }
 }

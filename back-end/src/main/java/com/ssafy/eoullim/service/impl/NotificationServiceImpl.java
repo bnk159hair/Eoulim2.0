@@ -36,4 +36,12 @@ public class NotificationServiceImpl implements NotificationService {
         .map(Notification::fromEntity)
         .collect(Collectors.toList());
   }
+
+  @Override
+  @Transactional
+  public void deleteNotifications(Authentication authentication) {
+    User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
+    if (user == null) throw new EoullimApplicationException(ErrorCode.AUTHENTICATION_NOT_FOUND);
+    notificationRepository.deleteByUserId(user.getId());
+  }
 }

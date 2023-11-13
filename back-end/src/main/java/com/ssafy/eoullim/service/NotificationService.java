@@ -11,4 +11,6 @@ import java.util.List;
 public interface NotificationService {
     void save(User user, String body);
     List<Notification> getNotifications(Authentication authentication);
+
+    void deleteNotifications(Authentication authentication);
 }
