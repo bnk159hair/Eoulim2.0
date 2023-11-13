@@ -29,6 +29,10 @@ export const ModalContent = styled.div`
   border-radius: 25px;
   align-items: center;
   background-image: url(${box});
+  @media (max-width: 481px) {
+    width: 80vw;
+    height: 48vw;
+  }
 `;
 
 export const Accept = styled.div`
