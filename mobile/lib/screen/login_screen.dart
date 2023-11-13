@@ -1,31 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile/api/api_login.dart';
+import 'package:get/get.dart';
+import 'package:mobile/api/api_user.dart';
 import 'package:mobile/model/request_models/put_login.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
 import 'package:mobile/screen/signup_screen.dart';
+import 'package:mobile/util/custom_text_field.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<Login> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<Login> {
+class _LoginScreenState extends State<LoginScreen> {
   final loginFormKey = GlobalKey<FormState>();
   final storage = const FlutterSecureStorage();
   String fcmToken = '';
-  String id = '';
-  String pw = '';
+  String username = '';
+  String password = '';
   generalResponse? loginAuth;
-  ApiLogin apiLogin = ApiLogin();
 
   @override
   void initState() {
-    super.initState();
     _initializeFCMToken();
+    super.initState();
   }
 
   Future<void> _initializeFCMToken() async {
@@ -68,69 +69,26 @@ class _LoginScreenState extends State<Login> {
                     key: loginFormKey,
                     child: Column(
                       children: [
-                        Padding(
+                        CustomTextFormField(
+                          labelText: '아이디',
+                          onChanged: (val) {
+                            username = val;
+                          },
+                          icon: Icons.person,
                           padding: const EdgeInsets.only(
                             left: 20,
                             right: 20,
                             bottom: 20,
                             top: 20,
                           ),
-                          child: TextFormField(
-                            onChanged: (val) {
-                              id = val;
-                            },
-                            decoration: const InputDecoration(
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide.none,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(10)),
-                              ),
-                              prefixIcon: Icon(
-                                Icons.person,
-                                color: Colors.green,
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              labelText: "아이디",
-                            ),
-                          ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, right: 20, bottom: 20),
-                          child: Form(
-                            child: TextFormField(
-                              obscuringCharacter: '*',
-                              obscureText: true,
-                              onChanged: (val) {
-                                pw = val;
-                              },
-                              decoration: const InputDecoration(
-                                focusedBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                enabledBorder: UnderlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(10)),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.lock,
-                                  color: Colors.green,
-                                ),
-                                filled: true,
-                                fillColor: Colors.white,
-                                labelText: "비밀번호",
-                              ),
-                            ),
-                          ),
+                        CustomTextFormField(
+                          labelText: '비밀번호',
+                          onChanged: (val) {
+                            password = val;
+                          },
+                          icon: Icons.lock,
+                          obscureText: true,
                         ),
                       ],
                     ),
@@ -150,10 +108,10 @@ class _LoginScreenState extends State<Login> {
                       ),
                     ),
                     onPressed: () async {
-                      print(id);
-                      print(pw);
+                      print(username);
+                      print(password);
 
-                      if (id.isEmpty || pw.isEmpty) {
+                      if (username.isEmpty || password.isEmpty) {
                         showDialog(
                             context: context,
                             barrierDismissible: false,
@@ -162,42 +120,50 @@ class _LoginScreenState extends State<Login> {
                                 content: const Text('아이디와 비밀번호를 입력해 주세요'),
                                 actions: [
                                   Center(
-                                      child: TextButton(
-                                          child: const Text('확인'),
-                                          onPressed: () {
-                                            Navigator.of(ctx).pop();
-                                          }))
+                                    child: TextButton(
+                                      child: const Text('확인'),
+                                      onPressed: () {
+                                        Navigator.of(ctx).pop();
+                                      },
+                                    ),
+                                  )
                                 ],
                               );
                             });
                       } else {
                         loginFormKey.currentState?.save();
-                        loginAuth = await apiLogin.login(LoginRequestModel(
-                            id: id, password: pw, fcmToken: fcmToken));
+                        loginAuth = await ApiUser.postLogin(
+                          LoginRequestModel(
+                            id: username,
+                            password: password,
+                            fcmToken: fcmToken,
+                          ),
+                        );
                         if (loginAuth?.status == 'OK') {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Profiles(),
-                            ),
+                          Get.offAll(
+                            () => ProfilesScreen(),
+                            transition: Transition.zoom,
                           );
                         } else {
                           showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext ctx) {
-                                return AlertDialog(
-                                  content: const Text('아이디와 비밀번호를 다시 입력해주세요'),
-                                  actions: [
-                                    Center(
-                                        child: TextButton(
-                                            child: const Text('확인'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            }))
-                                  ],
-                                );
-                              });
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext ctx) {
+                              return AlertDialog(
+                                content: const Text('아이디와 비밀번호를 다시 입력해주세요'),
+                                actions: [
+                                  Center(
+                                    child: TextButton(
+                                      child: const Text('확인'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         }
                       }
                     },
@@ -217,11 +183,10 @@ class _LoginScreenState extends State<Login> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const Signup(),
-                              ));
+                          Get.to(
+                            () => const SignupScreen(),
+                            transition: Transition.rightToLeft,
+                          );
                         },
                         child: const Text(
                           '회원가입',

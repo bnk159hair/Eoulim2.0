@@ -19,21 +19,21 @@ enum MenuOption {
   logout,
 }
 
-class Profiles extends StatefulWidget {
+class ProfilesScreen extends StatefulWidget {
   List<Profile> profiles = List.empty();
   Apiprofile apiProfile = Apiprofile();
 
-  Profiles({super.key});
+  ProfilesScreen({super.key});
 
   @override
-  _ProfilesState createState() => _ProfilesState();
+  State<ProfilesScreen> createState() => _ProfilesScreenState();
 }
 
-class _ProfilesState extends State<Profiles> {
+class _ProfilesScreenState extends State<ProfilesScreen> {
   @override
   void initState() {
-    super.initState();
     _getProfiles();
+    super.initState();
   }
 
   Future<void> _getProfiles() async {
@@ -43,7 +43,7 @@ class _ProfilesState extends State<Profiles> {
         widget.profiles = result.profiles!;
       });
     } else if (result.code == '401') {
-      Logout();
+      userLogout();
     } else {
       if (!mounted) return;
       showDialog(
@@ -69,11 +69,12 @@ class _ProfilesState extends State<Profiles> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Carousel Slider',
-      home: CarouselWidget(profiles: widget.profiles),
-    );
+    return CarouselWidget(profiles: widget.profiles);
+    //  MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   title: 'Flutter Carousel Slider',
+    //   home: CarouselWidget(profiles: widget.profiles),
+    // );
   }
 }
 
@@ -101,7 +102,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
 
   Future<void> _initializeFCMToken() async {
     const storage = FlutterSecureStorage();
-    fcmToken = (await storage.read(key: 'fcmToken'));
+    fcmToken = await storage.read(key: 'fcmToken');
   }
 
   @override
@@ -145,7 +146,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                               ),
                             );
                           } else {
-                            return Logout();
+                            userLogout();
                           }
                         },
                         itemBuilder: (BuildContext context) => [
@@ -212,11 +213,9 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                     child: widget.profiles.isEmpty
                         ? GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CreateProfile(),
-                                ),
+                              Get.to(
+                                () => const CreateProfileScreen(),
+                                transition: Transition.rightToLeftWithFade,
                               );
                             },
                             child: Image.asset(
@@ -237,12 +236,8 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                                     ),
                                   );
                                   if (!mounted) return;
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const Home(),
-                                    ),
-                                  );
+                                  Get.offAll(() => const HomeScreen(),
+                                      transition: Transition.size);
                                 },
                                 child: Stack(
                                   children: [
@@ -348,18 +343,16 @@ class _CarouselWidgetState extends State<CarouselWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CreateProfile(),
-            ),
+          Get.to(
+            () => const CreateProfileScreen(),
+            transition: Transition.rightToLeftWithFade,
           );
         },
-        backgroundColor: const Color(0xffffffff),
+        backgroundColor: Colors.white,
         elevation: 0,
         child: const Icon(
           Icons.add,
-          color: Color(0xff000000),
+          color: Colors.black,
         ),
       ),
     );

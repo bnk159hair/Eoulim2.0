@@ -34,7 +34,7 @@ class ApiRecords {
       print(recordInstances);
       return recordInstances;
     } else if (response.statusCode == 401) {
-      Logout();
+      userLogout();
     }
     throw Error();
   }
