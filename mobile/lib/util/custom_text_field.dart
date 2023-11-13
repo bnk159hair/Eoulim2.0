@@ -22,26 +22,28 @@ class CustomTextFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: padding,
-      child: TextFormField(
-        onChanged: onChanged,
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(10),
+      child: Form(
+        child: TextFormField(
+          onChanged: onChanged,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            prefixIcon: Icon(
+              icon,
+              color: Colors.green,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            labelText: labelText,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide.none,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          prefixIcon: Icon(
-            icon,
-            color: Colors.green,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          labelText: labelText,
         ),
       ),
     );

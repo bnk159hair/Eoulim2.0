@@ -1,7 +1,7 @@
 class RecordsModel {
   final int id;
   final List<dynamic> createTime;
-  final String videoPath, name, school, animonName;
+  final String videoPath, name, school, animonPath;
 
   RecordsModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -9,5 +9,5 @@ class RecordsModel {
         videoPath = json['videoPath'],
         name = json['name'],
         school = json['school'],
-        animonName = json['animonName'];
+        animonPath = json['animonPath'];
 }

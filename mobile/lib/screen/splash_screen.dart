@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mobile/screen/home_screen.dart';
 import 'package:mobile/screen/login_screen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,33 +22,20 @@ class SplashState extends State<Splash> {
   }
 
   Future<void> checkLoginStatus() async {
-    final storage = new FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
 
-    await Future.delayed(Duration(seconds: 2)); // 가짜 로딩 시간을 나타내는 코드 (실제 앱에서는 필요 없음)
+    await Future.delayed(
+        const Duration(seconds: 2)); // 가짜 로딩 시간을 나타내는 코드 (실제 앱에서는 필요 없음)
 
     if (authKey != null && childId != null) {
       // 'Authkey' 키에 값이 이미 저장되어 있으면 메인 페이지로 이동
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Home(),
-        ),
-      );
-    } 
-    else if (authKey != null){
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Profiles(),
-        ),
-      );
-    }
-    else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
-      );
+      Get.offAll(() => const HomeScreen());
+    } else if (authKey != null) {
+      Get.offAll(() => ProfilesScreen());
+    } else {
+      Get.offAll(() => const LoginScreen());
     }
 
     // 비동기 작업이 완료되면 isLoading를 false로 설정
@@ -59,11 +47,14 @@ class SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFB1EFBC), // 바탕 색상 설정
+      backgroundColor: const Color(0xFFB1EFBC), // 바탕 색상 설정
       body: Stack(
         children: [
           Center(
-            child: Image.asset('assets/logo.png', width: 300),
+            child: Image.asset(
+              'assets/logo.png',
+              width: 300,
+            ),
           ),
           Positioned(
             bottom: 0,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:mobile/api/api_profileinfo.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/controller/profile_select.dart';
-import 'package:mobile/model/response_models/get_porfile.dart';
+import 'package:mobile/model/response_models/get_profile.dart';
 import 'package:mobile/screen/session_screen.dart';
 import 'package:mobile/util/logout_logic.dart';
 
@@ -14,7 +14,6 @@ class Enter extends StatefulWidget {
 }
 
 class _EnterState extends State<Enter> {
-  Apiprofileinfo apiProfileinfo = Apiprofileinfo();
   final ProfileController profileController = Get.find<ProfileController>();
 
   @override
@@ -24,11 +23,11 @@ class _EnterState extends State<Enter> {
   }
 
   Future<void> _getProfileInfo() async {
-    getProfileinfo? result = await apiProfileinfo.getprofileAPI();
+    ProfileInfoModel? result = await ApiProfile.getProfileInfo();
     if (result != null && result.code == '200') {
       // Handle the result as needed
     } else {
-      Logout();
+      userLogout();
     }
   }
 
@@ -48,8 +47,8 @@ class _EnterState extends State<Enter> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FutureBuilder<getProfileinfo?>(
-                future: apiProfileinfo.getprofileAPI(),
+              FutureBuilder<ProfileInfoModel?>(
+                future: ApiProfile.getProfileInfo(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const CircularProgressIndicator(

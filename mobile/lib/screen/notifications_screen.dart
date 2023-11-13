@@ -50,7 +50,7 @@ class _NotificationsState extends State<Notifications> {
         widget.alarms = result.alarms!;
       });
     } else if (result.code == '401') {
-      Logout();
+      userLogout();
     } else {
       showDialog(
         context: context,
@@ -144,6 +144,9 @@ class _NotificationsState extends State<Notifications> {
         padding: const EdgeInsets.all(16.0),
         itemCount: widget.alarms.length,
         itemBuilder: (context, index) {
+          final dateTime = widget.alarms[index].createTime!;
+          final createTime =
+              '${dateTime[0]}년 ${dateTime[1]}월 ${dateTime[2]}일 ${dateTime[3]}:${dateTime[4]}';
           return Container(
             height: 80,
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -187,12 +190,15 @@ class _NotificationsState extends State<Notifications> {
                           children: [
                             Text(
                               widget.alarms[index].text!,
+                              style: TextStyle(
+                                fontSize: 14, 
+                              ),
                             ),
                             const SizedBox(
                               height: 8,
                             ),
                             Text(
-                              widget.alarms[index].createTime!,
+                              createTime,
                               style: TextStyle(
                                 color: Colors.black.withOpacity(0.6),
                               ),

@@ -2,37 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/api/api_animonlist.dart';
 import 'package:mobile/api/api_changeanimon.dart';
-import 'package:mobile/api/api_profileinfo.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/controller/profile_select.dart';
-import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:mobile/model/response_models/get_animonlist.dart';
-import 'package:mobile/model/response_models/get_porfile.dart';
-import 'package:mobile/util/custom_text_field.dart';
+import 'package:mobile/model/response_models/get_profile.dart';
 import 'package:mobile/util/logout_logic.dart';
 
-
-class Animons extends StatefulWidget {
-  Animons({Key? key}) : super(key: key);
+class AnimonsScreen extends StatefulWidget {
+  AnimonsScreen({Key? key}) : super(key: key);
   List<Animon> animons = List.empty();
   ApiAnimon apiAnimon = ApiAnimon();
   ApiChangeAnimon apichangeAnimon = ApiChangeAnimon();
-  
 
   @override
-  State<Animons> createState() => _AnimonState();
+  State<AnimonsScreen> createState() => _AnimonsScreenState();
 }
 
-class _AnimonState extends State<Animons> {
+class _AnimonsScreenState extends State<AnimonsScreen> {
   ApiChangeAnimon apichangeAnimon = ApiChangeAnimon();
-  Apiprofileinfo apiProfileinfo = Apiprofileinfo();
 
   Future<void> _getProfileInfo() async {
-    getProfileinfo? result = await apiProfileinfo.getprofileAPI();
+    ProfileInfoModel? result = await ApiProfile.getProfileInfo();
     if (result.code == '200') {
     } else {
-      Logout();
+      userLogout();
     }
   }
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +42,7 @@ class _AnimonState extends State<Animons> {
         widget.animons = result.animons!;
       });
     } else if (result.code == '401') {
-      Logout();
+      userLogout();
     } else {
       showDialog(
         context: context,
@@ -77,7 +73,7 @@ class _AnimonState extends State<Animons> {
       body: Stack(
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/enter.gif'),
                 fit: BoxFit.cover,
@@ -94,14 +90,14 @@ class _AnimonState extends State<Animons> {
                     padding: const EdgeInsets.only(top: 60.0),
                     child: Column(
                       children: [
-                        Text(
+                        const Text(
                           '현재 나의 애니몬',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(25),
                           child: Container(
@@ -109,10 +105,12 @@ class _AnimonState extends State<Animons> {
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Obx(() => Image.network(
-                                '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
-                                width: 100,
-                                height: 100,) 
-                              ),
+                                    profileController.selectedProfile.value
+                                            ?.profileAnimon?.bodyImagePath ??
+                                        '',
+                                    width: 100,
+                                    height: 100,
+                                  )),
                             ),
                           ),
                         ),
@@ -120,11 +118,11 @@ class _AnimonState extends State<Animons> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Container(
                   width: MediaQuery.of(context).size.width / 1.1,
                   decoration: BoxDecoration(
-                    image: DecorationImage(
+                    image: const DecorationImage(
                       image: AssetImage('assets/woodbox.jpg'),
                       fit: BoxFit.cover,
                     ),
@@ -132,10 +130,11 @@ class _AnimonState extends State<Animons> {
                   ),
                   child: Column(
                     children: [
-                      Container(
+                      SizedBox(
                         height: (widget.animons.length ~/ 2) * (175) + 20,
                         child: GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 10.0,
                             mainAxisSpacing: 10.0,
@@ -160,21 +159,28 @@ class _AnimonState extends State<Animons> {
                                         ),
                                         const SizedBox(height: 16),
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             ElevatedButton(
                                               onPressed: () async {
-                                                final response = await apichangeAnimon.getChangeAnimonsAPI(widget.animons[index].id.toString());
-                                                if(response.code =='200'){
+                                                final response =
+                                                    await apichangeAnimon
+                                                        .getChangeAnimonsAPI(
+                                                            widget
+                                                                .animons[index]
+                                                                .id
+                                                                .toString());
+                                                if (response.code == '200') {
                                                   _getProfileInfo();
                                                   Navigator.of(ctx).pop();
-                                                }
-                                                else{
-                                                Navigator.of(ctx).pop();
+                                                } else {
+                                                  Navigator.of(ctx).pop();
                                                 }
                                               },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(0xff00b7eb),
+                                                backgroundColor:
+                                                    const Color(0xff00b7eb),
                                               ),
                                               child: const Text(
                                                 '변경하기',
@@ -213,7 +219,8 @@ class _AnimonState extends State<Animons> {
                                       left: 0,
                                       right: 0,
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
                                         children: [
                                           Container(
                                             padding: const EdgeInsets.symmetric(
@@ -221,12 +228,15 @@ class _AnimonState extends State<Animons> {
                                               horizontal: 10.0,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.green.withOpacity(0.8),
-                                              borderRadius: BorderRadius.circular(16.0),
+                                              color:
+                                                  Colors.green.withOpacity(0.8),
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
                                             ),
                                             child: Text(
-                                              '${widget.animons[index]?.name}',
-                                              style: const TextStyle(color: Colors.white),
+                                              '${widget.animons[index].name}',
+                                              style: const TextStyle(
+                                                  color: Colors.white),
                                             ),
                                           ),
                                         ],
@@ -255,7 +265,7 @@ class CustomDialog extends StatelessWidget {
   final List<Widget> children;
 
   const CustomDialog({
-    Key? key,
+    super.key,
     required this.children,
   });
 
