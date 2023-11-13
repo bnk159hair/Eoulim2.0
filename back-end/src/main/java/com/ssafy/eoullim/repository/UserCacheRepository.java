@@ -16,7 +16,7 @@ public class UserCacheRepository {
 
     private final RedisTemplate<String, User> userRedisTemplate;
 
-    private final static Duration USER_CACHE_TTL = Duration.ofHours(10);
+    private final static Duration USER_CACHE_TTL = Duration.ofDays(30);
 
     public void setUser(User user) {
         String key = getKey(user.getUsername());
