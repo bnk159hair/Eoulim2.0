@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="record_guide")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RecordGuideEntity {
+public class RecordGuideEntity extends BaseEntity{
     @Id
     @Column(name = "record_guide_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
