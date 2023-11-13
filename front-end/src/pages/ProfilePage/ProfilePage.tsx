@@ -1,18 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { getLogout } from 'apis/authApis';
 import { fcmTokenState } from 'atoms/Firebase';
+import { Box, Divider, Menu, MenuItem, Typography } from '@mui/material';
+import { getNotifications } from 'apis/notificationApis';
 import ProfileList from '../../components/profile/ProfileList';
-import { ProfilePageContainer, PasswordChange, MarginContainer } from './ProfilePageStyles';
+import {
+  ProfilePageContainer,
+  PasswordChange,
+  MarginContainer,
+  Alarm,
+  NotificationBadge,
+} from './ProfilePageStyles';
 import ChangePasswordModal from '../../components/profile/ChangePasswordModal';
 import { userState } from '../../atoms/Auth';
+
+interface Notification {
+  createTime: number[];
+  text: string;
+}
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [, setUserName] = useRecoilState(userState);
   const fcmToken = useRecoilValue(fcmTokenState);
+  const [isReadNotifications, setIsReadNotifications] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  useEffect(() => {
+    getNotifications({
+      onSuccess: data => setNotifications(data),
+      onError: () => {},
+    });
+  }, []);
+
+  const formatTime = (timeline: number[]) => {
+    const [y, mo, d, h, mi] = timeline;
+    return `${y}. ${mo}. ${d}. ${h} : ${mi}`; // 원하는 형식으로 변환할 수 있습니다.
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setIsReadNotifications(false);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
     let token;
@@ -36,11 +74,54 @@ const ProfilePage = () => {
   return (
     <ProfilePageContainer>
       <MarginContainer>
-        <PasswordChange
-          onClick={() => {
-            setModalOpen(true);
+        <Alarm onClick={handleClick}>
+          <NotificationBadge $isReadNotifications={isReadNotifications}>
+            {notifications.length}
+          </NotificationBadge>
+        </Alarm>
+        <Menu
+          MenuListProps={{
+            'aria-labelledby': 'long-button',
           }}
-        />
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          sx={{
+            maxHeight: 500,
+            '*::-webkit-scrollbar': {
+              display: 'none',
+            },
+            textAlign: 'center',
+            marginTop: 1,
+          }}
+          PaperProps={{
+            style: { borderRadius: '15px' },
+          }}
+        >
+          <Typography variant={'h4'} fontWeight={'bold'} padding={1}>
+            {'알림 목록'}
+          </Typography>
+          {notifications.map(notification => (
+            <Box
+              key={notification.createTime.toString()}
+              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+            >
+              <Divider sx={{ my: 0.5, width: '90%' }} />
+              <MenuItem
+                sx={{ width: 400, display: 'flex', flexDirection: 'column' }}
+                onClick={handleClose}
+              >
+                <Typography variant={'body1'} fontWeight={'bold'}>
+                  {notification.text}
+                </Typography>
+                <Typography variant={'body2'}>{`보낸 시각 : ${formatTime(
+                  notification.createTime,
+                )}`}</Typography>
+              </MenuItem>
+            </Box>
+          ))}
+        </Menu>
+        <PasswordChange onClick={() => setModalOpen(true)} />
       </MarginContainer>
       {isModalOpen && <ChangePasswordModal onClose={() => setModalOpen(false)} />}
       <ProfileList />
