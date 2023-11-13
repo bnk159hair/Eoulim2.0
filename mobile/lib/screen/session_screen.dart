@@ -1,10 +1,12 @@
+import 'dart:async';
+import 'dart:convert';
+
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
-import 'package:mobile/widgets/session/menu.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key});
@@ -14,9 +16,37 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPageState extends State<SessionPage> {
-
   late final WebViewController _controller;
   final sessionId = Get.arguments['sessionId'];
+  final sessionToken = Get.arguments['sessionToken'];
+
+  Future<void> getChildInfo() async {
+    const storage = FlutterSecureStorage();
+
+    String? authKey = await storage.read(key: 'Authkey');
+    String? profileId = await storage.read(key: 'childId');
+
+    sendChildId(profileId, authKey, sessionId, sessionToken);
+  }
+
+  void sendChildId(childId, token, sessionId, sessionToken) async {
+    if (childId != '') {
+      print('웹으로 childId 보내는 중입니다.');
+      final bool invitation;
+      if (sessionId != '') {
+        invitation = true;
+      } else {
+        invitation = false;
+      }
+      String message = json.encode({
+        "childId": childId,
+        "invitation": invitation,
+        "sessionToken": sessionToken,
+        "token": token
+      });
+      await _controller.runJavaScript("changePage('$message')");
+    }
+  }
 
   @override
   void initState() {
@@ -33,10 +63,12 @@ class _SessionPageState extends State<SessionPage> {
     }
 
     final WebViewController controller =
-        WebViewController.fromPlatformCreationParams(params,
-        onPermissionRequest: (WebViewPermissionRequest request) {
-			request.grant();
-		  },);
+        WebViewController.fromPlatformCreationParams(
+      params,
+      onPermissionRequest: (WebViewPermissionRequest request) {
+        request.grant();
+      },
+    );
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -48,6 +80,9 @@ class _SessionPageState extends State<SessionPage> {
           },
           onPageStarted: (String url) {
             debugPrint('Page started loading: $url');
+            Future.delayed(const Duration(seconds: 1), () {
+              getChildInfo();
+            });
           },
           onPageFinished: (String url) {
             debugPrint('Page finished loading: $url');
@@ -85,8 +120,7 @@ class _SessionPageState extends State<SessionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          actions: [Menu(controller: _controller, sessionId: sessionId)]),
+      appBar: AppBar(),
       body: SafeArea(
         bottom: false,
         child: WebViewWidget(controller: _controller),
