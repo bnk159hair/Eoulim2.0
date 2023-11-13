@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mobile/api/api_child.dart';
-import 'package:mobile/api/api_profilelogout.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:get/get.dart';
-import 'package:mobile/screen/profiles/modify_child_screen.dart';
-import 'package:mobile/screen/profiles/profiles_screen.dart';
+import 'package:mobile/screen/profiles/modify_profile_screen.dart';
 import 'package:mobile/util/logout_logic.dart';
 
-class Settings extends StatelessWidget {
-  Settings({super.key});
+class SettingsScreen extends StatelessWidget {
+  SettingsScreen({super.key});
 
   generalResponse? profileloginAuth;
-
-  ApiprofileLogout apiProfileLogout = ApiprofileLogout();
-
-  void profileLogout() async {
-    await apiProfileLogout.postProfileLogoutAPI();
-    const storage = FlutterSecureStorage();
-    await storage.delete(key: 'childId');
-    Get.offAll(() => Profiles());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,17 +31,17 @@ class Settings extends StatelessWidget {
                   _buildButtonRow(
                     '프로필 정보 수정',
                     onPressed: () {
-                      Get.offAll(() => const ModifyChild());
+                      Get.to(() => const ModifyProfileScreen());
                     },
                   ),
                   _buildButtonRow(
                     '프로필 정보 삭제',
                     onPressed: () async {
-                      final response = await ApiChild.deleteChild();
+                      final response = await ApiProfile.deleteProfile();
                       if (response == 204) {
                         profileLogout();
                       } else if (response == 401) {
-                        Logout();
+                        userLogout();
                       } else {
                         showDialog(
                           context: context,
@@ -67,7 +55,7 @@ class Settings extends StatelessWidget {
                                     child: const Text('확인'),
                                     onPressed: () {
                                       profileLogout();
-                                      Logout();
+                                      userLogout();
                                     },
                                   ),
                                 ),

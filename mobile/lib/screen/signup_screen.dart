@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/widgets/auth/signup_form.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupState extends State<Signup> {
+class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
