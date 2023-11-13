@@ -14,14 +14,14 @@ import 'package:mobile/util/logout_logic.dart';
 
 var backButtonPressedOnce = false;
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
   @override
-  _HomeState createState() => _HomeState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeScreenState extends State<HomeScreen> {
   Apiprofileinfo apiProfileinfo = Apiprofileinfo();
   final ProfileController profileController = Get.find<ProfileController>();
 
@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
     getProfileinfo? result = await apiProfileinfo.getprofileAPI();
     if (result.code == '200') {
     } else {
-      Logout();
+      userLogout();
     }
   }
 
@@ -126,23 +126,25 @@ class _HomeState extends State<Home> {
                       return Row(
                         children: [
                           MaterialButton(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Animons(),
-                                ),
-                            );
-                            },
-                            child: Obx(() {
-        
-                              return Image.network(
-                                  '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}');
-                            }))
-                            ,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Animons(),
+                                  ),
+                                );
+                              },
+                              child: Obx(() {
+                                return Image.network(profileController
+                                        .selectedProfile
+                                        .value
+                                        ?.profileAnimon
+                                        ?.bodyImagePath ??
+                                    '');
+                              })),
                           Obx(() {
                             return Text(
                               '${profileController.selectedProfile.value?.name ?? ''}님 어서오세요',
@@ -173,7 +175,7 @@ List<Widget> _buildScreens() {
   return [
     const Enter(),
     Friends(),
-    Settings(),
+    SettingsScreen(),
   ];
 }
 

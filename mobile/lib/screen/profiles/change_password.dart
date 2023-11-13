@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mobile/api/api_change_password.dart';
 import 'package:mobile/screen/login_screen.dart';
 import 'package:mobile/util/custom_text_field.dart';
+import 'package:mobile/util/logout_logic.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -174,12 +176,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                                     child: TextButton(
                                       child: const Text('로그인'),
                                       onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (ctx) => const Login(),
-                                          ),
-                                        );
+                                        userLogout();
                                       },
                                     ),
                                   ),

@@ -31,20 +31,15 @@ class _RecordState extends State<Record> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        elevation: 0,
-        leading: const Icon(
-          Icons.chevron_left,
-          color: Colors.black,
-        ),
         title: const Text(
           '녹화 영상',
           style: TextStyle(
             fontSize: 24,
-            color: Colors.black,
           ),
         ),
+        elevation: 1,
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: Container(
         decoration: const BoxDecoration(
