@@ -7,6 +7,7 @@ interface IProps {
 }
 
 const Loading = ({ isAnimonLoaded }: IProps) => {
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [animal, setAnimal] = useState('🐱');
   useEffect(() => {
     const animalArray = [
@@ -37,10 +38,24 @@ const Loading = ({ isAnimonLoaded }: IProps) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  const size = screenWidth <= 481 ? 100 : 200;
+
   return (
     <SpinnerContainer isAnimonLoaded={isAnimonLoaded}>
       <Spinner>
-        <CircularProgress size={200} />
+        <CircularProgress size={size} />
         <AnimalEmoji>{animal}</AnimalEmoji>
       </Spinner>
     </SpinnerContainer>

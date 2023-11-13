@@ -20,6 +20,9 @@ import {
   SessionPageContainer,
   Click,
   CharacterContainer,
+  CheckContainer,
+  FriendVideo,
+  CheckVideo,
 } from './SessionPageStyles';
 import { Profile } from '../../atoms/Profile';
 import { IsAnimonLoaded, guideSeq, GuideScript, Timeline, SessionId } from '../../atoms/Session';
@@ -376,8 +379,8 @@ const SessionPage = () => {
   if (!checkVideo) {
     return (
       <SessionPageContainer>
-        <Container>
-          <MyVideo>
+        <CheckContainer>
+          <CheckVideo>
             {streamList[0]?.streamManager && (
               <StreamCanvas
                 streamManager={streamList[0]?.streamManager}
@@ -386,9 +389,9 @@ const SessionPage = () => {
                 videoState={subscriberVideoStatus}
               />
             )}
-          </MyVideo>
+          </CheckVideo>
           <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
-        </Container>
+        </CheckContainer>
       </SessionPageContainer>
     );
   }
@@ -418,7 +421,7 @@ const SessionPage = () => {
             </Character>
           </CharacterContainer>
         ) : null}
-        <MyVideo>
+        <FriendVideo>
           {streamList.length > 1 && streamList[0].streamManager ? (
             <>
               <StreamCanvas
@@ -432,7 +435,7 @@ const SessionPage = () => {
           ) : (
             <Loading isAnimonLoaded={false} />
           )}
-        </MyVideo>
+        </FriendVideo>
       </Container>
       <NavContainer>
         <Buttons>

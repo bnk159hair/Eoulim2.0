@@ -27,4 +27,7 @@ export const UserName = styled.div`
   font-size: 48px;
   border-radius: 10%;
   z-index: 2001;
+  @media (max-width: 481px) {
+    font-size: 28px;
+  }
 `;
