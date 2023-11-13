@@ -96,6 +96,10 @@ const SessionPage = () => {
   const [client, setClient] = useState<Client | null>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    Toaster.postMessage('request');
+
     setGuideScript([]);
     setTimeline([]);
     setPublisherAnimonURL(`${profile.profileAnimon.maskImagePath}`);
