@@ -4,6 +4,7 @@ import 'package:mobile/widgets/session/menu.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key});
@@ -13,6 +14,7 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPageState extends State<SessionPage> {
+
   late final WebViewController _controller;
   final sessionId = Get.arguments['sessionId'];
 
@@ -31,7 +33,10 @@ class _SessionPageState extends State<SessionPage> {
     }
 
     final WebViewController controller =
-        WebViewController.fromPlatformCreationParams(params);
+        WebViewController.fromPlatformCreationParams(params,
+        onPermissionRequest: (WebViewPermissionRequest request) {
+			request.grant();
+		  },);
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
