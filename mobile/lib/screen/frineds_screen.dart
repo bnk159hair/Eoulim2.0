@@ -1,8 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/api/api_deletefollowing.dart';
 import 'package:mobile/api/api_followings.dart';
+import 'package:mobile/api/api_invite.dart';
 import 'package:mobile/model/response_models/get_followings.dart';
+import 'package:get/get.dart';
+import 'package:mobile/model/response_models/post_invite.dart';
+import 'package:mobile/screen/session_screen.dart';
+import 'package:mobile/util/logout_logic.dart';
 
+Future<void> _invite(friendId) async {
+  String? childId = await storage.read(key: 'childId');
+  ApiInvite invite = ApiInvite();
+
+  invitePost response = await invite.inviteAPI(
+    childId!,
+    friendId,
+  );
+  if (response.code == '200') {
+    Get.to(() => SessionPage(), arguments: {
+      'sessionId': response.invitation!.sessionId,
+      'sessionToken': response.invitation!.token
+    });
+  } else if (response.code == '401') {
+    userLogout();
+  }
+}
 
 class Friends extends StatefulWidget {
   Friends({super.key});
@@ -14,7 +36,6 @@ class Friends extends StatefulWidget {
 }
 
 class _FriendsState extends State<Friends> {
-  
   ApiDeletefollowing apiDeletefollowing = ApiDeletefollowing();
 
   @override
@@ -24,7 +45,7 @@ class _FriendsState extends State<Friends> {
   }
 
   Future<void> _getFollowing() async {
-    GetFollowings result = await widget.apifollowing. getFollowingsAPI();
+    GetFollowings result = await widget.apifollowing.getFollowingsAPI();
     if (result.code == '200') {
       setState(() {
         widget.friends = result.followings!;
@@ -74,200 +95,218 @@ class _FriendsState extends State<Friends> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/friends.gif'),
-            fit: BoxFit.cover,
-            opacity: 0.5,
-          ),
-        ),
-        
-        child: Padding(
-          padding: const EdgeInsets.only(top: 90), // 상단 공백을 조절하려면 이 값을 조정하세요
-          child: widget.friends.length==0 ?
-          Center(
-            child: Image.asset('assets/emptyfriend.png'),
-          ) :
-          GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 10.0,
-              mainAxisSpacing: 10.0,
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/friends.gif'),
+              fit: BoxFit.cover,
+              opacity: 0.5,
             ),
-            padding: const EdgeInsets.all(16.0),
-            itemCount: widget.friends.length,
-            itemBuilder: (context, index) {
-              return Card(
-                elevation: 2.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Image.network(
-                        '${widget.friends[index].profileAnimon?.bodyImagePath ?? ''}',
-                        fit: BoxFit.cover,
-                        alignment: Alignment.center,
-                      ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 90), // 상단 공백을 조절하려면 이 값을 조정하세요
+            child: widget.friends.length == 0
+                ? Center(
+                    child: Image.asset('assets/emptyfriend.png'),
+                  )
+                : GridView.builder(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10.0,
+                      mainAxisSpacing: 10.0,
                     ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext ctx) {
-                                  return CustomDialog(
-                                    children: [
-                                      const Text(
-                                        '친구를 삭제할거야?',
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () async{
-                                              final response = await apiDeletefollowing.deletefollowing(widget.friends[index].id);
-                                              if(response.code == '204') {
-                                                await _getFollowing();
-                                                Navigator.of(ctx).pop();
-                                              }
-                                              else{
-                                                Navigator.of(ctx).pop();
-                                              }
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xffff6347),
-                                            ),
-                                            child: const Text(
-                                              '삭제하기',
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                            },
-                                            child: const Text('취소하기'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.delete_forever_rounded,
-                              size: 30,
-                              color: Colors.red,
-                            ),
-                            splashRadius: 16,
-                          )
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8.0,
-                              horizontal: 10.0,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            child: Text(
-                              '${widget.friends[index].name}',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (BuildContext ctx) {
-                                  return CustomDialog(
-                                    children: [
-                                      Text(
-                                        '${widget.friends[index].name} 초대할거야?',
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: const Color(0xff00b7eb),
-                                            ),
-                                            child: const Text(
-                                              '초대하기',
-                                            ),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(ctx).pop();
-                                            },
-                                            child: const Text('취소하기'),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.withOpacity(0.8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16.0),
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: widget.friends.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        elevation: 2.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Stack(
+                          children: [
+                            Center(
+                              child: Image.network(
+                                '${widget.friends[index].profileAnimon?.bodyImagePath ?? ''}',
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
                               ),
                             ),
-                            icon: const Text(
-                              '초대',
-                              style: TextStyle(fontSize: 14),
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext ctx) {
+                                          return CustomDialog(
+                                            children: [
+                                              const Text(
+                                                '친구를 삭제할거야?',
+                                                style: TextStyle(
+                                                  fontSize: 24,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () async {
+                                                      final response =
+                                                          await apiDeletefollowing
+                                                              .deletefollowing(
+                                                                  widget
+                                                                      .friends[
+                                                                          index]
+                                                                      .id);
+                                                      if (response.code ==
+                                                          '204') {
+                                                        await _getFollowing();
+                                                        Navigator.of(ctx).pop();
+                                                      } else {
+                                                        Navigator.of(ctx).pop();
+                                                      }
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xffff6347),
+                                                    ),
+                                                    child: const Text(
+                                                      '삭제하기',
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.of(ctx).pop();
+                                                    },
+                                                    child: const Text('취소하기'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      Icons.delete_forever_rounded,
+                                      size: 30,
+                                      color: Colors.red,
+                                    ),
+                                    splashRadius: 16,
+                                  )
+                                ],
+                              ),
                             ),
-                            label: const Icon(
-                              Icons.send,
-                              size: 14,
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              right: 0,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0,
+                                      horizontal: 10.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.8),
+                                      borderRadius: BorderRadius.circular(16.0),
+                                    ),
+                                    child: Text(
+                                      '${widget.friends[index].name}',
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext ctx) {
+                                          return CustomDialog(
+                                            children: [
+                                              Text(
+                                                '${widget.friends[index].name} 초대할거야?',
+                                                style: const TextStyle(
+                                                  fontSize: 24,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 16),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      _invite(widget
+                                                          .friends[index].id);
+                                                      Navigator.of(ctx).pop();
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color(
+                                                              0xff00b7eb),
+                                                    ),
+                                                    child: const Text(
+                                                      '초대하기',
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 16),
+                                                  ElevatedButton(
+                                                    onPressed: () {
+                                                      Navigator.of(ctx).pop();
+                                                    },
+                                                    child: const Text('취소하기'),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          Colors.green.withOpacity(0.8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(16.0),
+                                      ),
+                                    ),
+                                    icon: const Text(
+                                      '초대',
+                                      style: TextStyle(fontSize: 14),
+                                    ),
+                                    label: const Icon(
+                                      Icons.send,
+                                      size: 14,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        )
-
-      ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+          )),
     );
   }
 }

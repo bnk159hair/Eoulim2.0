@@ -14,9 +14,9 @@ class SessionPage extends StatefulWidget {
 }
 
 class _SessionPageState extends State<SessionPage> {
-
   late final WebViewController _controller;
   final sessionId = Get.arguments['sessionId'];
+  final sessionToken = Get.arguments['sessionToken'];
 
   @override
   void initState() {
@@ -33,10 +33,12 @@ class _SessionPageState extends State<SessionPage> {
     }
 
     final WebViewController controller =
-        WebViewController.fromPlatformCreationParams(params,
-        onPermissionRequest: (WebViewPermissionRequest request) {
-			request.grant();
-		  },);
+        WebViewController.fromPlatformCreationParams(
+      params,
+      onPermissionRequest: (WebViewPermissionRequest request) {
+        request.grant();
+      },
+    );
 
     controller
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -85,8 +87,13 @@ class _SessionPageState extends State<SessionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          actions: [Menu(controller: _controller, sessionId: sessionId)]),
+      appBar: AppBar(actions: [
+        Menu(
+          controller: _controller,
+          sessionId: sessionId,
+          sessionToken: sessionToken,
+        )
+      ]),
       body: SafeArea(
         bottom: false,
         child: WebViewWidget(controller: _controller),

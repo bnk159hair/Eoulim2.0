@@ -7,11 +7,16 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Menu extends StatelessWidget {
-  const Menu({required this.controller, required this.sessionId, Key? key})
+  const Menu(
+      {required this.controller,
+      required this.sessionId,
+      required this.sessionToken,
+      Key? key})
       : super(key: key);
 
   final WebViewController controller;
   final String sessionId;
+  final String sessionToken;
 
   Future<void> getChildInfo() async {
     const storage = FlutterSecureStorage();
@@ -19,10 +24,10 @@ class Menu extends StatelessWidget {
     String? authKey = await storage.read(key: 'Authkey');
     String? profileId = await storage.read(key: 'childId');
 
-    sendChildId(profileId, authKey, sessionId);
+    sendChildId(profileId, authKey, sessionId, sessionToken);
   }
 
-  void sendChildId(childId, token, sessionId) async {
+  void sendChildId(childId, token, sessionId, sessionToken) async {
     if (childId != '') {
       print('웹으로 childId 보내는 중입니다.');
       final bool invitation;
@@ -31,8 +36,12 @@ class Menu extends StatelessWidget {
       } else {
         invitation = false;
       }
-      String message = json.encode(
-          {"childId": childId, "invitation": invitation, "token": token});
+      String message = json.encode({
+        "childId": childId,
+        "invitation": invitation,
+        "sessionToken": sessionToken,
+        "token": token
+      });
       await controller.runJavaScript("changePage('$message')");
     }
   }
