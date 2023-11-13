@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router';
 import { useRecoilState } from 'recoil';
 import { getChildInfo } from 'apis/profileApis';
 import { Profile } from 'atoms/Profile';
-import { InvitationSessionId } from 'atoms/Ivitation';
+import { InvitationSessionId, InvitationToken } from 'atoms/Ivitation';
 import { SessionId } from 'atoms/Session';
 
 export const Mobile = () => {
   const navigate = useNavigate();
   const [childId, setChildId] = useRecoilState(MobileChildId);
   const [, setInvitationSessionId] = useRecoilState(InvitationSessionId);
+  const [, setInvitationToken] = useRecoilState(InvitationToken);
   const [, setProfile] = useRecoilState(Profile);
   const [, setSessionId] = useRecoilState(SessionId);
 
@@ -33,9 +34,9 @@ export const Mobile = () => {
       const data = JSON.parse(message);
       console.log(`invitation: ${data.invitation}, childId: ${data.childId}`);
       if (data) {
-        const { invitation, childId, token, sessionId } = JSON.parse(message);
+        const { invitation, childId, token, sessionId, sessionToken } = JSON.parse(message);
         console.log(
-          `invitation: ${invitation}, childId: ${childId}, token: ${token}, sessionId: ${sessionId}`,
+          `invitation: ${invitation}, childId: ${childId}, token: ${token}, sessionId: ${sessionId}, sessionToken: ${sessionToken}`,
         );
         if (token) {
           saveToken(token);
@@ -57,8 +58,15 @@ export const Mobile = () => {
           console.log('모바일에서 새 친구 세션으로 이동합니다.');
           setChildId(data.childId);
           navigate('/session', { state: { childId, invitation } });
-        } else if (childId && token && invitation === true) {
-          console.log('모바일에서 내 친구 세션으로 이동합니다.');
+        } else if (childId && token && sessionToken) {
+          console.log('모바일에서 내가 초대해서 내 친구 세션으로 이동합니다.');
+          setChildId(data.childId);
+          setSessionId(sessionId);
+          setInvitationToken(sessionToken);
+          setInvitationSessionId(sessionId);
+          navigate('/session', { state: { childId, invitation } });
+        } else if (childId && token && sessionToken == '') {
+          console.log('모바일에서 초대를 받아서 내 친구 세션으로 이동합니다.');
           setChildId(data.childId);
           setSessionId(sessionId);
           setInvitationSessionId(sessionId);
