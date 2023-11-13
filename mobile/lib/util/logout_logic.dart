@@ -1,13 +1,26 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
-import 'package:mobile/api/api_logout.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/api/api_user.dart';
 import 'package:mobile/screen/login_screen.dart';
+import 'package:mobile/api/api_profilelogout.dart';
+import 'package:mobile/screen/profiles/profiles_screen.dart';
 
-final ApiLogout apiLogout = ApiLogout();
+const storage = FlutterSecureStorage();
 
-void Logout() async {
-    await apiLogout.postLogoutAPI();
-    final storage = new FlutterSecureStorage();
-    await storage.delete(key: 'Authkey');
-    Get.offAll(() => Login());
-    }
+void userLogout() async {
+  await ApiUser.postLogout();
+  await storage.delete(key: 'Authkey');
+  Get.offAll(
+    () => const LoginScreen(),
+    transition: Transition.size,
+  );
+}
+
+void profileLogout() async {
+  await ApiprofileLogout.postProfileLogout();
+  await storage.delete(key: 'childId');
+  Get.offAll(
+    () => ProfilesScreen(),
+    transition: Transition.size,
+  );
+}

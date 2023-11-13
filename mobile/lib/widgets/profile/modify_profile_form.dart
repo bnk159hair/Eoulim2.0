@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:get/get.dart';
 import 'package:mobile/api/api_child.dart';
 
 import 'package:mobile/api/api_createprofile.dart';
-import 'package:mobile/api/api_profilelogout.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
 import 'package:mobile/util/custom_text_field.dart';
+import 'package:mobile/util/logout_logic.dart';
 
-class ModifyChildForm extends StatefulWidget {
-  const ModifyChildForm({super.key});
+class ModifyProfileForm extends StatefulWidget {
+  const ModifyProfileForm({super.key});
 
   @override
-  State<ModifyChildForm> createState() => _ModifyChildFormState();
+  State<ModifyProfileForm> createState() => _ModifyProfileFormState();
 }
 
-class _ModifyChildFormState extends State<ModifyChildForm> {
+class _ModifyProfileFormState extends State<ModifyProfileForm> {
   String name = '';
   DateTime birth = DateTime.now();
   String school = '';
@@ -372,7 +370,7 @@ class _ModifyChildFormState extends State<ModifyChildForm> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => Profiles(),
+                                  builder: (context) => ProfilesScreen(),
                                 ),
                               );
                             },
@@ -383,12 +381,7 @@ class _ModifyChildFormState extends State<ModifyChildForm> {
                   },
                 );
               } else if (response == 401) {
-                ApiprofileLogout apiProfileLogout = ApiprofileLogout();
-
-                await apiProfileLogout.postProfileLogoutAPI();
-                const storage = FlutterSecureStorage();
-                await storage.delete(key: 'childId');
-                Get.offAll(() => Profiles());
+                profileLogout();
               } else {
                 if (!mounted) return;
                 showDialog(
@@ -413,7 +406,7 @@ class _ModifyChildFormState extends State<ModifyChildForm> {
               }
             },
             child: const Text(
-              '아이 정보 수정',
+              '프로필 수정',
               style: TextStyle(fontSize: 17),
             ),
           ),

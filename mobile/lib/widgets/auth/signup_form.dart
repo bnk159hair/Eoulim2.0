@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/api/api_signup.dart';
+import 'package:get/get.dart';
+import 'package:mobile/api/api_user.dart';
 import 'package:mobile/model/request_models/put_signup.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/login_screen.dart';
@@ -16,12 +17,11 @@ class _SignupFormState extends State<SignupForm> {
   final signupFormKey = GlobalKey<FormState>();
 
   String username = '';
-  String pw = '';
-  String pwCheck = '';
+  String password = '';
+  String passwordCheck = '';
   String name = '';
   String phoneNumber = '';
   generalResponse? signupAuth;
-  ApiSignup apiSignup = ApiSignup();
   bool isClicked = false;
   bool isValidUsername = false;
 
@@ -84,7 +84,7 @@ class _SignupFormState extends State<SignupForm> {
                             );
                           } else {
                             final response =
-                                await apiSignup.checkUsername(username);
+                                await ApiUser.getCheckUsername(username);
                             if (response.data) {
                               showDialog(
                                 context: context,
@@ -150,7 +150,7 @@ class _SignupFormState extends State<SignupForm> {
               CustomTextFormField(
                 labelText: "비밀번호",
                 onChanged: (val) {
-                  pw = val;
+                  password = val;
                 },
                 icon: Icons.lock,
                 obscureText: true,
@@ -158,7 +158,7 @@ class _SignupFormState extends State<SignupForm> {
               CustomTextFormField(
                 labelText: "비밀번호 확인",
                 onChanged: (val) {
-                  pwCheck = val;
+                  passwordCheck = val;
                 },
                 icon: Icons.lock,
                 obscureText: true,
@@ -196,8 +196,8 @@ class _SignupFormState extends State<SignupForm> {
             ),
             onPressed: () async {
               if (username.isEmpty ||
-                  pw.isEmpty ||
-                  pwCheck.isEmpty ||
+                  password.isEmpty ||
+                  passwordCheck.isEmpty ||
                   phoneNumber.isEmpty ||
                   name.isEmpty) {
                 return showDialog(
@@ -265,7 +265,7 @@ class _SignupFormState extends State<SignupForm> {
                 );
               }
 
-              if (pw != pwCheck) {
+              if (password != passwordCheck) {
                 return showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -288,10 +288,10 @@ class _SignupFormState extends State<SignupForm> {
               }
 
               signupFormKey.currentState?.save();
-              signupAuth = await apiSignup.signup(
+              signupAuth = await ApiUser.postSignup(
                 SignupRequestModel(
                   username: username,
-                  password: pw,
+                  password: password,
                   name: name,
                   phoneNumber: phoneNumber,
                 ),
@@ -309,11 +309,9 @@ class _SignupFormState extends State<SignupForm> {
                           child: TextButton(
                             child: const Text('로그인'),
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Login(),
-                                ),
+                              Get.offAll(
+                                () => const LoginScreen(),
+                                transition: Transition.zoom,
                               );
                             },
                           ),
@@ -362,11 +360,9 @@ class _SignupFormState extends State<SignupForm> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Login(),
-                  ),
+                Get.to(
+                  () => const LoginScreen(),
+                  transition: Transition.leftToRightWithFade,
                 );
               },
               child: const Text(
