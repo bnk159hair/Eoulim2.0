@@ -51,7 +51,7 @@ const AnimonModal = ({ onClose, profile }: AnimonModalProps) => {
           <Animon
             key={animon.id}
             onClick={() => onClick(animon.id)}
-            animonurl={animon.bodyImagePath}
+            animonurl={animon.maskImagePath}
           />
         ))}
       </ModalContent>

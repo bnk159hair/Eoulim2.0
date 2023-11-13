@@ -96,8 +96,7 @@ const MainPage: React.FC = () => {
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isAlarmOpen, setAlarmOpen] = useState(false);
-  const IMGURL = `${profile.profileAnimon.bodyImagePath}`;
-  // const IMGURL = `/dog.png`;
+  // const IMGURL = `${profile.profileAnimon.bodyImagePath}`;
 
   const audioObjRef = useRef(new Audio(`${S3_SOUND_BASE_URL}/guide/main.mp3`));
 
@@ -118,7 +117,10 @@ const MainPage: React.FC = () => {
     <MainPageContainer>
       <MarginContainer>
         <BackIcon onClick={getBack} />
-        <ProfileImg style={{ backgroundImage: `url(${IMGURL})` }} onClick={openModal} />
+        <ProfileImg
+          style={{ backgroundImage: `url(${profile.profileAnimon.maskImagePath})` }}
+          onClick={openModal}
+        />
       </MarginContainer>
       <ChaterLocation>
         {isModalOpen && <AnimonModal onClose={closeModal} profile={getChild} />}
@@ -129,7 +131,10 @@ const MainPage: React.FC = () => {
           <NewFriend />
           <NewFirendsignpost />
         </HoberLeft>
-        <MainCharacter style={{ backgroundImage: `url(${IMGURL})` }} onClick={playAudio} />
+        <MainCharacter
+          style={{ backgroundImage: `url(${profile.profileAnimon.bodyImagePath})` }}
+          onClick={playAudio}
+        />
         <HoberRight onClick={handleFriendsClick}>
           <MyFirendsignpost />
           <MyFriend />
