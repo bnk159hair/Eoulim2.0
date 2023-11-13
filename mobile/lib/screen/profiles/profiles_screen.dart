@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/api/api_profile.dart';
-import 'package:mobile/api/api_profilelogin.dart';
 import 'package:mobile/model/request_models/put_profilelogin.dart';
 import 'package:mobile/model/response_models/general_response.dart';
-import 'package:mobile/model/response_models/get_profilelist.dart';
+import 'package:mobile/model/response_models/get_profiles.dart';
 import 'package:mobile/screen/home_screen.dart';
-import 'package:mobile/screen/login_screen.dart';
-import 'package:mobile/screen/profiles/change_password.dart';
+import 'package:mobile/screen/profiles/change_password_screen.dart';
 import 'package:mobile/screen/profiles/create_profile_screen.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -21,7 +19,6 @@ enum MenuOption {
 
 class ProfilesScreen extends StatefulWidget {
   List<Profile> profiles = List.empty();
-  Apiprofile apiProfile = Apiprofile();
 
   ProfilesScreen({super.key});
 
@@ -30,14 +27,20 @@ class ProfilesScreen extends StatefulWidget {
 }
 
 class _ProfilesScreenState extends State<ProfilesScreen> {
+  CarouselController carouselController = CarouselController();
+  String? fcmToken;
+  generalResponse? profileloginAuth;
+  MenuOption? selectedMenu;
+
   @override
   void initState() {
     _getProfiles();
+    _initializeFCMToken();
     super.initState();
   }
 
   Future<void> _getProfiles() async {
-    getProfiles result = await widget.apiProfile.getprofilesAPI();
+    ProfilesModel result = await ApiProfile.getProfiles();
     if (result.code == '200') {
       setState(() {
         widget.profiles = result.profiles!;
@@ -47,7 +50,7 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
     } else {
       if (!mounted) return;
       showDialog(
-        context: context, // 이 부분에 정의가 필요
+        context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             content: Text('${result.status}'),
@@ -65,39 +68,6 @@ class _ProfilesScreenState extends State<ProfilesScreen> {
         },
       );
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return CarouselWidget(profiles: widget.profiles);
-    //  MaterialApp(
-    //   debugShowCheckedModeBanner: false,
-    //   title: 'Flutter Carousel Slider',
-    //   home: CarouselWidget(profiles: widget.profiles),
-    // );
-  }
-}
-
-class CarouselWidget extends StatefulWidget {
-  final List<Profile> profiles;
-
-  const CarouselWidget({Key? key, required this.profiles}) : super(key: key);
-
-  @override
-  State<CarouselWidget> createState() => _CarouselWidgetState();
-}
-
-class _CarouselWidgetState extends State<CarouselWidget> {
-  CarouselController carouselController = CarouselController();
-  String? fcmToken;
-  generalResponse? profileloginAuth;
-  ApiprofileLogin apiProfileLogin = ApiprofileLogin();
-  MenuOption? selectedMenu;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeFCMToken();
   }
 
   Future<void> _initializeFCMToken() async {
@@ -139,11 +109,9 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                             selectedMenu = item;
                           });
                           if (selectedMenu == MenuOption.changePassword) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ChangePassword(),
-                              ),
+                            Get.to(
+                              () => const ChangePasswordScreen(),
+                              transition: Transition.rightToLeftWithFade,
                             );
                           } else {
                             userLogout();
@@ -154,7 +122,6 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                             value: MenuOption.changePassword,
                             child: Container(
                               decoration: const BoxDecoration(
-                                // Add your background image or color here
                                 image: DecorationImage(
                                   image: AssetImage('assets/dialog.png'),
                                   fit: BoxFit.cover,
@@ -165,7 +132,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                                   Icons.change_circle_outlined,
                                 ),
                                 title: Text(
-                                  '비밀번호 수정',
+                                  '비밀번호 변경',
                                 ),
                               ),
                             ),
@@ -174,7 +141,6 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                             value: MenuOption.logout,
                             child: Container(
                               decoration: const BoxDecoration(
-                                // Add your background image or color here
                                 image: DecorationImage(
                                   image: AssetImage('assets/dialog.png'),
                                   fit: BoxFit.cover,
@@ -195,12 +161,17 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                         child: const Center(
                           child: Padding(
                             padding: EdgeInsets.all(8),
-                            child: Text(
-                              '설정',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '설정',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Icon(Icons.settings_outlined),
+                              ],
                             ),
                           ),
                         ),
@@ -229,15 +200,16 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                               return GestureDetector(
                                 onTap: () async {
                                   profileloginAuth =
-                                      await apiProfileLogin.postProfileLoginAPI(
+                                      await ApiProfile.postProfileLogin(
                                     ProfileLoginRequestModel(
                                       childId: profile.id,
                                       fcmToken: fcmToken ?? "",
                                     ),
                                   );
-                                  if (!mounted) return;
-                                  Get.offAll(() => const HomeScreen(),
-                                      transition: Transition.size);
+                                  Get.offAll(
+                                    () => const HomeScreen(),
+                                    transition: Transition.size,
+                                  );
                                 },
                                 child: Stack(
                                   children: [
@@ -262,7 +234,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                                             '${profile.name}',
                                             style: const TextStyle(
                                               fontSize: 20,
-                                              color: Color(0xff000000),
+                                              color: Colors.black,
                                             ),
                                           ),
                                         ],
@@ -279,13 +251,10 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                                             key: 'childId',
                                             value: profile.id.toString(),
                                           );
-                                          if (!mounted) return;
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Record(),
-                                            ),
+                                          Get.to(
+                                            () => const Record(),
+                                            transition:
+                                                Transition.rightToLeftWithFade,
                                           );
                                         },
                                         child: Container(
@@ -294,7 +263,7 @@ class _CarouselWidgetState extends State<CarouselWidget> {
                                           decoration: BoxDecoration(
                                             borderRadius:
                                                 BorderRadius.circular(10),
-                                            color: Colors.red,
+                                            color: const Color(0xffff6347),
                                           ),
                                           child: const Row(
                                             mainAxisAlignment:
