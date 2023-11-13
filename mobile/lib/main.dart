@@ -25,7 +25,8 @@ void backgroundHandler(NotificationResponse details) {
   print('현재 백그라운드에서 초대 메시지를 받았습니다.');
   final payload = details.payload!.split(' ');
   final sessionId = payload[payload.length - 1];
-  Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
+  Get.to(() => SessionPage(),
+      arguments: {'sessionId': sessionId, 'sessionToken': ''});
 }
 
 void initializeNotification() async {
@@ -45,7 +46,8 @@ void initializeNotification() async {
     onDidReceiveNotificationResponse: (NotificationResponse details) {
       final payload = details.payload!.split(' ');
       final sessionId = payload[payload.length - 1];
-      Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
+      Get.to(() => SessionPage(),
+          arguments: {'sessionId': sessionId, 'sessionToken': ''});
     },
     onDidReceiveBackgroundNotificationResponse: backgroundHandler,
   );
@@ -85,7 +87,8 @@ void initializeNotification() async {
     if (notification != null) {
       final payload = notification.body!.split(' ');
       final sessionId = payload[payload.length - 1];
-      Get.to(() => SessionPage(), arguments: {'sessionId': sessionId});
+      Get.to(() => SessionPage(),
+          arguments: {'sessionId': sessionId, 'sessionToken': ''});
     }
   });
 
@@ -103,38 +106,6 @@ Future<String?> getMyDeviceToken() async {
     print("내 디바이스 토큰: $token");
   }
   return token;
-}
-
-void _permission() async {
-  Map<Permission, PermissionStatus> requestStatuses = await [
-    Permission.camera,
-    Permission.audio,
-    Permission.microphone,
-  ].request();
-  // 각 권한에 대한 상태를 확인하고 처리할 수 있습니다.
-  if (requestStatuses[Permission.camera] == PermissionStatus.granted) {
-    // Camera 권한이 허용된 경우
-    print('Camera permission granted');
-  } else {
-    // Camera 권한이 거부된 경우
-    print('Camera permission denied');
-  }
-
-  if (requestStatuses[Permission.audio] == PermissionStatus.granted) {
-    // Audio 권한이 허용된 경우
-    print('Audio permission granted');
-  } else {
-    // Audio 권한이 거부된 경우
-    print('Audio permission denied');
-  }
-
-  if (requestStatuses[Permission.microphone] == PermissionStatus.granted) {
-    // Microphone 권한이 허용된 경우
-    print('Microphone permission granted');
-  } else {
-    // Microphone 권한이 거부된 경우
-    print('Microphone permission denied');
-  }
 }
 
 Future<void> main() async {

@@ -61,8 +61,7 @@ class _EnterState extends State<Enter> {
                   } else {
                     final profileInfo = snapshot.data!;
                     print('여기서 호출중');
-                    print(
-                        profileInfo.profile?.profileAnimon?.bodyImagePath);
+                    print(profileInfo.profile?.profileAnimon?.bodyImagePath);
                     return Obx(() {
                       return Image.network(
                         '${profileController.selectedProfile.value?.profileAnimon?.bodyImagePath ?? ''}',
@@ -88,7 +87,8 @@ class _EnterState extends State<Enter> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.to(() => SessionPage(), arguments: {'sessionId': ''});
+                    Get.to(() => SessionPage(),
+                        arguments: {'sessionId': '', 'sessionToken': ''});
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
