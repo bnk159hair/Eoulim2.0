@@ -31,20 +31,15 @@ class _RecordState extends State<Record> {
       extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        elevation: 0,
-        leading: const Icon(
-          Icons.chevron_left,
-          color: Colors.black,
-        ),
         title: const Text(
           '녹화 영상',
           style: TextStyle(
             fontSize: 24,
-            color: Colors.black,
           ),
         ),
+        elevation: 1,
         centerTitle: true,
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.black.withOpacity(0.2),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -60,61 +55,80 @@ class _RecordState extends State<Record> {
             children: [
               checkingpassword
                   ? Expanded(
-                      child: FutureBuilder(
-                        future: recordList,
-                        builder: (context, snapshot) {
-                          if (snapshot.hasData) {
-                            return ListView.separated(
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                var record = snapshot.data![index];
-                                return Card(
-                                  elevation: 2.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Text(record.animonName),
-                                      Column(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: FutureBuilder(
+                          future: recordList,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return ListView.separated(
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  var record = snapshot.data![index];
+                                  final dateTime = record.createTime;
+                                  final createTime =
+                                      '${dateTime[0]}년 ${dateTime[1]}월 ${dateTime[2]}일 ${dateTime[3]}:${dateTime[4]}';
+                                  return Card(
+                                    elevation: 2.0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(14.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          Text(record.name),
-                                          Text(record.createTime.join('-')),
+                                          Image.network(
+                                            record.animonPath,
+                                            width: 60,
+                                            height: 60,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text('이름: ${record.name}'),
+                                              Text('학교: ${record.school}'),
+                                              Text('시간: $createTime'),
+                                            ],
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      PlayVideo(
+                                                          videoPath:
+                                                              record.videoPath),
+                                                ),
+                                              );
+                                            },
+                                            icon: const Icon(
+                                              Icons.play_circle_outline_rounded,
+                                              size: 32,
+                                            ),
+                                          ),
                                         ],
                                       ),
-                                      IconButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => PlayVideo(
-                                                  videoPath: record.videoPath),
-                                            ),
-                                          );
-                                        },
-                                        icon: const Icon(
-                                          Icons.play_circle_outline_rounded,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              separatorBuilder: (context, index) {
-                                return const SizedBox(
-                                  height: 20,
-                                );
-                              },
+                                    ),
+                                  );
+                                },
+                                separatorBuilder: (context, index) {
+                                  return const SizedBox(
+                                    height: 20,
+                                  );
+                                },
+                              );
+                            }
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
-                          }
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        },
+                          },
+                        ),
                       ),
                     )
                   : Expanded(

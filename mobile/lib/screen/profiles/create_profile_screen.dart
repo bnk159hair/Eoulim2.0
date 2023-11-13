@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/profile/createprofile_form.dart';
+import 'package:mobile/widgets/profile/create_profile_form.dart';
 
-class CreateProfile extends StatelessWidget {
-  const CreateProfile({super.key});
+class CreateProfileScreen extends StatelessWidget {
+  const CreateProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text(
+          '프로필 생성',
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+        elevation: 1,
+        centerTitle: true,
+        backgroundColor: Colors.black.withOpacity(0.2),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -19,20 +31,9 @@ class CreateProfile extends StatelessWidget {
         child: const SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  '프로필 생성',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               Center(
-                child: CreateprofileForm(),
+                child: CreateProfileForm(),
               ),
             ],
           ),

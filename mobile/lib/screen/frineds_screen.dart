@@ -3,15 +3,6 @@ import 'package:mobile/api/api_deletefollowing.dart';
 import 'package:mobile/api/api_followings.dart';
 import 'package:mobile/model/response_models/get_followings.dart';
 
-// class Friend {
-//   final String name;
-//   final String imageUrl;
-
-//   Friend(
-//     this.name,
-//     this.imageUrl,
-//   );
-// }
 
 class Friends extends StatefulWidget {
   Friends({super.key});
@@ -93,7 +84,11 @@ class _FriendsState extends State<Friends> {
         
         child: Padding(
           padding: const EdgeInsets.only(top: 90), // 상단 공백을 조절하려면 이 값을 조정하세요
-          child: GridView.builder(
+          child: widget.friends.length==0 ?
+          Center(
+            child: Image.asset('assets/emptyfriend.png'),
+          ) :
+          GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10.0,

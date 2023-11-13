@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:get/get.dart';
-
-import 'package:mobile/api/api_createprofile.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/model/request_models/put_createprofile.dart';
 import 'package:mobile/model/response_models/general_response.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
 import 'package:mobile/util/custom_text_field.dart';
 
-class CreateprofileForm extends StatefulWidget {
-  const CreateprofileForm({super.key});
+class CreateProfileForm extends StatefulWidget {
+  const CreateProfileForm({super.key});
 
   @override
-  State<CreateprofileForm> createState() => _CreateprofileFormState();
+  State<CreateProfileForm> createState() => _CreateProfileFormState();
 }
 
-class _CreateprofileFormState extends State<CreateprofileForm> {
-  final createprofileFormkey = GlobalKey<FormState>();
+class _CreateProfileFormState extends State<CreateProfileForm> {
+  final createProfileFormkey = GlobalKey<FormState>();
 
   String name = '';
   DateTime birth = DateTime.now();
@@ -38,7 +37,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
             color: Colors.white.withOpacity(0.3),
             borderRadius: BorderRadius.circular(20),
           ),
-          key: createprofileFormkey,
+          key: createProfileFormkey,
           child: Column(
             children: [
               Row(
@@ -130,7 +129,7 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                             );
                           } else {
                             final response =
-                                await ApiCreateprofile.postCheckShool(school);
+                                await ApiProfile.postCheckShool(school);
                             if (response.data) {
                               if (!mounted) return;
                               showDialog(
@@ -350,8 +349,8 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                 );
               }
 
-              createprofileFormkey.currentState?.save();
-              profileCreate = await ApiCreateprofile.createprofile(
+              createProfileFormkey.currentState?.save();
+              profileCreate = await ApiProfile.postCreateProfile(
                 CreateprofileRequestModel(
                   name: name,
                   birth: birth.toString().split(' ')[0],
@@ -373,12 +372,9 @@ class _CreateprofileFormState extends State<CreateprofileForm> {
                           child: TextButton(
                             child: const Text('프로필 선택창'),
                             onPressed: () {
-                              Navigator.of(ctx).pop();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => Profiles(),
-                                ),
+                              Get.offAll(
+                                () => ProfilesScreen(),
+                                transition: Transition.zoom,
                               );
                             },
                           ),

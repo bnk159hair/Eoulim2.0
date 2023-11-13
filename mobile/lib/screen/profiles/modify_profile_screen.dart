@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:mobile/widgets/profile/modify_child_form.dart';
+import 'package:mobile/widgets/profile/modify_profile_form.dart';
 
-class ModifyChild extends StatelessWidget {
-  const ModifyChild({super.key});
+class ModifyProfileScreen extends StatelessWidget {
+  const ModifyProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: const Text(
+          '프로필 수정',
+          style: TextStyle(
+            fontSize: 24,
+          ),
+        ),
+        elevation: 1,
+        centerTitle: true,
+        backgroundColor: Colors.black.withOpacity(0.2),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -19,20 +31,9 @@ class ModifyChild extends StatelessWidget {
         child: const SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                  '아이 정보 수정',
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
               Center(
-                child: ModifyChildForm(),
+                child: ModifyProfileForm(),
               ),
             ],
           ),
