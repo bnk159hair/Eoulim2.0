@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/api/api_user.dart';
 import 'package:mobile/screen/login_screen.dart';
-import 'package:mobile/api/api_profilelogout.dart';
 import 'package:mobile/screen/profiles/profiles_screen.dart';
 
 const storage = FlutterSecureStorage();
@@ -17,7 +17,7 @@ void userLogout() async {
 }
 
 void profileLogout() async {
-  await ApiprofileLogout.postProfileLogout();
+  await ApiProfile.postProfileLogout();
   await storage.delete(key: 'childId');
   Get.offAll(
     () => ProfilesScreen(),

@@ -2,30 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mobile/api/api_animonlist.dart';
 import 'package:mobile/api/api_changeanimon.dart';
-import 'package:mobile/api/api_profileinfo.dart';
+import 'package:mobile/api/api_profile.dart';
 import 'package:mobile/controller/profile_select.dart';
-import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:mobile/model/response_models/get_animonlist.dart';
-import 'package:mobile/model/response_models/get_porfile.dart';
-import 'package:mobile/util/custom_text_field.dart';
+import 'package:mobile/model/response_models/get_profile.dart';
 import 'package:mobile/util/logout_logic.dart';
 
-class Animons extends StatefulWidget {
-  Animons({Key? key}) : super(key: key);
+class AnimonsScreen extends StatefulWidget {
+  AnimonsScreen({Key? key}) : super(key: key);
   List<Animon> animons = List.empty();
   ApiAnimon apiAnimon = ApiAnimon();
   ApiChangeAnimon apichangeAnimon = ApiChangeAnimon();
 
   @override
-  State<Animons> createState() => _AnimonState();
+  State<AnimonsScreen> createState() => _AnimonsScreenState();
 }
 
-class _AnimonState extends State<Animons> {
+class _AnimonsScreenState extends State<AnimonsScreen> {
   ApiChangeAnimon apichangeAnimon = ApiChangeAnimon();
-  Apiprofileinfo apiProfileinfo = Apiprofileinfo();
 
   Future<void> _getProfileInfo() async {
-    getProfileinfo? result = await apiProfileinfo.getprofileAPI();
+    ProfileInfoModel? result = await ApiProfile.getProfileInfo();
     if (result.code == '200') {
     } else {
       userLogout();

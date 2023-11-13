@@ -1,14 +1,14 @@
 import 'package:mobile/model/response_models/general_response.dart';
 
-class getProfiles extends generalResponse {
+class ProfilesModel extends generalResponse {
   List<Profile>? profiles;
 
-  getProfiles(String? code, String? status, List<Profile> data)
+  ProfilesModel(String? code, String? status, List<Profile> data)
       : super(code, status) {
-    this.profiles = data;
+    profiles = data;
   }
 
-  getProfiles.fromJson(Map<String, dynamic> json)
+  ProfilesModel.fromJson(Map<String, dynamic> json)
       : super(json['code'], json['status']) {
     if (json['data'] != null) {
       profiles = <Profile>[];
@@ -87,7 +87,8 @@ class ProfileAnimon {
   String? bodyImagePath;
   String? name;
 
-  ProfileAnimon({required this.id,this.maskImagePath, this.bodyImagePath, this.name});
+  ProfileAnimon(
+      {required this.id, this.maskImagePath, this.bodyImagePath, this.name});
 
   ProfileAnimon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
