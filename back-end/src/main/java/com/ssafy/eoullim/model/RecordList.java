@@ -14,5 +14,5 @@ public class RecordList {
     private String videoPath;
     private String name;
     private String school;
-    private String animonName;
+    private String animonPath;
 }

@@ -17,7 +17,7 @@ public class Record {
     private String videoPath;
     private String name;
     private String school;
-    private String animonName;
+    private String animonPath;
     private List<Guide> guideInfo;
 
 }
