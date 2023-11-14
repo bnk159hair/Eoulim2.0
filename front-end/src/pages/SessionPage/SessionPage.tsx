@@ -285,6 +285,9 @@ const SessionPage = () => {
       });
     }
     session.disconnect();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    Toaster.postMessage('leave');
     navigate('/');
   };
 
@@ -402,9 +405,9 @@ const SessionPage = () => {
             {streamList[0]?.streamManager && (
               <StreamCanvas
                 streamManager={streamList[0]?.streamManager}
-                name={subscriberName}
-                avatarPath={subscriberAnimonURL}
-                videoState={subscriberVideoStatus}
+                name={profile.name}
+                avatarPath={`${publisherAnimonURL}`}
+                videoState={publisherVideoStatus}
               />
             )}
           </CheckVideo>

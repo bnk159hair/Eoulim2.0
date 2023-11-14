@@ -54,23 +54,21 @@ export const Mobile = () => {
           },
         });
 
-        if (childId && token && invitation === false) {
-          console.log('모바일에서 새 친구 세션으로 이동합니다.');
+        if (childId && token) {
           setChildId(data.childId);
-          navigate('/session', { state: { childId, invitation } });
-        } else if (childId && token && sessionToken) {
-          console.log('모바일에서 내가 초대해서 내 친구 세션으로 이동합니다.');
-          setChildId(data.childId);
-          setSessionId(sessionId);
-          setInvitationToken(sessionToken);
-          setInvitationSessionId(sessionId);
-          navigate('/session', { state: { childId, invitation } });
-        } else if (childId && token && sessionToken == '') {
-          console.log('모바일에서 초대를 받아서 내 친구 세션으로 이동합니다.');
-          setChildId(data.childId);
-          setSessionId(sessionId);
-          setInvitationSessionId(sessionId);
-          navigate('/session', { state: { childId, invitation } });
+          if (invitation === false) {
+            console.log('모바일에서 새 친구 세션으로 이동합니다.');
+            navigate('/session', { state: { childId, invitation } });
+          } else {
+            setSessionId(sessionId);
+            setInvitationSessionId(sessionId);
+            if (sessionToken) {
+              setInvitationToken(sessionToken);
+              navigate('/session', { state: { childId, invitation } });
+            } else {
+              navigate('/session', { state: { childId, invitation } });
+            }
+          }
         } else {
           console.log('모바일에서 웹 세션으로 접속에 실패하였습니다.');
           console.log(data);
