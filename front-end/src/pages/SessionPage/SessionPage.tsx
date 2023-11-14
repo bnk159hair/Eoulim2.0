@@ -423,7 +423,7 @@ const SessionPage = () => {
   if (!checkVideo) {
     return window.innerWidth > 600 ? (
       <SessionPageContainer>
-        <CheckContainer>
+        <Container>
           <ButtonContainer>
             <Typography variant={'h2'} color={'white'} marginY={5}>
               {'내 모습 확인'}
@@ -463,14 +463,14 @@ const SessionPage = () => {
               </Button>
             </CheckButtons>
           </ButtonContainer>
-        </CheckContainer>
+        </Container>
         <Container>
           <MyVideo>
             {streamList[0]?.streamManager && (
               <StreamCanvas
                 streamManager={streamList[0]?.streamManager}
                 name={profile.name}
-                avatarPath={`${publisherAnimonURL}`}
+                avatarPath={publisherAnimonURL}
                 videoState={publisherVideoStatus}
               />
             )}
@@ -485,13 +485,28 @@ const SessionPage = () => {
               <StreamCanvas
                 streamManager={streamList[0]?.streamManager}
                 name={profile.name}
-                avatarPath={`${publisherAnimonURL}`}
+                avatarPath={publisherAnimonURL}
                 videoState={publisherVideoStatus}
               />
             )}
           </CheckVideo>
-          <button onClick={() => setCheckVideo(true)}>{'체크완료'}</button>
         </CheckContainer>
+        <NavContainer>
+          <Buttons>
+            <Button variant={'contained'} color={'success'} onClick={() => setCheckVideo(true)}>
+              {'만나기'}
+            </Button>
+            <Button variant={'contained'} onClick={changeVideoStatus} sx={{ fontSize: '28px' }}>
+              {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
+            </Button>
+            <Button variant={'contained'} onClick={changeAudioStatus}>
+              {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
+            </Button>
+            <Button variant={'contained'} color={'error'} onClick={sessionOver}>
+              {'나가기'}
+            </Button>
+          </Buttons>
+        </NavContainer>
       </SessionPageContainer>
     );
   }

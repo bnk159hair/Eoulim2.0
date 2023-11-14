@@ -21,9 +21,11 @@ export const Container = styled.div`
 `;
 
 export const CheckContainer = styled.div`
-  width: 100%;
+  width: 90%;
   height: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const ButtonContainer = styled.div`
@@ -76,12 +78,12 @@ export const CharacterContainer = styled.div`
   left: 49%;
   transform: translate(-50%, -50%);
   z-index: 2005;
-  @media (max-width: 481px) {
+  @media (max-width: 600px) {
     position: absolute;
     width: 35%;
     height: 24%;
     top: 70%;
-    left: 45%;
+    left: 20%;
   }
 `;
 
@@ -109,13 +111,12 @@ export const MyVideo = styled.div`
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 10px;
   position: relative;
-  @media (max-width: 481px) {
+  @media (max-width: 600px) {
     width: 35%;
     height: 30%;
-    z-index: 1000;
     position: absolute;
     bottom: 15%;
-    right: 0;
+    right: 5%;
     z-index: 2006;
   }
 `;
@@ -123,7 +124,7 @@ export const MyVideo = styled.div`
 export const CheckVideo = styled.div`
   width: 100%;
   height: 85%;
-  margin: 0.5rem;
+  margin-top: 0.5rem;
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 10px;
   position: relative;
@@ -153,7 +154,7 @@ export const Buttons = styled.div`
   width: 30%;
   display: flex;
   justify-content: space-evenly;
-  @media (max-width: 481px) {
+  @media (max-width: 600px) {
     width: 100%;
   }
 `;
