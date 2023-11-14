@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import {
   ModalOverlay,
   ModalContent,
-  Accept,
-  Refuse,
   FlexContent,
   EndMessage,
   ProfileImg,
