@@ -11,6 +11,7 @@ import com.ssafy.eoullim.service.FcmTokenService;
 import com.ssafy.eoullim.service.UserService;
 import com.ssafy.eoullim.utils.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -41,6 +43,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void saveFcmToken(User user, String token) {
+        log.info("service method call");
         fcmTokenService.saveFcmTokenOfParent(user, token);
     }
 
@@ -86,6 +89,7 @@ public class UserServiceImpl implements UserService {
         String key = setBlackListKey(username);
         blackListTemplate.delete(key); // BlackList에서 삭제
 
+        log.info("api call");
         saveFcmToken(savedUser, fcmToken); // fcm token 저장
         return JwtTokenUtils.generateAccessToken(username, secretKey, expiredTimeMs);
     }

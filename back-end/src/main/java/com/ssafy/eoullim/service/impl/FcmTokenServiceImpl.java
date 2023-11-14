@@ -42,6 +42,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
   @Transactional
   public void saveFcmTokenOfParent(User user, String token) {
     if (fcmTokenRepository.findByUserIdAndToken(user.getId(), token) == null) {
+      log.info("call repository save");
       fcmTokenRepository.save(
               FcmTokenEntity.builder().user(UserEntity.of(user)).token(token).build());
     }
