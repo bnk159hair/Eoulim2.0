@@ -102,6 +102,8 @@ const SessionPage = () => {
     setGuideScript([]);
     setTimeline([]);
     setPublisherAnimonURL(`${profile.profileAnimon.maskImagePath}`);
+    console.log('여기여기여기');
+    console.log(profile.profileAnimon.maskImagePath);
     getFriends({
       childId,
       onSuccess: data => {
