@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { Client } from '@stomp/stompjs';
 import MicIcon from '@mui/icons-material/Mic';
@@ -23,6 +23,8 @@ import {
   CheckContainer,
   FriendVideo,
   CheckVideo,
+  ButtonContainer,
+  CheckButtons,
 } from './SessionPageStyles';
 import { Profile } from '../../atoms/Profile';
 import { IsAnimonLoaded, guideSeq, GuideScript, Timeline, SessionId } from '../../atoms/Session';
@@ -416,7 +418,63 @@ const SessionPage = () => {
     );
   }
   if (!checkVideo) {
-    return (
+    return window.innerWidth > 600 ? (
+      <SessionPageContainer>
+        <CheckContainer>
+          <ButtonContainer>
+            <Typography variant={'h2'} color={'white'} marginY={5}>
+              {'내 모습 확인'}
+            </Typography>
+            <CheckButtons>
+              <Button
+                sx={{ paddingY: 2, transform: 'scale(2)' }}
+                variant={'contained'}
+                onClick={changeAudioStatus}
+              >
+                {micStatus ? <MicIcon fontSize={'large'} /> : <MicOffIcon fontSize={'large'} />}
+              </Button>
+              <Button
+                variant={'contained'}
+                onClick={changeVideoStatus}
+                sx={{ fontSize: '28px', paddingY: 1, transform: 'scale(2)' }}
+              >
+                {publisherVideoStatus ? (profile.gender === 'W' ? '👩' : '🧑') : '🙈'}
+              </Button>
+            </CheckButtons>
+            <CheckButtons>
+              <Button
+                variant={'contained'}
+                color={'success'}
+                onClick={() => setCheckVideo(true)}
+                sx={{ fontSize: '30px', paddingY: 3, transform: 'scale(1.3)' }}
+              >
+                {'만나기'}
+              </Button>
+              <Button
+                variant={'contained'}
+                color={'error'}
+                onClick={sessionOver}
+                sx={{ fontSize: '30px', paddingY: 3, transform: 'scale(1.3)' }}
+              >
+                {'나가기'}
+              </Button>
+            </CheckButtons>
+          </ButtonContainer>
+        </CheckContainer>
+        <Container>
+          <MyVideo>
+            {streamList[0]?.streamManager && (
+              <StreamCanvas
+                streamManager={streamList[0]?.streamManager}
+                name={profile.name}
+                avatarPath={`${publisherAnimonURL}`}
+                videoState={publisherVideoStatus}
+              />
+            )}
+          </MyVideo>
+        </Container>
+      </SessionPageContainer>
+    ) : (
       <SessionPageContainer>
         <CheckContainer>
           <CheckVideo>

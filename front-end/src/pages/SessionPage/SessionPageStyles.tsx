@@ -21,12 +21,24 @@ export const Container = styled.div`
 `;
 
 export const CheckContainer = styled.div`
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+`;
+
+export const ButtonContainer = styled.div`
+  width: 100%;
+  height: 85%;
+  margin: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  text-align: center;
+`;
+
+export const CheckButtons = styled.div`
+  margin-top: 15%;
+  display: flex;
+  justify-content: space-evenly;
 `;
 
 const gelatineAnimation = keyframes`
