@@ -90,6 +90,7 @@ export const useFaceMask = (
       faceCanvas!.render(positionBufferData);
       requestRef.current = requestAnimationFrame(animate);
     } catch (e) {
+      // console.log('이건 또 뭐야', e);
       requestRef.current = requestAnimationFrame(animate);
     }
   }, [model, videoElement, faceCanvas, canvasElement, avatarPath]);
@@ -166,11 +167,22 @@ class FaceCanvas {
   }
 
   _addMaterial() {
-    this._textureLoader = new THREE.TextureLoader();
-    this._textureLoader.setRequestHeader({
-      'Access-Control-Allow-Origin': '*',
-    });
-    const texture = this._textureLoader.load(this._textureFilePath);
+    this._textureLoader = new THREE.TextureLoader().crossOrigin('anonymous');
+    // this._textureLoader.setRequestHeader({
+    //   'Access-Control-Allow-Origin': '*',
+    // });
+    const texture = this._textureLoader.load(
+      this._textureFilePath + '?not-from-cache-please',
+      (loadedTexture: THREE.Texture) => {
+        console.log('텍스처 로딩 완료:', loadedTexture);
+        console.log('텍스처 이미지:', loadedTexture.image); // 이미지 확인
+      },
+      undefined,
+      (error: any) => {
+        console.error('텍스처 로딩 에러:', error);
+      },
+    );
+    console.log('텍스쳐: ', texture);
     texture.encoding = THREE.sRGBEncoding;
 
     texture.anisotropy = 16;
