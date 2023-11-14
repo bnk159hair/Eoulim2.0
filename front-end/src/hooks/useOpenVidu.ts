@@ -22,12 +22,12 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
     console.log('나가기 실행');
     if (sessionId) {
       console.log('초대 세션이랑 연결 끊기');
-      session.disconnect();
       destroyInvitationSession({
         sessionId,
         onSuccess: () => {
           setInvitationSessionId('');
           setSessionToken('');
+          session.disconnect();
         },
         onError: () => {
           console.log('destroyInvitationSession api를 사용한 세션 접속 종료에 실패하였습니다.');
@@ -36,7 +36,6 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
     } else if (session) {
       console.log('나랑 세션이랑 연결 끊기');
       session.disconnect();
-      console.log(session);
     }
     setSession(null);
     setPublisher(null);

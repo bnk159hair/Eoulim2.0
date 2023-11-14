@@ -73,9 +73,9 @@ const SessionPage = () => {
   const [timeline, setTimeline] = useRecoilState(Timeline);
   const [startTime, setStartTime] = useState(0);
 
-  const sessionId = useRecoilValue(SessionId);
-  const invitationSessionId = useRecoilValue(InvitationSessionId);
-  const sessionToken = useRecoilValue(InvitationToken);
+  const [sessionId, setSessionId] = useRecoilState(SessionId);
+  const [invitationSessionId, setInvitationSessionId] = useRecoilState(InvitationSessionId);
+  const [sessionToken, setSessionToken] = useRecoilState(InvitationToken);
 
   const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
     childId,
@@ -278,13 +278,15 @@ const SessionPage = () => {
         sessionId,
         onSuccess: () => {
           console.log('세션 페이지에서 초대 세션 접속을 종료하였습니다.');
+          setInvitationSessionId('');
+          setSessionToken('');
         },
         onError: () => {
           console.log('세션 페이지에서 초대 세션 종료에 실패하였습니다.');
         },
       });
     }
-    session.disconnect();
+    setSessionId('');
     navigate('/');
     sendToMobile();
   };

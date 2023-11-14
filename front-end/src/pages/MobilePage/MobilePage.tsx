@@ -55,14 +55,14 @@ export const Mobile = () => {
         });
 
         if (childId && token) {
-          setChildId(data.childId);
+          setChildId(childId);
           if (invitation === false) {
             console.log('모바일에서 새 친구 세션으로 이동합니다.');
             navigate('/session', { state: { childId, invitation } });
           } else {
             setSessionId(sessionId);
             setInvitationSessionId(sessionId);
-            if (sessionToken) {
+            if (sessionToken !== '') {
               setInvitationToken(sessionToken);
               navigate('/session', { state: { childId, invitation } });
             } else {
