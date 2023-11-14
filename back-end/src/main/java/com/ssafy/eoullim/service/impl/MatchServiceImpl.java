@@ -1,6 +1,5 @@
 package com.ssafy.eoullim.service.impl;
 
-import com.ssafy.eoullim.dto.request.MatchStartRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.eoullim.exception.EoullimApplicationException;
@@ -13,25 +12,20 @@ import com.ssafy.eoullim.model.Room;
 import com.ssafy.eoullim.service.*;
 import com.ssafy.eoullim.utils.RandomGeneratorUtils;
 import io.openvidu.java.client.*;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.sql.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,9 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MatchServiceImpl implements MatchService {
 
   private final RecordService recordService;
-  //  private final AlarmService alarmservice;
   private final ChildService childService;
-  private final SimpMessageSendingOperations simpMessageSendingOperations;
 
   private final FirebaseMessagingService firebaseMessagingService;
   private final FcmTokenService fcmTokenService;
@@ -377,6 +369,23 @@ public class MatchServiceImpl implements MatchService {
 
       existingRoom.setRecordingId(recordingId);
 
+      // fcm token 가져오기
+      Long friendId = existingRoom.getChildOne();
+      final var friend = childService.getChildWithNoPermission(friendId);
+      Set<String> childTokenSet = fcmTokenService.getFcmTokenOfChild(childId);
+      Set<String> childParentTokenSet = fcmTokenService.getFcmTokenOfParent(child.getUser().getId());
+      Set<String> friendTokenSet = fcmTokenService.getFcmTokenOfChild(friendId);
+      Set<String> friendParentTokenSet = fcmTokenService.getFcmTokenOfParent(friend.getUser().getId());
+      // 부모님 토큰과 아이 토큰이 겹치는 경우 빼주기 (아이가 부모님 폰을 사용하는 경우)
+      childParentTokenSet.removeAll(childTokenSet);
+      friendParentTokenSet.removeAll(friendTokenSet);
+
+      // 아이와 친구 부모님 모두에게 미팅 시작 알림 보내고 저장하기
+      sendStartMessage(child, friend, childParentTokenSet);
+      sendStartMessage(friend, child, friendParentTokenSet);
+      notificationService.save(child.getUser(), meetingStartText(child.getName(), friend.getName()));
+      notificationService.save(friend.getUser(), meetingStartText(friend.getName(), child.getName()));
+
       return result;
     }
   }
@@ -457,7 +466,6 @@ public class MatchServiceImpl implements MatchService {
       // 아이와 친구 부모님 모두에게 미팅 시작 알림 보내고 저장하기
       sendStartMessage(child, friend, childParentTokenSet);
       sendStartMessage(friend, child, friendParentTokenSet);
-
       notificationService.save(child.getUser(), meetingStartText(child.getName(), friend.getName()));
       notificationService.save(friend.getUser(), meetingStartText(friend.getName(), child.getName()));
 
