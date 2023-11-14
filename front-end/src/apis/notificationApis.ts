@@ -15,3 +15,12 @@ export const getNotifications = async ({ onSuccess, onError }: ApiResponse) => {
     onError();
   }
 };
+
+export const deleteNotifications = async () => {
+  try {
+    const response = await instance.delete('/notifications');
+    console.log(response);
+  } catch (error) {
+    console.log(error);
+  }
+};

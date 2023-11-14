@@ -3,8 +3,8 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { getLogout } from 'apis/authApis';
 import { fcmTokenState } from 'atoms/Firebase';
-import { Box, Divider, Menu, MenuItem, Typography } from '@mui/material';
-import { getNotifications } from 'apis/notificationApis';
+import { Box, Divider, Menu, MenuItem, Typography, Button } from '@mui/material';
+import { deleteNotifications, getNotifications } from 'apis/notificationApis';
 import ProfileList from '../../components/profile/ProfileList';
 import {
   ProfilePageContainer,
@@ -33,7 +33,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     getNotifications({
-      onSuccess: data => setNotifications(data),
+      onSuccess: data => setNotifications(data.reverse()),
       onError: () => {},
     });
   }, []);
@@ -71,56 +71,72 @@ const ProfilePage = () => {
     });
   };
 
+  const handleDelete = () => {
+    deleteNotifications();
+    setNotifications([]);
+  };
+
   return (
     <ProfilePageContainer>
       <MarginContainer>
         <Alarm onClick={handleClick}>
-          <NotificationBadge $isReadNotifications={isReadNotifications}>
-            {notifications.length}
-          </NotificationBadge>
+          {notifications.length === 0 ? (
+            <NotificationBadge $isReadNotifications>{notifications.length}</NotificationBadge>
+          ) : (
+            <NotificationBadge $isReadNotifications={isReadNotifications}>
+              {notifications.length}
+            </NotificationBadge>
+          )}
         </Alarm>
-        <Menu
-          MenuListProps={{
-            'aria-labelledby': 'long-button',
-          }}
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          sx={{
-            maxHeight: 500,
-            '*::-webkit-scrollbar': {
-              display: 'none',
-            },
-            textAlign: 'center',
-            marginTop: 1,
-          }}
-          PaperProps={{
-            style: { borderRadius: '15px' },
-          }}
-        >
-          <Typography variant={'h4'} fontWeight={'bold'} padding={1}>
-            {'알림 목록'}
-          </Typography>
-          {notifications.map(notification => (
-            <Box
-              key={notification.createTime.toString()}
-              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
-            >
-              <Divider sx={{ my: 0.5, width: '90%' }} />
-              <MenuItem
-                sx={{ width: 400, display: 'flex', flexDirection: 'column' }}
-                onClick={handleClose}
-              >
-                <Typography variant={'body1'} fontWeight={'bold'}>
-                  {notification.text}
-                </Typography>
-                <Typography variant={'body2'}>{`보낸 시각 : ${formatTime(
-                  notification.createTime,
-                )}`}</Typography>
-              </MenuItem>
+        {notifications.length > 0 && (
+          <Menu
+            MenuListProps={{
+              'aria-labelledby': 'long-button',
+            }}
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            sx={{
+              maxHeight: 500,
+              '*::-webkit-scrollbar': {
+                display: 'none',
+              },
+              // textAlign: 'center',
+              marginTop: 1,
+            }}
+            PaperProps={{
+              style: { borderRadius: '15px' },
+            }}
+          >
+            <Box sx={{ paddingX: 2.5, display: 'flex', justifyContent: 'space-between' }}>
+              <Typography variant={'h5'} fontWeight={'bold'} padding={1}>
+                {'알림 목록'}
+              </Typography>
+              <Button size={'large'} onClick={handleDelete}>
+                {'목록 비우기'}
+              </Button>
             </Box>
-          ))}
-        </Menu>
+            {notifications.map(notification => (
+              <Box
+                key={notification.createTime.toString()}
+                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+              >
+                <Divider sx={{ my: 0.5, width: '90%' }} />
+                <MenuItem
+                  sx={{ width: 400, display: 'flex', flexDirection: 'column' }}
+                  onClick={handleClose}
+                >
+                  <Typography variant={'body1'} fontWeight={'bold'}>
+                    {notification.text}
+                  </Typography>
+                  <Typography variant={'body2'}>{`보낸 시각 : ${formatTime(
+                    notification.createTime,
+                  )}`}</Typography>
+                </MenuItem>
+              </Box>
+            ))}
+          </Menu>
+        )}
         <PasswordChange onClick={() => setModalOpen(true)} />
       </MarginContainer>
       {isModalOpen && <ChangePasswordModal onClose={() => setModalOpen(false)} />}
