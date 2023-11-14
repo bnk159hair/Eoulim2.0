@@ -25,7 +25,7 @@ void backgroundHandler(NotificationResponse details) {
   print('현재 백그라운드에서 초대 메시지를 받았습니다.');
   final payload = details.payload!.split(' ');
   final sessionId = payload[payload.length - 1];
-  Get.to(() => SessionPage(),
+  Get.to(() => const SessionPage(),
       arguments: {'sessionId': sessionId, 'sessionToken': ''});
 }
 
@@ -46,7 +46,7 @@ void initializeNotification() async {
     onDidReceiveNotificationResponse: (NotificationResponse details) {
       final payload = details.payload!.split(' ');
       final sessionId = payload[payload.length - 1];
-      Get.to(() => SessionPage(),
+      Get.to(() => const SessionPage(),
           arguments: {'sessionId': sessionId, 'sessionToken': ''});
     },
     onDidReceiveBackgroundNotificationResponse: backgroundHandler,
@@ -87,7 +87,7 @@ void initializeNotification() async {
     if (notification != null) {
       final payload = notification.body!.split(' ');
       final sessionId = payload[payload.length - 1];
-      Get.to(() => SessionPage(),
+      Get.to(() => const SessionPage(),
           arguments: {'sessionId': sessionId, 'sessionToken': ''});
     }
   });
@@ -111,9 +111,6 @@ Future<String?> getMyDeviceToken() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await Permission.audio.request();
-  await Permission.camera.request();
-  await Permission.microphone.request();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   initializeNotification();
 
