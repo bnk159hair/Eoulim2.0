@@ -29,6 +29,7 @@ import { IsAnimonLoaded, guideSeq, GuideScript, Timeline, SessionId } from '../.
 import EndModal from '../../components/stream/EndModal';
 import { destroyInvitationSession, destroySession } from '../../apis/openViduApis';
 import { S3_SOUND_BASE_URL } from '../../apis/urls';
+import NewMaskModal from '../../components/stream/NewMask';
 
 interface FriendsProfile {
   id: number;
@@ -50,7 +51,7 @@ const SessionPage = () => {
   const [first, setFirst] = useState(true);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [isFriend, setFriend] = useState(false);
-
+  const [presentAnimon, setPresentAnimon] = useState('');
   const [friendId, setFriendId] = useState(0);
   const [publisherVideoStatus, setPublisherVideoStatus] = useState(false);
   const [subscriberVideoStatus, setSubscriberVideoStatus] = useState(false);
@@ -305,7 +306,6 @@ const SessionPage = () => {
       followingData,
       onSuccess: () => {
         console.log('친구 추가 성공');
-        leaveSession();
       },
       onError: () => {
         console.log('친구 추가를 실패하였습니다.');
@@ -318,9 +318,11 @@ const SessionPage = () => {
       onSuccess: data => {
         // 성공적으로 받은 애니몬
         console.log('선물받기 : ', data);
+        setPresentAnimon(data.maskImagePath);
       },
       onError: () => {
         console.log('친구의 애니몬을 선물 받지 못했어요 ㅜㅜ');
+        leaveSession();
       },
     });
   };
@@ -386,12 +388,22 @@ const SessionPage = () => {
     }
     if (!isFriend) {
       return (
-        <EndModal
-          onClose={leaveSession}
-          message={'다음에 다시 만날래?'}
-          isFriend={isFriend}
-          addFriend={addFriend}
-        />
+        <div>
+          {presentAnimon === '' ? (
+            <EndModal
+              onClose={leaveSession}
+              message={'다음에 다시 만날래?'}
+              isFriend={isFriend}
+              addFriend={addFriend}
+            />
+          ) : (
+            <NewMaskModal
+              onClose={leaveSession}
+              message={'새로운 가면을 얻었어요!'}
+              isAnimon={presentAnimon}
+            />
+          )}
+        </div>
       );
     }
     return (
