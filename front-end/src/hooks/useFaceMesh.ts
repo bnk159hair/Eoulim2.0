@@ -166,7 +166,9 @@ class FaceCanvas {
   }
 
   _addMaterial() {
-    this._textureLoader = new THREE.TextureLoader();
+    this._textureLoader = new THREE.TextureLoader().setRequestHeader({
+      'Access-Control-Allow-Origin': '*',
+    });
     const texture = this._textureLoader.load(this._textureFilePath);
     texture.encoding = THREE.sRGBEncoding;
 
