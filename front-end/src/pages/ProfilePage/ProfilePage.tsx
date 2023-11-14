@@ -5,6 +5,7 @@ import { getLogout } from 'apis/authApis';
 import { fcmTokenState } from 'atoms/Firebase';
 import { Box, Divider, Menu, MenuItem, Typography, Button } from '@mui/material';
 import { deleteNotifications, getNotifications } from 'apis/notificationApis';
+import formatTime from 'utils/formatTime';
 import ProfileList from '../../components/profile/ProfileList';
 import {
   ProfilePageContainer,
@@ -37,11 +38,6 @@ const ProfilePage = () => {
       onError: () => {},
     });
   }, []);
-
-  const formatTime = (timeline: number[]) => {
-    const [y, mo, d, h, mi] = timeline;
-    return `${y}. ${mo}. ${d}. ${h} : ${mi}`; // 원하는 형식으로 변환할 수 있습니다.
-  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setIsReadNotifications(false);
