@@ -48,33 +48,33 @@ export const Mobile = () => {
             setProfile(data);
             console.log('프로필 가져오기에 성공하였습니다.');
             console.log(data);
+
+            if (childId && token) {
+              setChildId(childId);
+              if (invitation === false) {
+                console.log('모바일에서 새 친구 세션으로 이동합니다.');
+                navigate('/session', { state: { childId, invitation } });
+              } else {
+                setSessionId(sessionId);
+                setInvitationSessionId(sessionId);
+                if (sessionToken !== '') {
+                  setInvitationToken(sessionToken);
+                  navigate('/session', { state: { childId, invitation } });
+                } else {
+                  navigate('/session', { state: { childId, invitation } });
+                }
+              }
+            } else {
+              console.log('모바일에서 웹 세션으로 접속에 실패하였습니다.');
+              console.log(data);
+              console.log(typeof data);
+              console.log(invitation, childId, token);
+            }
           },
           onError: () => {
             console.log('프로필 가져오기에 실패하였습니다.');
           },
         });
-
-        if (childId && token) {
-          setChildId(childId);
-          if (invitation === false) {
-            console.log('모바일에서 새 친구 세션으로 이동합니다.');
-            navigate('/session', { state: { childId, invitation } });
-          } else {
-            setSessionId(sessionId);
-            setInvitationSessionId(sessionId);
-            if (sessionToken !== '') {
-              setInvitationToken(sessionToken);
-              navigate('/session', { state: { childId, invitation } });
-            } else {
-              navigate('/session', { state: { childId, invitation } });
-            }
-          }
-        } else {
-          console.log('모바일에서 웹 세션으로 접속에 실패하였습니다.');
-          console.log(data);
-          console.log(typeof data);
-          console.log(invitation, childId, token);
-        }
       }
     };
   }, [childId]);
