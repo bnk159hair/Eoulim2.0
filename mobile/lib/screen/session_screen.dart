@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import "package:flutter/material.dart";
 import 'package:get/get.dart';
+import 'package:mobile/screen/home_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
@@ -101,9 +102,11 @@ class _SessionPageState extends State<SessionPage> {
       ..addJavaScriptChannel(
         'Toaster',
         onMessageReceived: (JavaScriptMessage message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
-          );
+          if (message.message == 'leave') {
+            Get.to(
+              () => const HomeScreen(),
+            );
+          }
         },
       )
       ..loadRequest(Uri.parse('https://k9c103.p.ssafy.io/mobile'));
