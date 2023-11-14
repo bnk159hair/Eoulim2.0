@@ -42,6 +42,7 @@ class _SessionPageState extends State<SessionPage> {
       String message = json.encode({
         "childId": childId,
         "invitation": invitation,
+        "sessionId": sessionId,
         "sessionToken": sessionToken,
         "token": token
       });
@@ -81,7 +82,7 @@ class _SessionPageState extends State<SessionPage> {
           },
           onPageStarted: (String url) {
             debugPrint('Page started loading: $url');
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               getChildInfo();
             });
           },

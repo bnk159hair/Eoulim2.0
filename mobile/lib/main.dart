@@ -111,6 +111,8 @@ Future<String?> getMyDeviceToken() async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  Permission.camera.request();
+  Permission.microphone.request();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   initializeNotification();
 

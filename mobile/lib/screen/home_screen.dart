@@ -11,8 +11,20 @@ import 'package:mobile/screen/enter_screen.dart';
 import 'package:mobile/screen/frineds_screen.dart';
 import 'package:mobile/screen/session_screen.dart';
 import 'package:mobile/screen/settings_screen.dart';
+import 'package:mobile/util/websocket.dart' as websocket;
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:mobile/util/logout_logic.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+void refuse(String sessionId) async {
+  const storage = FlutterSecureStorage();
+  String? childId = await storage.read(key: 'childId');
+
+  final Map<String, dynamic> message = {'childId': childId, 'isLeft': false};
+
+  websocket.send(sessionId, 'leave-session', message);
+  Get.back();
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,15 +46,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
+      websocket.stompClient.activate();
 
       if (notification != null) {
+        final payload = notification.body!.split(' ');
+        final sessionId = payload[payload.length - 1];
+        print(sessionId);
         Future.delayed(const Duration(milliseconds: 1000), () {
           Get.defaultDialog(
             title: '친구가 초대를 보냈어요!',
             middleText: '만나러 가볼까요?',
             actions: [
               IconButton(
-                onPressed: () => Get.to(() => const SessionPage()),
+                onPressed: () => {
+                  Get.to(() => const SessionPage(),
+                      arguments: {'sessionId': sessionId, 'sessionToken': ''})
+                },
                 icon: const Icon(
                   Icons.circle_outlined,
                   size: 40,
@@ -50,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               IconButton(
-                onPressed: () => Get.back(),
+                onPressed: () => {refuse(sessionId)},
                 icon: const Icon(
                   Icons.close_rounded,
                   size: 40,
