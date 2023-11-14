@@ -285,10 +285,14 @@ const SessionPage = () => {
       });
     }
     session.disconnect();
+    navigate('/');
+    sendToMobile();
+  };
+
+  const sendToMobile = () => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     Toaster.postMessage('leave');
-    navigate('/');
   };
 
   const addFriend = () => {
