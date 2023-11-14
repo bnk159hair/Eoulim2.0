@@ -103,27 +103,27 @@ export const useFaceMask = (
 };
 
 class FaceCanvas {
-  _camera: any;
+  camera: any;
 
-  _halfW: any;
+  halfW: any;
 
-  _halfH: any;
+  halfH: any;
 
-  _scene: any;
+  scene: any;
 
-  _geometry: any;
+  geometry: any;
 
-  _textureLoader: any;
+  textureLoader: any;
 
-  _textureFilePath: any;
+  textureFilePath: any;
 
-  _material: any;
+  material: any;
 
-  _mesh: any;
+  mesh: any;
 
-  _renderer: any;
+  renderer: any;
 
-  static get EYE_VERTICES() {
+  static get EYEVERTICES() {
     return [
       // LEFT EYE
       133, 173, 157, 158, 159, 160, 161, 246, 33, 7, 163, 144, 145, 153, 154, 155,
@@ -132,47 +132,44 @@ class FaceCanvas {
     ];
   }
 
-  _addCamera() {
-    this._camera = new THREE.OrthographicCamera(
-      this._halfW,
-      -this._halfW,
-      -this._halfH,
-      this._halfH,
+  addCamera() {
+    this.camera = new THREE.OrthographicCamera(
+      this.halfW,
+      -this.halfW,
+      -this.halfH,
+      this.halfH,
       1,
       800,
     );
-    this._camera.position.x = 320;
-    this._camera.position.y = 240;
-    this._camera.position.z = -600;
-    this._camera.lookAt(320, 240, 0);
+    this.camera.position.x = 320;
+    this.camera.position.y = 240;
+    this.camera.position.z = -600;
+    this.camera.lookAt(320, 240, 0);
   }
 
-  _addLights() {
+  addLights() {
     const light = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.2);
-    this._scene.add(light);
+    this.scene.add(light);
     const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(this._halfW, this._halfH * 0.5, -1000).normalize();
-    this._scene.add(directionalLight);
+    directionalLight.position.set(this.halfW, this.halfH * 0.5, -1000).normalize();
+    this.scene.add(directionalLight);
   }
 
-  _addGeometry() {
-    this._geometry = new THREE.BufferGeometry();
-    this._geometry.setIndex(TRIANGULATION);
-    this._geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positionBufferData, 3),
-    );
-    this._geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-    this._geometry.computeVertexNormals();
+  addGeometry() {
+    this.geometry = new THREE.BufferGeometry();
+    this.geometry.setIndex(TRIANGULATION);
+    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positionBufferData, 3));
+    this.geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    this.geometry.computeVertexNormals();
   }
 
-  _addMaterial() {
-    this._textureLoader = new THREE.TextureLoader().crossOrigin('anonymous');
-    // this._textureLoader.setRequestHeader({
+  addMaterial() {
+    this.textureLoader = new THREE.TextureLoader().setCrossOrigin('anonymous');
+    // this.textureLoader.setRequestHeader({
     //   'Access-Control-Allow-Origin': '*',
     // });
-    const texture = this._textureLoader.load(
-      this._textureFilePath + '?not-from-cache-please',
+    const texture = this.textureLoader.load(
+      `${this.textureFilePath}?not-from-cache-please`,
       (loadedTexture: THREE.Texture) => {
         console.log('텍스처 로딩 완료:', loadedTexture);
         console.log('텍스처 이미지:', loadedTexture.image); // 이미지 확인
@@ -188,7 +185,7 @@ class FaceCanvas {
     texture.anisotropy = 16;
     const alpha = 0.4;
     const beta = 0.5;
-    this._material = new THREE.MeshPhongMaterial({
+    this.material = new THREE.MeshPhongMaterial({
       map: texture,
       color: new THREE.Color(0xffffff),
       specular: new THREE.Color(beta * 0.2, beta * 0.2, beta * 0.2),
@@ -197,36 +194,33 @@ class FaceCanvas {
     });
   }
 
-  _setupScene() {
-    this._scene = new THREE.Scene();
-    this._addCamera();
-    this._addLights();
-    this._addGeometry();
-    this._addMaterial();
-    this._mesh = new THREE.Mesh(this._geometry, this._material);
-    this._scene.add(this._mesh);
+  setupScene() {
+    this.scene = new THREE.Scene();
+    this.addCamera();
+    this.addLights();
+    this.addGeometry();
+    this.addMaterial();
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+    this.scene.add(this.mesh);
   }
 
   render(positionBufferData: any) {
-    this._geometry.setAttribute(
-      'position',
-      new THREE.Float32BufferAttribute(positionBufferData, 3),
-    );
-    this._geometry.attributes.position.needsUpdate = true;
+    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(positionBufferData, 3));
+    this.geometry.attributes.position.needsUpdate = true;
 
-    this._renderer.render(this._scene, this._camera);
+    this.renderer.render(this.scene, this.camera);
   }
 
   constructor({ canvas, textureFilePath, w, h }: any) {
-    this._renderer = new THREE.WebGLRenderer({
+    this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
       canvas,
     });
-    this._renderer.setSize(w, h);
-    this._halfW = w * 0.38;
-    this._halfH = h * 0.38;
-    this._textureFilePath = textureFilePath;
-    this._setupScene();
+    this.renderer.setSize(w, h);
+    this.halfW = w * 0.38;
+    this.halfH = h * 0.38;
+    this.textureFilePath = textureFilePath;
+    this.setupScene();
   }
 }

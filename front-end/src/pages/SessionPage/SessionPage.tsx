@@ -77,7 +77,7 @@ const SessionPage = () => {
   const [invitationSessionId, setInvitationSessionId] = useRecoilState(InvitationSessionId);
   const [sessionToken, setSessionToken] = useRecoilState(InvitationToken);
 
-  const { streamList, session, isOpen, onChangeMicStatus } = useOpenVidu(
+  const { streamList, isOpen, onChangeMicStatus } = useOpenVidu(
     childId,
     invitationSessionId,
     sessionToken,
