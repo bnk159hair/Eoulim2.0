@@ -105,6 +105,7 @@ export const Character = styled.div<{ isPlaying: boolean }>`
 `;
 
 export const MyVideo = styled.div`
+  position: relative;
   width: 100%;
   height: 85%;
   margin: 0.5rem;
@@ -122,6 +123,7 @@ export const MyVideo = styled.div`
 `;
 
 export const CheckVideo = styled.div`
+  position: relative;
   width: 100%;
   height: 85%;
   margin-top: 0.5rem;
@@ -131,6 +133,7 @@ export const CheckVideo = styled.div`
 `;
 
 export const FriendVideo = styled.div`
+  position: relative;
   width: 100%;
   height: 85%;
   margin: 0.5rem;
