@@ -8,23 +8,7 @@ import 'package:mobile/model/response_models/post_invite.dart';
 import 'package:mobile/screen/session_screen.dart';
 import 'package:mobile/util/logout_logic.dart';
 
-Future<void> _invite(friendId) async {
-  String? childId = await storage.read(key: 'childId');
-  ApiInvite invite = ApiInvite();
 
-  invitePost response = await invite.inviteAPI(
-    childId!,
-    friendId,
-  );
-  if (response.code == '200') {
-    Get.to(() => SessionPage(), arguments: {
-      'sessionId': response.invitation!.sessionId,
-      'sessionToken': response.invitation!.token
-    });
-  } else if (response.code == '401') {
-    userLogout();
-  }
-}
 
 class Friends extends StatefulWidget {
   Friends({super.key});
@@ -43,6 +27,43 @@ class _FriendsState extends State<Friends> {
     super.initState();
     _getFollowing();
   }
+
+  Future<void> _invite(friendId) async {
+  String? childId = await storage.read(key: 'childId');
+  ApiInvite invite = ApiInvite();
+
+  invitePost response = await invite.inviteAPI(
+    childId!,
+    friendId,
+  );
+  if (response.code == '200') {
+    Get.to(() => SessionPage(), arguments: {
+      'sessionId': response.invitation!.sessionId,
+      'sessionToken': response.invitation!.token
+    });
+  } else if (response.code == '401') {
+    userLogout();
+  } else {
+    showDialog(
+        context: context, 
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: const Text('친구가 접속중이 아니에요'),
+            actions: [
+              Center(
+                child: TextButton(
+                  child: const Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      );
+  }
+}
 
   Future<void> _getFollowing() async {
     GetFollowings result = await widget.apifollowing.getFollowingsAPI();
