@@ -124,7 +124,10 @@ class _SessionPageState extends State<SessionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: Colors.yellow.shade200,
+      ),
       body: SafeArea(
         bottom: false,
         child: WebViewWidget(controller: _controller),
