@@ -117,6 +117,7 @@ export const getCheckUsername = async ({ username, onSuccess, onError }: CheckUs
     const response = await userInstance.get(`/check-username/${username}`);
     onSuccess(response.data.data);
   } catch (error) {
+    console.error(error);
     onError();
   }
 };

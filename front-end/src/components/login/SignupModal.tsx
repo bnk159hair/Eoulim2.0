@@ -89,11 +89,15 @@ const SignupModal = ({ onClose }: { onClose: () => void }) => {
     getCheckUsername({
       username,
       onSuccess: data => {
-        setIsUsernameUnique(data);
-        inputAlert('사용 가능한 아이디입니다!', false);
+        if (data) {
+          setIsUsernameUnique(data);
+          inputAlert('사용 가능한 아이디입니다!', false);
+        } else {
+          inputAlert('이미 사용 중인 아이디입니다!');
+        }
       },
       onError: () => {
-        inputAlert('이미 사용 중인 아이디입니다!');
+        inputAlert('잠시 후 다시 시도해주세요!');
       },
     });
   };
