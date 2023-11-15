@@ -112,11 +112,10 @@ export const MyVideo = styled.div`
   border-radius: 10px;
   position: relative;
   @media (max-width: 600px) {
-    width: 35%;
-    height: 30%;
+    transform: scale(0.32);
     position: absolute;
-    bottom: 15%;
-    right: 5%;
+    bottom: -15%;
+    right: -30%;
     z-index: 2006;
   }
 `;

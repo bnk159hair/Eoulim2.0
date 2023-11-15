@@ -218,8 +218,8 @@ class FaceCanvas {
       canvas,
     });
     this.renderer.setSize(w, h);
-    this.halfW = w * 0.38;
-    this.halfH = h * 0.38;
+    this.halfW = w * 0.3;
+    this.halfH = h * 0.3;
     this.textureFilePath = textureFilePath;
     this.setupScene();
   }
