@@ -12,9 +12,6 @@ export const Canvas = styled.canvas<{ videoState: boolean }>`
 `;
 
 export const Video = styled.video<{ videoState: boolean }>`
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   border-radius: 10px;
