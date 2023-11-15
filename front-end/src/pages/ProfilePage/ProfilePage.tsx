@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useNavigate } from 'react-router-dom';
-import { getLogout } from 'apis/authApis';
+import { postLogout } from 'apis/authApis';
 import { fcmTokenState } from 'atoms/Firebase';
 import { Box, Divider, Menu, MenuItem, Typography, Button } from '@mui/material';
 import { deleteNotifications, getNotifications } from 'apis/notificationApis';
@@ -55,7 +55,7 @@ const ProfilePage = () => {
     } else {
       token = 'null';
     }
-    getLogout({
+    postLogout({
       fcmToken: token,
       onSuccess: () => {
         navigate('/login');

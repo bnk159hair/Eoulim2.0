@@ -90,9 +90,9 @@ export const postSignup = async ({ signupData, onSuccess, onError }: SignupParam
   }
 };
 
-export const getLogout = async ({ fcmToken, onSuccess, onError }: LogoutParams) => {
+export const postLogout = async ({ fcmToken, onSuccess, onError }: LogoutParams) => {
   try {
-    await instance.post('/users/logout', fcmToken);
+    await instance.post('/users/logout', { fcmToken });
     onSuccess();
   } catch (error) {
     onError();

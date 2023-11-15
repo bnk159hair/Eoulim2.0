@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, IconButton, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { getLogout, patchChangePassword } from 'apis/authApis';
+import { postLogout, patchChangePassword } from 'apis/authApis';
 import inputAlert from 'utils/inputAlert';
 import { useRecoilValue } from 'recoil';
 import { fcmTokenState } from 'atoms/Firebase';
@@ -60,7 +60,7 @@ const ChangePasswordModal = ({ onClose }: { onClose: () => void }) => {
       passwordData,
       onSuccess: () => {
         inputAlert('비밀번호가 변경되었습니다!', false).then(() =>
-          getLogout({
+          postLogout({
             fcmToken,
             onSuccess: () => {
               navigate('/login');
