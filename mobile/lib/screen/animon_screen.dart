@@ -81,8 +81,8 @@ class _AnimonsScreenState extends State<AnimonsScreen> {
               ),
             ),
           ),
-          SingleChildScrollView(
-            child: Column(
+          
+            Column(
               children: [
                 Align(
                   alignment: Alignment.topCenter,
@@ -131,7 +131,7 @@ class _AnimonsScreenState extends State<AnimonsScreen> {
                   child: Column(
                     children: [
                       SizedBox(
-                        height: (widget.animons.length ~/ 2) * (175) + 20,
+                        height: 500,
                         child: GridView.builder(
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -254,7 +254,7 @@ class _AnimonsScreenState extends State<AnimonsScreen> {
                 ),
               ],
             ),
-          ),
+        
         ],
       ),
     );
