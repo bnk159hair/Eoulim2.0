@@ -12,7 +12,8 @@ import 'package:mobile/model/response_models/post_check_info.dart';
 
 class ApiProfile {
   static const storage = FlutterSecureStorage();
-  static const baseUrl = 'https://k9c103.p.ssafy.io/api/v1/children';
+  static const baseUrl = 'https://k9c103.p.ssafy.io/api/v1';
+  static const childrenPath = 'children';
   static const profileLoginPath = 'login';
   static const profileLogoutPath = 'logout';
   static const checkSchoolPath = 'open-api/schools';
@@ -20,7 +21,7 @@ class ApiProfile {
   static Future<ProfilesModel> getProfiles() async {
     String? authKey = await storage.read(key: 'Authkey');
     final response = await http.get(
-      Uri.parse(baseUrl),
+      Uri.parse('$baseUrl/$childrenPath'),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
         'Content-Type': 'application/json; charset=UTF-8',
@@ -46,7 +47,7 @@ class ApiProfile {
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
     final response = await http.get(
-      Uri.parse('$baseUrl/$childId'),
+      Uri.parse('$baseUrl/$childrenPath/$childId'),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
         'Content-Type': 'application/json; charset=UTF-8',
@@ -80,7 +81,7 @@ class ApiProfile {
     await storage.write(
         key: 'childId', value: requestModel.childId?.toString());
     final response = await http.post(
-      Uri.parse('$baseUrl/$profileLoginPath'),
+      Uri.parse('$baseUrl/$childrenPath/$profileLoginPath'),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
         'Content-Type': 'application/json; charset=UTF-8',
@@ -117,7 +118,7 @@ class ApiProfile {
       'fcmToken': fcmToken ?? ''
     };
     final response = await http.post(
-      Uri.parse('$baseUrl/$profileLogoutPath'),
+      Uri.parse('$baseUrl/$childrenPath/$profileLogoutPath'),
       headers: <String, String>{
         'Authorization': 'Bearer $authKey',
         'Content-Type': 'application/json; charset=UTF-8',
@@ -149,7 +150,7 @@ class ApiProfile {
     String? authKey = await storage.read(key: 'Authkey');
     final response = await http.post(
       Uri.parse(
-        baseUrl,
+        '$baseUrl/$childrenPath',
       ),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
@@ -202,7 +203,7 @@ class ApiProfile {
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
     final response = await http.put(
-      Uri.parse('$baseUrl/$childId'),
+      Uri.parse('$baseUrl/$childrenPath/$childId'),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
         'Content-Type': 'application/json',
@@ -221,7 +222,7 @@ class ApiProfile {
     String? authKey = await storage.read(key: 'Authkey');
     String? childId = await storage.read(key: 'childId');
     final response = await http.delete(
-      Uri.parse('$baseUrl/$childId'),
+      Uri.parse('$baseUrl/$childrenPath/$childId'),
       headers: <String, String>{
         'Authorization': "Bearer $authKey",
         'Content-Type': 'application/json',
