@@ -1,5 +1,5 @@
 import { OpenVidu } from 'openvidu-browser';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { getUserInfo, getToken, invite, destroyInvitationSession } from '../apis/openViduApis';
 import { SessionId, guideSeq } from '../atoms/Session';
@@ -11,7 +11,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [, setGuide] = useRecoilState(guideSeq);
-
+  const videoRef = useRef<HTMLVideoElement>(null);
   const [, setSessionId] = useRecoilState(SessionId);
   const [, setInvitationSessionId] = useRecoilState(InvitationSessionId);
   const [, setSessionToken] = useRecoilState(InvitationToken);
@@ -116,7 +116,7 @@ export const useOpenVidu = (userId: number, sessionId: string, sessionToken: str
                     videoSource: videoDevices[0].deviceId,
                     publishAudio: true,
                     publishVideo: true,
-                    resolution: '640x480',
+                    resolution: `${videoRef.current?.videoWidth}x${videoRef.current?.videoHeight}`,
                     frameRate: 30,
                     insertMode: 'APPEND',
                     mirror: false,
