@@ -13,7 +13,7 @@
 
 <div align=center>
 
-![웹 화면](exec/outputs/웹화면.png){: width="800" height=""}
+![웹 화면](exec/assets/main.png){: width="800" height=""}
 
 📅 프로젝트 기간 : 2023.10.10 ~ 2023.11.17 (7주)
 
