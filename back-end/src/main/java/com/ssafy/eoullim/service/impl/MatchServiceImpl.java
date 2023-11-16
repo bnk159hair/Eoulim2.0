@@ -242,18 +242,18 @@ public class MatchServiceImpl implements MatchService {
     return newRoom;
   }
 
-  private Room newMakeNewRoom(String sessionId, Boolean isRandom, Long childOneId, Long childTwoId) {
-    Room newRoom = new Room();
-    if (isRandom) {
-      List<Integer> random = RandomGeneratorUtils.generateRandomNumbers(2, 12, 4);
-      log.info("[EMPTY] randomNum is created - sessionId : " + sessionId);
-      newRoom.setRandom(random); // random 일 때만
-    }
-    newRoom.setSessionId(sessionId);
-    newRoom.setChildOne(childOneId); // 첫 입장자 아이디 저장
-    newRoom.setChildTwo(childTwoId);
-    return newRoom;
-  }
+//  private Room newMakeNewRoom(String sessionId, Boolean isRandom, Long childOneId, Long childTwoId) {
+//    Room newRoom = new Room();
+//    if (isRandom) {
+//      List<Integer> random = RandomGeneratorUtils.generateRandomNumbers(2, 12, 4);
+//      log.info("[EMPTY] randomNum is created - sessionId : " + sessionId);
+//      newRoom.setRandom(random); // random 일 때만
+//    }
+//    newRoom.setSessionId(sessionId);
+//    newRoom.setChildOne(childOneId); // 첫 입장자 아이디 저장
+//    newRoom.setChildTwo(childTwoId);
+//    return newRoom;
+//  }
 
   private String startRecording(String sessionId) { // 녹화
     RecordingProperties recordingProperties =
