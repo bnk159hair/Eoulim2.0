@@ -1,28 +1,43 @@
 package com.ssafy.eoullim.model.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.ssafy.eoullim.model.Animon;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Setter
 @Getter
 @Entity
-@Table(name="animon")
-@NoArgsConstructor
-public class AnimonEntity {
-    @Id
-    @Column(name = "animon_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+@Table(name = "animon")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AnimonEntity extends BaseEntity {
+  @Id
+  @Column(name = "animon_id", columnDefinition = "INT UNSIGNED")
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "head_image_path", nullable = false)
-    private String headImagePath;
+  @Column(nullable = false, length = 20)
+  private String name;
 
-    @Column(name = "body_image_path", nullable = false)
-    private String bodyImagePath;
+  @Column(nullable = false)
+  private String maskImagePath;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String bodyImagePath;
+
+  @Builder
+  public AnimonEntity(Long id, String name, String maskImagePath, String bodyImagePath) {
+    this.id = id;
+    this.name = name;
+    this.maskImagePath = maskImagePath;
+    this.bodyImagePath = bodyImagePath;
+  }
+
+  public static AnimonEntity of(Animon animon) {
+    return AnimonEntity.builder()
+        .id(animon.getId())
+        .name(animon.getName())
+        .maskImagePath(animon.getMaskImagePath())
+        .bodyImagePath(animon.getBodyImagePath())
+        .build();
+  }
 }

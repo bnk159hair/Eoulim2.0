@@ -10,9 +10,9 @@ import java.util.List;
 public class Room {
     private String sessionId;
     private String recordingId;
-    private Integer childOne;
-    private Integer childTwo;
+    private Long childOne;
+    private Long childTwo;
     private List<Integer> random;
-    private String guideSeq;
-    private String timeline;
+    private List<Integer> guideSeq;
+    private List<String> timeline;
 }
