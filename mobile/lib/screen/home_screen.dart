@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       RemoteNotification? notification = message.notification;
       websocket.stompClient.activate();
 
-      if (notification != null) {
+      if (notification != null && notification.body!.split(' ') == '세션') {
         final payload = notification.body!.split(' ');
         final sessionId = payload[payload.length - 1];
         print(sessionId);
