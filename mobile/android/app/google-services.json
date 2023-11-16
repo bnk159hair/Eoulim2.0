@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "54110600029",
+    "firebase_url": "https://eoullim-7e5fb-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "eoullim-7e5fb",
+    "storage_bucket": "eoullim-7e5fb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:54110600029:android:cd6e73ec1d8e5b7f5946b4",
+        "android_client_info": {
+          "package_name": "com.example.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdI7sATkgwTqiPxtuGJc1q9fbo16SHO5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

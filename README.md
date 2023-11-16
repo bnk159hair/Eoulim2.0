@@ -1,3 +1,3 @@
 # PJT
 
-## frontend
+## mobile
