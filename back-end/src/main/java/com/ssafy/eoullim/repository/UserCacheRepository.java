@@ -20,13 +20,13 @@ public class UserCacheRepository {
 
     public void setUser(User user) {
         String key = getKey(user.getUsername());
-        log.info("Set User to Redis {}({})", key, user);
+//        log.info("Set User to Redis {}({})", key, user);
         userRedisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
     }
 
     public Optional<User> getUser(String userName) {
         User data = userRedisTemplate.opsForValue().get(getKey(userName));
-        log.info("Get User from Redis {}", data);
+//        log.info("Get User from Redis {}", data);
         return Optional.ofNullable(data);
     }
 
