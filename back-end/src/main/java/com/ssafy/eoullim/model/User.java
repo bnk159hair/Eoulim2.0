@@ -19,7 +19,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements UserDetails {
 
-    private Integer id;
+    private Long id;
     private String name;
     private String phoneNumber;
     private String username;
@@ -31,7 +31,7 @@ public class User implements UserDetails {
                 entity.getId(),
                 entity.getName(),
                 entity.getPhoneNumber(),
-                entity.getUserName(),
+                entity.getUsername(),
                 entity.getPassword(),
                 entity.getRole()
         );

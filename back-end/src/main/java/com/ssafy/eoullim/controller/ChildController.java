@@ -1,98 +1,126 @@
 package com.ssafy.eoullim.controller;
 
-import com.ssafy.eoullim.dto.request.ChildSchoolRequest;
+import com.ssafy.eoullim.dto.request.ChildLoginRequest;
+import com.ssafy.eoullim.dto.request.ChildLogoutRequest;
 import com.ssafy.eoullim.dto.request.ChildRequest;
-import com.ssafy.eoullim.dto.response.Response;
+import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Animon;
 import com.ssafy.eoullim.model.Child;
-import com.ssafy.eoullim.model.Friend;
-import com.ssafy.eoullim.model.User;
+import com.ssafy.eoullim.model.OtherChild;
 import com.ssafy.eoullim.service.ChildService;
-import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
-@RestController
-@RequestMapping("/api/v1/children")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/children")
+@RestController
 public class ChildController {
 
-    private final ChildService childService;
+  private final ChildService childService;
 
-    @GetMapping
-    public Response<List<Child>> getChildrenList(Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        List<Child> childrenList = childService.getChildrenList(user.getId());
-        return Response.success(childrenList);
-    }
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> login(
+      @Valid @RequestBody ChildLoginRequest request, Authentication authentication) {
+    Child child = childService.login(request.getChildId(), request.getFcmToken(), authentication);
+    return new SuccessResponse<>(child);
+  }
 
-    @PostMapping
-    public Response<Void> create(@RequestBody ChildRequest request, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        childService.create(user, request);
-        return Response.success();
-    }
+  @PostMapping("/logout")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public SuccessResponse<Void> logout(
+      @Valid @RequestBody ChildLogoutRequest request, Authentication authentication) {
+    childService.logout(request.getChildId(), request.getFcmToken(), authentication);
+    return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
+  }
 
-    @PostMapping("/login/{childId}")
-    public Response<Child> login(@PathVariable Integer childId) {
-        Child child = childService.login(childId);
-        return Response.success(child);
-    }
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public SuccessResponse<Child> create(
+      @Valid @RequestBody ChildRequest request, Authentication authentication) {
+    Child child = childService.create(Child.of(request), authentication);
+    return new SuccessResponse<>(HttpStatus.CREATED, child);
+  }
 
-    @PostMapping("/logout/{childId}")
-    public Response<Void> logout(@PathVariable Integer childId) {
-        childService.logout(childId);
-        return Response.success();
-    }
+  @GetMapping
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<List<Child>> getChildren(Authentication authentication) {
+    List<Child> childrenList = childService.getChildren(authentication);
+    return new SuccessResponse<>(childrenList);
+  }
 
-    @GetMapping("/{childId}")
-    public Response<Child> getChildInfo(@PathVariable Integer childId, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);  // 현재 api를 요청한 사용자(Client)
-        Child child = childService.getChildInfo(childId, user.getId());
-        return Response.success(child);
-    }
+  @GetMapping("/{childId}")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> getChild(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    Child child = childService.getChild(childId, authentication);
+    return new SuccessResponse<>(child);
+  }
 
-    @GetMapping("/participant/{participantId}")
-    public Response<Friend> getParticipantInfo(@PathVariable Integer participantId) {
-        Friend friend = childService.getParticipantInfo(participantId);
-        return Response.success(friend);
-    }
+  @PutMapping("/{childId}")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Child> modify(
+      @PathVariable @NotBlank Long childId,
+      @Valid @RequestBody ChildRequest request,
+      Authentication authentication) {
+    Child updatedChild = childService.modify(childId, Child.of(request), authentication);
+    return new SuccessResponse<>(updatedChild);
+  }
 
-    @PutMapping("/{childId}")
-    public Response<Void> modify(@PathVariable Integer childId,
-                              @RequestBody ChildRequest request) {
-        childService.modify(childId, request);
-        return Response.success();
-    }
+  @DeleteMapping("/{childId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public SuccessResponse<?> delete(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    childService.delete(childId, authentication);
+    return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
+  }
 
-    @DeleteMapping("/{childId}")
-    public Response<Void> delete(@PathVariable Integer childId, Authentication authentication) {
-        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        childService.delete(childId, user.getId());
-        return Response.success();
-    }
+  /** Child Animon Child의 정보 중 애니몬 관련 API */
+  // GET : Child가 소유한 Animon List
+  @GetMapping("/{childId}/animons")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<List<Animon>> getAnimonList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    List<Animon> animonList = childService.getAnimonList(childId, authentication);
+    return new SuccessResponse<>(animonList);
+  }
 
-    @GetMapping("/{childId}/animons")
-    public Response<List<Animon>> getAnimonList(@PathVariable Integer childId) {
-        List<Animon> animonList = childService.getAnimonList(childId);
-        return Response.success(animonList);
-    }
+  // PATCH : Child의 프로필 애니몬을 변경
+  @PatchMapping("/{childId}/animons")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<Animon> selectAnimon(
+      @PathVariable @NotBlank Long childId,
+      @RequestBody Map<String, Long> requestBody,
+      Authentication authentication) {
+    Animon animon = childService.setProfileAnimon(childId, requestBody.get("animonId"), authentication);
+    return new SuccessResponse<>(animon);
+  }
 
-    @GetMapping("/{childId}/animons/{animonId}")
-    public Response<Animon> selectAnimon(@PathVariable Integer childId, @PathVariable Integer animonId) {
-        Animon animon = childService.setAnimon(childId, animonId);
-        return Response.success(animon);
-    }
+  /** Child follow Child의 정보 중 팔로우 관련 API */
+  @GetMapping("/{childId}/follows")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public SuccessResponse<List<OtherChild>> getFriendsList(
+      @PathVariable @NotBlank Long childId, Authentication authentication) {
+    List<OtherChild> friendList = childService.getFriends(childId, authentication);
+    return new SuccessResponse<>(friendList);
+  }
 
-    @PostMapping("/school")
-    public Response<Void> checkSchool(@RequestBody ChildSchoolRequest request) {
-        childService.checkSchool(request.getKeyword());
-        return Response.success();
-    }
-
+  // TODO  : api url refactoring
+  @GetMapping("/participant/{participantId}")
+  public ResponseEntity<SuccessResponse<OtherChild>> getOtherChild(
+      @PathVariable @NotBlank Long participantId) {
+    OtherChild friend = childService.getOtherChild(participantId);
+    return ResponseEntity.ok(new SuccessResponse<>(friend));
+  }
 }

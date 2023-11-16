@@ -17,19 +17,19 @@ public class EmitterRepository {
 
     private final Map<String, SseEmitter> emitterMap = new ConcurrentHashMap<>();
 
-    public SseEmitter save(Integer childId, SseEmitter emitter) {
+    public SseEmitter save(Long childId, SseEmitter emitter) {
         final String key = getKey(childId);
         log.info("emitter 생성 key: " + key);
         emitterMap.put(key, emitter);
         return emitter;
     }
 
-    public void delete(Integer childId) {
+    public void delete(Long childId) {
         log.info("delete call");
         log.info(childId + "여기서 에러 발생");
         emitterMap.remove(getKey(childId));
     }
-    public Optional<SseEmitter> get(Integer childId) {
+    public Optional<SseEmitter> get(Long childId) {
         final String key = getKey(childId);
         log.info("emitter가져오기 호출");
         log.info("key: " + key);
@@ -37,7 +37,7 @@ public class EmitterRepository {
         return Optional.ofNullable(result);
     }
 
-    private String getKey(Integer childId) {
+    private String getKey(Long childId) {
         return "childId:" + childId;
     }
 

@@ -1,63 +1,46 @@
 package com.ssafy.eoullim.model.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
-@Setter
 @Getter
 @Entity
-@Table(name="record_info")
-@NoArgsConstructor
-public class RecordEntity {
+@Table(name="record")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class RecordEntity extends BaseEntity {
     @Id
-    @Column(name="record_id")
+    @Column(name = "record_id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(name="create_time")
-    @CreationTimestamp
-    private LocalDateTime createTime;
-
-    @Column(name="video_path")
+    @Column(nullable = false)
     private String videoPath;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="master_id", nullable = false, referencedColumnName = "child_id")
+    @JoinColumn(name="master_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ChildEntity master;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="participant_id", nullable = false, referencedColumnName = "child_id")
+    @JoinColumn(name="participant_id")    // 상대방 아이가 삭제 되면? -> null로
     private ChildEntity participant;
 
-    @Column(name="guide_seq")
-    private String guideSeq;
-
-    @Column(name="timeline")
-    private String timeline;
-
-    public RecordEntity(Integer id, String videoPath, ChildEntity master, ChildEntity participant, String guideSeq, String timeline) {
-        this.id = id;
+    @Builder
+    public RecordEntity(String videoPath, ChildEntity master, ChildEntity participant) {
         this.videoPath = videoPath;
         this.master = master;
         this.participant = participant;
-        this.guideSeq = guideSeq;
-        this.timeline = timeline;
     }
 
-    public static RecordEntity of(String videoPath, ChildEntity master, ChildEntity participant, String guideSeq, String timeline){
-        return new RecordEntity(
-                null,
-                videoPath,
-                master,
-                participant,
-                guideSeq,
-                timeline
-        );
+    public static RecordEntity of(String videoPath, ChildEntity master, ChildEntity participant){
+        return RecordEntity.builder()
+                .videoPath(videoPath)
+                .master(master)
+                .participant(participant)
+                .build();
     }
 
 }

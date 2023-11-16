@@ -16,17 +16,17 @@ public class UserCacheRepository {
 
     private final RedisTemplate<String, User> userRedisTemplate;
 
-    private final static Duration USER_CACHE_TTL = Duration.ofHours(1);
+    private final static Duration USER_CACHE_TTL = Duration.ofDays(30);
 
     public void setUser(User user) {
         String key = getKey(user.getUsername());
-        log.info("Set User to Redis {}({})", key, user);
+//        log.info("Set User to Redis {}({})", key, user);
         userRedisTemplate.opsForValue().set(key, user, USER_CACHE_TTL);
     }
 
     public Optional<User> getUser(String userName) {
         User data = userRedisTemplate.opsForValue().get(getKey(userName));
-        log.info("Get User from Redis {}", data);
+//        log.info("Get User from Redis {}", data);
         return Optional.ofNullable(data);
     }
 

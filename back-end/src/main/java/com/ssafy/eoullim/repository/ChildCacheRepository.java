@@ -16,13 +16,13 @@ public class ChildCacheRepository {
 
     private final static Duration CHILD_CACHE_TTL = Duration.ofMinutes(5);
 
-    public void setStatus(Integer childId) {
+    public void setOnline(Long childId) {
         String key = getKey(childId);
         log.info("Set Child to Redis {}({})", key, "ON");
         childRedisTemplate.opsForValue().set(key, "ON", CHILD_CACHE_TTL);
     }
 
-    public boolean isON(Integer childId) {
+    public boolean isON(Long childId) {
         String status = (String) childRedisTemplate.opsForValue().get(getKey(childId));
         if (ObjectUtils.isEmpty(status)) {
             return false;
@@ -31,12 +31,12 @@ public class ChildCacheRepository {
         return true;
     }
 
-    public void delete(Integer childId) {
+    public void setOffline(Long childId) {
         String key = getKey(childId);
         childRedisTemplate.delete(key);
     }
 
-    private String getKey(Integer childId) {
+    private String getKey(Long childId) {
         return "ChildCache:" + childId;
     }
 
