@@ -1,9 +1,6 @@
 package com.ssafy.eoullim.exception;
 
 import com.ssafy.eoullim.dto.response.ErrorResponse;
-import com.ssafy.eoullim.dto.response.Response;
-import io.openvidu.java.client.OpenViduHttpException;
-import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +11,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TimeZone;
-
-import static com.ssafy.eoullim.exception.ErrorCode.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -55,12 +48,17 @@ public class GlobalExceptionHandler {
   }
 
   private void printLog(Exception e) {
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + Arrays.toString(e.getStackTrace()));
+    log.error("[EXCEPTION] 내용 : {}", e.toString());
+    StackTraceElement[] stackTraceElements = e.getStackTrace();
+    StackTraceElement element = stackTraceElements[0];
+    log.error(
+        String.format(
+            "[EXCEPTION] 위치 : 클래스 - %s, 발생 메서드 - %s, in Line (%d)",
+            element.getClassName(), element.getMethodName(), element.getLineNumber()));
   }
 
   private ErrorResponse getErrorResponse(Exception e) {
-    String status = "", code  = "", message = "";
+    String status = "", code = "", message = "";
     HttpStatus httpStatus = null;
 
     if (e instanceof EoullimApplicationException) {
@@ -68,8 +66,7 @@ public class GlobalExceptionHandler {
       status = exception.getErrorCode().getStatus().toString();
       code = exception.getErrorCode().getCode();
       message = exception.getErrorCode().name() + " : " + e.getMessage();
-    }
-    else if (e instanceof MethodArgumentNotValidException) {
+    } else if (e instanceof MethodArgumentNotValidException) {
       final var exception = (MethodArgumentNotValidException) e;
       httpStatus = HttpStatus.BAD_REQUEST;
 
@@ -81,35 +78,21 @@ public class GlobalExceptionHandler {
         eMsg.append(fieldError.getDefaultMessage()).append("\n");
       }
       message = eMsg.toString();
-    }
-    else if (e instanceof IllegalArgumentException) {
+    } else if (e instanceof IllegalArgumentException) {
       httpStatus = HttpStatus.BAD_REQUEST;
-    }
-    else {    // 나머지 전체 Exception
+    } else { // 나머지 전체 Exception
       httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    if(status.isBlank()) status = httpStatus.toString();
-    if(code.isBlank()) code = String.valueOf(httpStatus.value());
-    if(message.isBlank()) message = e.getMessage();
+    if (status.isBlank()) status = httpStatus.toString();
+    if (code.isBlank()) code = String.valueOf(httpStatus.value());
+    if (message.isBlank()) message = e.getMessage();
 
     return ErrorResponse.builder()
-            .status(status)
-            .code(code)
-            .message(message) // 클라이언트에게는 에러 코드만.
-            .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
-            .build();
-  }
-
-  @ExceptionHandler({
-    OpenViduHttpException.class,
-    OpenViduJavaClientException.class,
-    InterruptedException.class
-  })
-  public ResponseEntity<?> openviduErrorHandler(OpenViduHttpException e) {
-    log.error("Error occurs {}", e.toString());
-    log.error("Error occurs in method: " + e.getStackTrace()[0]);
-    return ResponseEntity.status(OPENVIDU_HTTP_ERROR.getStatus())
-        .body(Response.error(OPENVIDU_HTTP_ERROR.name()));
+        .status(status)
+        .code(code)
+        .message(message) // 클라이언트에게는 에러 코드만.
+        .timeStamp(ZonedDateTime.now(TimeZone.getTimeZone("Asia/Seoul").toZoneId()))
+        .build();
   }
 }
