@@ -1,13 +1,13 @@
 import { atom } from 'recoil';
 
+export const SessionId = atom<string>({
+  key: 'sessionId',
+  default: '',
+});
+
 export const PublisherId = atom<number>({
   key: 'publisherId',
   default: 0,
-});
-
-export const PublisherVideoStatus = atom<boolean>({
-  key: 'publisherVideoStatus',
-  default: false,
 });
 
 export const PublisherAnimonURL = atom<string>({
@@ -15,19 +15,9 @@ export const PublisherAnimonURL = atom<string>({
   default: '',
 });
 
-export const PublisherGuideStatus = atom<boolean>({
-  key: 'publisherGuideStatus',
-  default: false,
-});
-
 export const SubscriberId = atom<number>({
   key: 'subscriberId',
   default: 0,
-});
-
-export const SubscriberVideoStatus = atom<boolean>({
-  key: 'subscirberVideoStatus',
-  default: false,
 });
 
 export const SubscriberAnimonURL = atom<string>({
@@ -35,27 +25,22 @@ export const SubscriberAnimonURL = atom<string>({
   default: '',
 });
 
-export const SubscriberGuideStatus = atom<boolean>({
-  key: 'subscriberGuideStatus',
-  default: false,
-});
-
 export const IsAnimonLoaded = atom<boolean>({
   key: 'isAnimonLoaded',
   default: false,
 });
 
-export const guideSeq = atom<Number[]>({
+export const guideSeq = atom<number[]>({
   key: 'guideSeq',
   default: [],
 });
 
-export const GuideScript = atom<string>({
+export const GuideScript = atom<number[]>({
   key: 'guideScript',
-  default: '',
+  default: [],
 });
 
-export const TimeStamp = atom<string>({
-  key: 'timeStamp',
-  default: '',
+export const Timeline = atom<string[]>({
+  key: 'timeline',
+  default: [],
 });

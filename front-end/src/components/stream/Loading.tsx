@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { SpinnerContainer, AnimalEmoji, Spinner } from './LoadingStyles';
 
@@ -7,7 +6,8 @@ interface IProps {
   isAnimonLoaded: boolean;
 }
 
-const Loading: FC<IProps> = ({ isAnimonLoaded }) => {
+const Loading = ({ isAnimonLoaded }: IProps) => {
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [animal, setAnimal] = useState('🐱');
   useEffect(() => {
     const animalArray = [
@@ -38,10 +38,24 @@ const Loading: FC<IProps> = ({ isAnimonLoaded }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
+  const size = screenWidth <= 481 ? 100 : 200;
+
   return (
     <SpinnerContainer isAnimonLoaded={isAnimonLoaded}>
       <Spinner>
-        <CircularProgress size={200} />
+        <CircularProgress size={size} />
         <AnimalEmoji>{animal}</AnimalEmoji>
       </Spinner>
     </SpinnerContainer>

@@ -1,9 +1,7 @@
 import styled from 'styled-components';
-import cat from '../../assets/animon/cat.png'
-import tiger from '../../assets/animon/tiger.png'
-import dog from '../../assets/animon/dog.png'
-import panda from '../../assets/animon/panda.png'
-import box from '../../assets/box/woodbox.jpg'
+import box from '../../assets/box/woodbox.jpg';
+import before from '../../assets/ecc/before.png';
+import after from '../../assets/ecc/after.png';
 
 export const ModalOverlay = styled.div`
   position: fixed;
@@ -19,7 +17,6 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
-  
   width: 800px;
   height: 200px;
   // background-color: white;
@@ -33,55 +30,38 @@ export const ModalContent = styled.div`
   background-image: url(${box});
 `;
 
-export const Cat = styled.div`
+export const Animon = styled.div<{ animonurl?: string }>`
   width: 150px;
   height: 150px;
-  background-image: url(${cat});
+  background-image: url(${props => props.animonurl});
   background-size: cover;
-  background-color: #87CEFA;
+  background-color: #87cefa;
   border-radius: 25px;
   border: solid 2px;
-  cursor:pointer;
+  cursor: pointer;
   &:hover {
     transform: scale(1.25);
   }
-` 
-export const Tiger = styled.div`
-  width: 150px;
-  height: 150px;
-  background-image: url(${tiger});
+`;
+
+export const BeforeButton = styled.div`
+  height: 50px;
+  width: 50px;
+  background-image: url(${before});
   background-size: cover;
-  background-color: #87CEFA;
-  border-radius: 25px;
-  border: solid 2px;
-  cursor:pointer;
+  cursor: pointer;
   &:hover {
     transform: scale(1.25);
   }
-` 
-export const Dog = styled.div`
-  width: 150px;
-  height: 150px;
-  background-image: url(${dog});
+`;
+
+export const AfterButton = styled.div`
+  height: 50px;
+  width: 50px;
+  background-image: url(${after});
   background-size: cover;
-  background-color: #87CEFA;
-  border-radius: 25px;
-  border: solid 2px;
-  cursor:pointer;
+  cursor: pointer;
   &:hover {
     transform: scale(1.25);
   }
-` 
-export const Panda = styled.div`
-  width: 150px;
-  height: 150px;
-  background-image: url(${panda});
-  background-size: cover;
-  background-color: #87CEFA;
-  border-radius: 25px;
-  border: solid 2px;
-  cursor:pointer;
-  &:hover {
-    transform: scale(1.25);
-  }
-` 
+`;

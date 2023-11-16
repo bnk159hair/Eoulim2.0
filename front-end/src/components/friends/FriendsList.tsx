@@ -1,60 +1,37 @@
-import { useState, useEffect } from 'react';
-import FriendsListItem from './FriendsListItem';
-import axios from 'axios';
-import { API_BASE_URL } from '../../apis/urls';
-import { tokenState } from '../../atoms/Auth';
-import { Profilekey } from '../../atoms/Profile';
+import React, { useState, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
-import { EmptyFriend,BeforeButton,AfterButton,FriendsListContent } from './FriendsListStyles';
-import { useNavigate } from 'react-router-dom';
+import { getFollowings } from 'apis/followingApis';
+import FriendsListItem from './FriendsListItem';
+import { Profilekey } from '../../atoms/Profile';
+import { EmptyFriend, BeforeButton, AfterButton, FriendsListContent } from './FriendsListStyles';
 
 interface FriendsProfile {
+  gender: string;
+  grade: number;
   id: number;
   name: string;
-  birth: number;
-  gender: string;
+  profileAnimon: { bodyImagePath: string; id: number; maskImagePath: string; name: string };
   school: string;
-  grade: number;
-  status: string;
-  animon: { id: number; imagePath: string; name: string };
 }
 
 const FriendsList = () => {
-  const navigate = useNavigate();
-  const profileId = useRecoilValue(Profilekey);
-  const token = useRecoilValue(tokenState);
+  const childId = useRecoilValue(Profilekey);
   const [friends, setFriends] = useState<FriendsProfile[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const friendsPerPage = 3; // 페이지당 보여줄 친구 수 설정
 
-  const getFriends = () => {
-    axios
-      .get(`${API_BASE_URL}/friendship/${profileId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        const data = response.data.result;
+  useEffect(() => {
+    getFollowings({
+      childId,
+      onSuccess: data => {
         setFriends(data);
         console.log(data);
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          navigate('/login');
-        } else {
-          console.log('친구목록불러오기오류', error);
-        }
-      });
-  };
-
-  useEffect(() => {
-    if (!token) {
-      navigate('/login');
-    } else {
-      getFriends();
-    }
-  }, [profileId, token]);
+      },
+      onError: () => {
+        console.log('친구목록 불러오기 오류');
+      },
+    });
+  }, [childId]);
 
   const indexOfLastFriend = currentPage * friendsPerPage;
   const indexOfFirstFriend = indexOfLastFriend - friendsPerPage;
@@ -71,33 +48,32 @@ const FriendsList = () => {
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {friends.length > friendsPerPage && (
-        <div style={{width: '80px'}}>{currentPage > 1 && 
-        <BeforeButton onClick={prevPage}/>
-        }</div>
+        <div style={{ width: '80px' }}>
+          {currentPage > 1 && <BeforeButton onClick={prevPage} />}
+        </div>
       )}
       <FriendsListContent>
-      {/* <div
+        {/* <div
         style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', width: '1200px' }}
       > */}
         {currentFriends.length > 0 ? (
-          currentFriends.map((friend) => (
+          currentFriends.map(friend => (
             <FriendsListItem
               key={friend.id}
               friendId={friend.id}
               friendName={friend.name}
-              animon={friend.animon.name}
-              status={friend.status}
+              animonImgPath={friend.profileAnimon.bodyImagePath}
             />
           ))
         ) : (
           <EmptyFriend />
         )}
-      {/* </div> */}
+        {/* </div> */}
       </FriendsListContent>
       {friends.length > friendsPerPage && (
-        <div style={{width: '80px'}}>
+        <div style={{ width: '80px' }}>
           {currentPage < Math.ceil(friends.length / friendsPerPage) && (
-            <AfterButton onClick={nextPage}/>
+            <AfterButton onClick={nextPage} />
           )}
         </div>
       )}

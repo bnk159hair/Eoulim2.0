@@ -1,6 +1,7 @@
 import { styled, keyframes, css } from 'styled-components';
 import loginBackground from '../../assets/background/login.gif';
 import click from '../../assets/ecc/click.png';
+
 const IMGURL = '/bear.png';
 
 export const SessionPageContainer = styled.div`
@@ -17,6 +18,29 @@ export const Container = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
+`;
+
+export const CheckContainer = styled.div`
+  width: 90%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const ButtonContainer = styled.div`
+  width: 100%;
+  height: 85%;
+  margin: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  text-align: center;
+`;
+
+export const CheckButtons = styled.div`
+  margin-top: 15%;
+  display: flex;
+  justify-content: space-evenly;
 `;
 
 const gelatineAnimation = keyframes`
@@ -54,6 +78,13 @@ export const CharacterContainer = styled.div`
   left: 49%;
   transform: translate(-50%, -50%);
   z-index: 2005;
+  @media (max-width: 600px) {
+    position: absolute;
+    width: 35%;
+    height: 24%;
+    top: 70%;
+    left: 20%;
+  }
 `;
 
 export const Character = styled.div<{ isPlaying: boolean }>`
@@ -66,7 +97,7 @@ export const Character = styled.div<{ isPlaying: boolean }>`
   justify-content: center;
   align-items: center;
 
-  ${(props) =>
+  ${props =>
     props.isPlaying &&
     css`
       animation: ${gelatineAnimation} 0.5s infinite;
@@ -74,6 +105,31 @@ export const Character = styled.div<{ isPlaying: boolean }>`
 `;
 
 export const MyVideo = styled.div`
+  width: 100%;
+  height: 85%;
+  margin: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  position: relative;
+  @media (max-width: 600px) {
+    transform: scale(0.32);
+    position: absolute;
+    bottom: -15%;
+    right: -30%;
+    z-index: 2006;
+  }
+`;
+
+export const CheckVideo = styled.div`
+  width: 100%;
+  height: 85%;
+  margin-top: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  position: relative;
+`;
+
+export const FriendVideo = styled.div`
   width: 100%;
   height: 85%;
   margin: 0.5rem;
@@ -97,6 +153,9 @@ export const Buttons = styled.div`
   width: 30%;
   display: flex;
   justify-content: space-evenly;
+  @media (max-width: 600px) {
+    width: 100%;
+  }
 `;
 
 const blinkAnimation = keyframes`

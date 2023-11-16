@@ -3,19 +3,19 @@ import { recoilPersist } from 'recoil-persist';
 
 interface Animon {
   id: number;
-  headImagePath: string;
   bodyImagePath: string;
+  maskImagePath: string;
   name: string;
 }
 
 interface ChildProfile {
-  animon: Animon;
+  profileAnimon: Animon;
   id: number;
   name: string;
-  birth: number;
+  birth: string;
   gender: string;
   school: string;
-  grade: number;
+  grade: string;
   status: string;
 }
 
@@ -30,17 +30,17 @@ export const Profilekey = atom<number>({
 export const Profile = atom<ChildProfile>({
   key: 'profile',
   default: {
-    id: 1,
+    id: 0,
     name: '짱구아들',
-    birth: 1399248000000,
+    birth: '1399248000000',
     gender: 'M',
     school: '떡잎초등학교',
-    grade: 3,
+    grade: '3',
     status: 'ON',
-    animon: {
+    profileAnimon: {
       id: 4,
-      headImagePath: 'tiger_head',
-      bodyImagePath: 'tiger_body',
+      bodyImagePath: 'tiger_head',
+      maskImagePath: 'tiger_body',
       name: 'tiger',
     },
   },
