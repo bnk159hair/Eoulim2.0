@@ -1,69 +1,61 @@
 import React from 'react';
-import { FriendCard, FriendImg, FrinedInfo,InviteButton } from './FriendsListItemStyles';
-import axios from 'axios';
 import { useRecoilValue, useRecoilState } from 'recoil';
-import { tokenState, userState } from '../../atoms/Auth';
-import { invitationToken, invitationSessionId } from '../../atoms/Ivitation';
-import { Profilekey } from '../../atoms/Profile';
-import { API_BASE_URL } from '../../apis/urls';
 import { useNavigate } from 'react-router-dom';
+import { invite } from 'apis/openViduApis';
+import inputAlert from 'utils/inputAlert';
+import { SessionId } from 'atoms/Session';
+import { FriendCard, FriendImg, FrinedInfo, InviteButton } from './FriendsListItemStyles';
+import { InvitationToken, InvitationSessionId } from '../../atoms/Ivitation';
+import { Profilekey } from '../../atoms/Profile';
 
 interface FriendsListItemProps {
   friendId: number;
   friendName: string;
-  animon: string;
-  status: string;
+  animonImgPath: string;
 }
 
 const FriendsListItem: React.FC<FriendsListItemProps> = ({
   friendId,
   friendName,
-  animon,
-  status
+  animonImgPath,
 }) => {
-  const [sessionToken, setSessionToken] = useRecoilState(invitationToken);
-  const [invitationId, setInvitationId] = useRecoilState(invitationSessionId);
+  const [, setSessionId] = useRecoilState(SessionId);
+  const [, setSessionToken] = useRecoilState(InvitationToken);
+  const [, setInvitationId] = useRecoilState(InvitationSessionId);
 
-  const IMGURL = `/${animon}.png`;
+  const IMGURL = `${animonImgPath}`;
+  console.log(IMGURL);
   const navigate = useNavigate();
 
-  const myName = useRecoilValue(userState);
-  const token = useRecoilValue(tokenState);
-  const profileKey = useRecoilValue(Profilekey);
+  const childId = useRecoilValue(Profilekey);
 
   const handleInvite = () => {
-    console.log(friendId, myName);
-    axios
-      .post(
-        `${API_BASE_URL}/meetings/friend/start`,
-        {
-          childId: profileKey,
-          friendId: friendId, // 친구 아이디
-          name: myName, // 내 이름
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      .then((response) => {
-        const { sessionId, token } = response.data;
+    const invitationSessionData = { childId, friendId };
+    invite({
+      invitationSessionData,
+      onSuccess: data => {
+        const { sessionId, token } = data;
+        setSessionId(sessionId);
         setInvitationId(sessionId);
         setSessionToken(token);
-        console.log(sessionId, token);
-
-        navigate(`/friendsession`);
-      })
-      .catch((error) => console.log(error));
+        console.log('초대에 보내는데 성공했습니다.');
+        navigate(`/session`, { state: { childId, invitation: true } });
+      },
+      onError: () => {
+        inputAlert('상대방이 현재 온라인 상태가 아닙니다.');
+      },
+    });
   };
 
   return (
     <FriendCard>
       <FriendImg style={{ backgroundImage: `url(${IMGURL})` }} />
       <FrinedInfo>
-        <div>친구 이름 : {friendName}</div>
-        {status === 'ON' && <InviteButton onClick={handleInvite} />}
+        <div>
+          {'친구 이름 : '}
+          {friendName}
+        </div>
+        <InviteButton onClick={handleInvite} />
       </FrinedInfo>
     </FriendCard>
   );

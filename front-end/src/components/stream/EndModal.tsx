@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   ModalOverlay,
   ModalContent,
@@ -6,34 +6,32 @@ import {
   Refuse,
   FlexContent,
   EndMessage,
-} from "./EndModalStyles";
+} from './EndModalStyles';
 
 interface EndModalProps {
   message: string;
   onClose: () => void;
   isFriend: boolean;
-  addFriend: ()=>void;
+  addFriend: () => void;
 }
 
-const EndModal: React.FC<EndModalProps> = ({ onClose, message, isFriend,addFriend }) => {
+const EndModal: React.FC<EndModalProps> = ({ onClose, message, isFriend, addFriend }) => {
   return (
-    <>
-      <ModalOverlay>
-        <ModalContent>
-          <EndMessage>{message}</EndMessage>
-          <FlexContent>
-            {!isFriend ? (
-              <>
-                <Accept onClick={addFriend} />
-                <Refuse onClick={onClose} />
-              </>
-            ) : (
+    <ModalOverlay>
+      <ModalContent>
+        <EndMessage>{message}</EndMessage>
+        <FlexContent>
+          {!isFriend ? (
+            <>
+              <Accept onClick={addFriend} />
               <Refuse onClick={onClose} />
-            )}
-          </FlexContent>
-        </ModalContent>
-      </ModalOverlay>
-    </>
+            </>
+          ) : (
+            <Refuse onClick={onClose} />
+          )}
+        </FlexContent>
+      </ModalContent>
+    </ModalOverlay>
   );
 };
 

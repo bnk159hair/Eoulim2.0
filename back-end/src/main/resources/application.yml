@@ -1,12 +1,12 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://ssafy207.duckdns.org:3306/eoullim?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://ssafy207.duckdns.org:3306/develop?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: ssafy
     password: ssafy207
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
     properties:
@@ -15,15 +15,44 @@ spring:
   redis:
     port: 6379
     host: localhost
-
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+springfox:
+  documentation:
+    swagger:
+      use-model-v3=false:
 jwt:
   secret-key: ssafy_9th_gwanju_c207_eoullim_secret_key
-  token.expired-time-ms: 3600000
+  expired-time-ms: 2592000
 public-api:
   service-key: Ng3w6w1%2B7JypSInrX8Wa10b9j0G6%2F9ailN1XP%2FuO9oB7gfAImwjczu8kP%2F9JfDsX0wLbLW9%2Bv3NZsh2XG1Gw8Q%3D%3D
+  url: http://api.data.go.kr/openapi/tn_pubr_public_elesch_mskul_lc_api
 
 server:
   port: 8081
 
-OPENVIDU_URL: https://i9c207.p.ssafy.io
-OPENVIDU_SECRET: ssafy207
+# aws s3 설정
+cloud:
+  aws:
+    s3:
+      bucket: ssafy-9th-c103-eoullim-record
+    credentials:
+      access-key: AKIA2V4EIHNBC5YW73MT
+      secret-key: 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
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+# Local에서 돌릴 경우 Amazon cloud 설정이 없어서 나오는 warning log 출력 하지 않도록 설정
+logging:
+  level:
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+
+OPENVIDU_URL: https://k9c103.p.ssafy.io
+OPENVIDU_SECRET: eoulim

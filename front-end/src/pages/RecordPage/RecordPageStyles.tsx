@@ -38,4 +38,7 @@ export const Scroll = styled.div`
   height: 600px;
   width: 900px;
   overflow: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;

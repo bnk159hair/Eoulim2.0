@@ -4,7 +4,9 @@ export const Canvas = styled.canvas<{ videoState: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
-  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
   visibility: ${(props) => (props.videoState ? "hidden" : "visible")};
   z-index: 2001;
 `;
@@ -27,4 +29,7 @@ export const UserName = styled.div`
   font-size: 48px;
   border-radius: 10%;
   z-index: 2001;
+  @media (max-width: 481px) {
+    font-size: 28px;
+  }
 `;

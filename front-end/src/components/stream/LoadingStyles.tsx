@@ -25,4 +25,7 @@ export const AnimalEmoji = styled.span`
   top: 47%;
   left: 50%;
   transform: translate(-50%, -50%);
+  @media (max-width: 481px) {
+    font-size: 50px;
+  }
 `;

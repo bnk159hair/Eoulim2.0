@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import formatTime from 'utils/formatTime';
 import {
   RecordItemContainer,
   RecordProfileImg,
@@ -8,25 +9,24 @@ import {
 import VideoModal from './RecordVideo';
 
 interface RecordListItemProps {
-  animonName: string;
-  create_time: string;
+  animonPath: string;
+  createTime: number[];
   school: string;
-  video_path: string;
+  videoPath: string;
   name: string;
-  guide_seq: string;
-  timeline: string;
+  recordId: number;
 }
 
 const RecordListItem: React.FC<RecordListItemProps> = ({
   name,
-  animonName,
+  animonPath,
   school,
-  video_path,
-  create_time,
-  guide_seq,
-  timeline,
+  videoPath,
+  createTime,
+  recordId,
 }) => {
-  const IMGURL = `/${animonName}.png`;
+  const IMGURL = `${animonPath}`;
+  console.log(IMGURL);
   const [isModalOpen, setModalOpen] = useState(false);
   const openModal = () => {
     setModalOpen(true);
@@ -35,27 +35,22 @@ const RecordListItem: React.FC<RecordListItemProps> = ({
   const closeModal = () => {
     setModalOpen(false);
   };
-  const formatTime = (timeString: string) => {
-    const date = new Date(timeString);
-    return date.toLocaleString(); // 원하는 형식으로 변환할 수 있습니다.
-  };
 
   return (
     <RecordItemContainer>
       <RecordProfileImg style={{ backgroundImage: `url(${IMGURL})` }} />
       <OpponentImformation>
-        <div>친구 이름 : {name}</div>
-        <div>친구 학교 : {school}초등학교</div>
-        <div>녹화 날짜 : {formatTime(create_time)}</div>
+        <div>
+          {'친구 이름 : '}
+          {name}
+        </div>
+        <div>
+          {'친구 학교: '}
+          {school}
+        </div>
+        <div>{`녹화 날짜 : ${formatTime(createTime)}`}</div>
       </OpponentImformation>
-      {isModalOpen && (
-        <VideoModal
-          onClose={closeModal}
-          videoPath={video_path}
-          guideSeq={guide_seq}
-          timeStamp={timeline}
-        />
-      )}
+      {isModalOpen && <VideoModal onClose={closeModal} recordId={recordId} videoPath={videoPath} />}
       <RecordUrl onClick={openModal} />
     </RecordItemContainer>
   );

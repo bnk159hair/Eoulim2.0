@@ -1,55 +1,91 @@
-import React from 'react';
-import {
-  ModalOverlay,
-  ModalContent,
-  Cat,
-  Dog,
-  Panda,
-  Tiger,
-} from './AnimonModalStyles';
+import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
+import { changeAnimon, getAnimons } from 'apis/animonApis';
+import { ModalOverlay, ModalContent, Animon, BeforeButton, AfterButton } from './AnimonModalStyles';
 import { Profilekey } from '../../atoms/Profile';
-import { tokenState } from '../../atoms/Auth';
-import axios from 'axios';
-import { API_BASE_URL } from '../../apis/urls';
 
 interface AnimonModalProps {
   onClose: () => void;
   profile: () => void;
 }
 
-const AnimonModal: React.FC<AnimonModalProps> = ({ onClose, profile }) => {
-  const profileId = useRecoilValue(Profilekey);
-  const token = useRecoilValue(tokenState);
+interface AnimonInfo {
+  id: number;
+  bodyImagePath: string;
+  maskImagePath: string;
+  name: string;
+}
 
-  const changeAnimon = (id: number) => {
-    axios
-      .get(`${API_BASE_URL}/children/${profileId}/animons/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then(() => {
+const AnimonModal = ({ onClose, profile }: AnimonModalProps) => {
+  const childId = useRecoilValue(Profilekey);
+  const [animons, setAnimons] = useState<AnimonInfo[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const animonsPerPage = 3;
+
+  getAnimons({
+    childId,
+    onSuccess: data => {
+      setAnimons(data);
+    },
+    onError: () => {
+      console.log('애니몬 리스트 조회에 실패했습니다.');
+    },
+  });
+
+  const stopPropagation = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+  };
+
+  const onClick = (animonId: number) => {
+    changeAnimon({
+      animonId,
+      childId,
+      onSuccess: () => {
         onClose();
         profile();
-        console.log('바꾸기 완료');
-      })
-      .catch((error) => {
-        console.log('바꾸기 요청 오류', error);
-      });
+      },
+      onError: () => {
+        console.log('애니몬을 바꾸는데 실패했습니다.');
+      },
+    });
+  };
+
+  const indexOfLastAnimon = currentPage * animonsPerPage;
+  const indexOfFirstAnimon = indexOfLastAnimon - animonsPerPage;
+  const currentAnimons = animons.slice(indexOfFirstAnimon, indexOfLastAnimon);
+
+  const nextPage = () => {
+    setCurrentPage(currentPage + 1);
+  };
+
+  const prevPage = () => {
+    setCurrentPage(currentPage - 1);
   };
 
   return (
-    <>
-      <ModalOverlay onClick={onClose} >
-        <ModalContent>
-          <Panda onClick={() => changeAnimon(1)}></Panda>
-          <Dog onClick={() => changeAnimon(2)}></Dog>
-          <Cat onClick={() => changeAnimon(3)}></Cat>
-          <Tiger onClick={() => changeAnimon(4)}></Tiger>
-        </ModalContent>
-      </ModalOverlay>
-    </>
+    <ModalOverlay onClick={onClose}>
+      <ModalContent onClick={stopPropagation}>
+        {animons.length > animonsPerPage && (
+          <div style={{ width: '50px' }}>
+            {currentPage > 1 && <BeforeButton onClick={prevPage} />}
+          </div>
+        )}
+        {currentAnimons.map(animon => (
+          <Animon
+            key={animon.id}
+            onClick={() => onClick(animon.id)}
+            animonurl={animon.maskImagePath}
+          />
+        ))}
+        {animons.length > animonsPerPage && (
+          <div style={{ width: '50px' }}>
+            {currentPage < Math.ceil(animons.length / animonsPerPage) && (
+              <AfterButton onClick={nextPage} />
+            )}
+          </div>
+        )}
+      </ModalContent>
+    </ModalOverlay>
   );
 };
 

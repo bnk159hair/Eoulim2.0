@@ -2,35 +2,52 @@ package com.ssafy.eoullim.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public class Response<T> {
-    private String resultCode;
-    private T result;
+public class Response<Object> {
 
-    public static <T> Response<T> success() {
-        return new Response<T>("SUCCESS", null);
+    private final HttpStatus status;
+    private final String message;
+    private final Object content;
+
+    public static <Object> Response<Object> success() {
+        return new Response<Object>(HttpStatus.OK,"success", null);
     }
 
-    public static <T> Response<T> success(T result) {
-        return new Response<T>("SUCCESS", result);
+    public static <Object> Response<Object> success(Object content) {
+        return new Response<Object>(HttpStatus.OK,"success", null);
+    }
+
+    public static <Object> Response<Object> success(String message, Object content) {
+        return new Response<Object>(HttpStatus.OK,"success", null);
+    }
+
+    public static <Object> Response<Object> success(HttpStatus status, String message) {
+        return new Response<Object>(status, message, null);
+    }
+
+    public static <Object> Response<Object> success(HttpStatus status, String message, Object content) {
+        return new Response<Object>(status, message, content);
     }
 
     public static Response<Void> error(String resultCode) {
-        return new Response<Void>(resultCode, null);
+        return new Response<Void>(null, resultCode, null);
     }
 
+
     public String toStream() {
-        if (result == null) {
+        if (content == null) {
             return "{" +
-                    "\"resultCode\":" + "\"" + resultCode + "\"," +
-                    "\"result\":" + null +
+                    "\"status\":" + "\"" + status + "\"," +
+                    "\"message\":" + "\"" + message + "\"," +
                     "}";
         }
         return "{" +
-                "\"resultCode\":" + "\"" + resultCode + "\"," +
-                "\"result\":" + "\"" + result + "\"," +
+                "\"status\":" + "\"" + status + "\"," +
+                "\"message\":" + "\"" + message + "\"," +
+                content +
                 "}";
     }
 }

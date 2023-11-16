@@ -1,11 +1,12 @@
 package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.MatchFriendRequest;
-import com.ssafy.eoullim.dto.request.MatchRequest;
+import com.ssafy.eoullim.dto.request.MatchStartRequest;
+import com.ssafy.eoullim.dto.request.MatchStopRequest;
+import com.ssafy.eoullim.dto.request.WSAnimonOnOffRequest;
+import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.Match;
-import com.ssafy.eoullim.service.AlarmService;
 import com.ssafy.eoullim.service.MatchService;
-import com.ssafy.eoullim.service.RecordService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import io.openvidu.java.client.Recording;
@@ -15,123 +16,83 @@ import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.expression.ParseException;
+import org.json.simple.parser.ParseException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/meetings")
 @RequiredArgsConstructor
 public class MatchController {
-    private final RecordService recordService;
-    private final AlarmService alarmService;
-    private final MatchService matchService;
+  private final MatchService matchService;
 
-    @PostMapping("/random/start")
-    @Transactional
-    public synchronized ResponseEntity<?> startRandom(
-            @RequestBody MatchRequest matchRequest
-    ) {
-        Match result = null;
-        try{
-            result = matchService.startRandom(matchRequest.getChildId());
+  @PostMapping("/random/start")
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  public synchronized SuccessResponse<?> startRandom(
+      @Valid @RequestBody MatchStartRequest request, Authentication authentication) {
+    Match result = matchService.startRandom(request.getChildId(), authentication);
+    return new SuccessResponse<>(result);
+  }
 
-        } catch (OpenViduJavaClientException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (OpenViduHttpException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+
+//  @MessageMapping("/random/start")        // client가 publish한 Msg Mapping
+//  public SuccessResponse<?> startRandom(MatchStartRequest request) {
+//    matchService.startRandom_01(request);
+//
+//    return new SuccessResponse<>(HttpStatus.OK);
+//  }
+
+  @PostMapping("/random/stop")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<?> stopRandom(@RequestBody MatchStopRequest matchStopRequest) {
+
+    String sessionId = matchStopRequest.getSessionId();
+    List<Integer> guideSeq = matchStopRequest.getGuideScript();
+    List<String> timeline = matchStopRequest.getTimeline();
+    log.info("Random Stop Called " + sessionId);
+
+    try {
+      Recording recording = matchService.stopRandom(sessionId, guideSeq, timeline);
+      return new SuccessResponse<>(recording);
+    } catch (OpenViduJavaClientException | OpenViduHttpException | IOException | ParseException e) {
+      throw new RuntimeException(e);
     }
-    @PostMapping("/random/stop")
-    public ResponseEntity<?> stopRandom(
-            @RequestBody Map<String, Object> params
-    ) throws OpenViduJavaClientException, OpenViduHttpException, IOException, ParseException, org.json.simple.parser.ParseException {
+  }
 
-        String sessionId = (String) params.get("sessionId");
-        String guideSeq = (String) params.get("guideSeq");
-        String timeline = (String) params.get("timeline");
-        log.info("Random Stop Called " + sessionId);
+  /* 친구 만나기 */
+  @PostMapping("/friend/start")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<?> startFrined(
+      @Valid @RequestBody MatchFriendRequest matchFriendRequest, Authentication authentication) {
+    String existSessionId = matchFriendRequest.getSessionId();
+    Long childId = matchFriendRequest.getChildId();
+    Long friendId = matchFriendRequest.getFriendId();
 
-        Recording recording = null;
+    Match result = matchService.startFriend(childId, friendId, existSessionId, authentication);
 
-        try{
-            recording = matchService.stopRandom(sessionId, guideSeq, timeline, recordService);
-        } catch (OpenViduJavaClientException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (OpenViduHttpException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (org.json.simple.parser.ParseException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(recording, HttpStatus.OK);
+    return new SuccessResponse<>(result);
+  }
+
+  @PostMapping("/friend/stop")
+  @ResponseStatus(HttpStatus.OK)
+  public SuccessResponse<?> stopFriend(@RequestBody Map<String, Object> params) {
+
+    String sessionId = (String) params.get("sessionId");
+    try {
+      Recording recording = matchService.stopFriend(sessionId);
+      return new SuccessResponse<>(recording);
+    } catch (OpenViduJavaClientException | OpenViduHttpException | IOException | ParseException e) {
+      log.info(e.getMessage());
+      throw new RuntimeException(e);
     }
-
-    /* 친구 만나기 */
-    @PostMapping("/friend/start")
-    public ResponseEntity<?> startFrined(
-            @RequestBody MatchFriendRequest matchFriendRequest
-    ) {
-
-        String existSessionId = matchFriendRequest.getSessionId();
-        Integer childId = matchFriendRequest.getChildId();
-        String childName = matchFriendRequest.getName();
-        Integer friendId = matchFriendRequest.getFriendId();
-
-        Match result = null;
-        try{
-            result = matchService.startFriend(childId, childName, friendId, existSessionId, alarmService);
-        } catch (OpenViduJavaClientException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (OpenViduHttpException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (ParseException e){
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
-
-    }
-
-    @PostMapping("/friend/stop")
-    public ResponseEntity<?> stopFriend(
-            @RequestBody Map<String, Object> params
-    ) {
-
-        String sessionId = (String) params.get("sessionId");
-        Recording recording = null;
-        try{
-            recording = matchService.stopFriend(sessionId, recordService);
-        } catch (OpenViduJavaClientException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (OpenViduHttpException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        } catch (org.json.simple.parser.ParseException e) {
-            log.info(e.getMessage());
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<>(recording, HttpStatus.OK);
-    }
-
+  }
 }

@@ -1,14 +1,18 @@
 package com.ssafy.eoullim.controller;
 
 import com.ssafy.eoullim.dto.request.*;
-import com.ssafy.eoullim.dto.response.Response;
+import com.ssafy.eoullim.dto.response.SuccessResponse;
 import com.ssafy.eoullim.model.User;
 import com.ssafy.eoullim.service.UserService;
 import com.ssafy.eoullim.utils.ClassUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @Slf4j
 @RestController
@@ -19,43 +23,52 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/join")
-    private Response<Void> join(@RequestBody UserJoinRequest request) {
-        userService.join(request.getUserName(),
+    @ResponseStatus(HttpStatus.CREATED)
+    private SuccessResponse<User> join(@Valid @RequestBody UserJoinRequest request) {
+        User user = userService.join(
+                request.getUsername(),
                 request.getPassword(),
                 request.getName(),
-                request.getPhoneNumber());
-        return Response.success();
+                request.getPhoneNumber()
+        );
+        return new SuccessResponse<>(HttpStatus.CREATED, user);
     }
 
     @PostMapping("/login")
-    public Response<String> login(@RequestBody UserLoginRequest request) {
-        String token = userService.login(request.getUserName(), request.getPassword());
-        return Response.success(token);
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse<?> login(@Valid @RequestBody UserLoginRequest request) {
+        String accessToken = userService.login(request.getUsername(), request.getPassword(), request.getFcmToken());
+        return new SuccessResponse<>(accessToken);
     }
 
-    @GetMapping("/logout")
-    public Response<Void> logout(Authentication authentication) {
-        userService.logout(authentication.getName());
-        return Response.success();
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public SuccessResponse<?> logout(@Valid @RequestBody UserLogoutRequest request, Authentication authentication) {
+        userService.logout(authentication.getName(), request.getFcmToken());
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
 
-    @PutMapping
-    public Response<Void> modify(@RequestBody UserModifyRequest request, Authentication authentication) {
+    @PatchMapping("/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public SuccessResponse<?> updatePassword(
+            @Valid @RequestBody UserModifyRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        userService.modify(user, request.getCurPassword(), request.getNewPassword());
-        return Response.success();
+        userService.updatePw(user, request.getCurPassword(), request.getNewPassword());
+        return new SuccessResponse<>(HttpStatus.NO_CONTENT, null);
     }
-    
-    @PostMapping("/id-check")    // ID 중복 체크
-    public Response<Void> checkId(@RequestBody UserIdCheckRequest request) {
-        userService.checkId(request.getUserName());
-        return Response.success();
+
+    @GetMapping("/check-username/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse<?> isAvailableUsername(@PathVariable @NotBlank String username) {
+        final var isAvailable = userService.isAvailableUsername(username);
+        return new SuccessResponse<>(isAvailable);
     }
-    
-    @PostMapping("/pw-check")    // User Password 재확인
-    public Response<Void> checkPw(@RequestBody UserPwCheckRequest request, Authentication authentication) {
+
+    @PostMapping("/check-password")
+    @ResponseStatus(HttpStatus.OK)
+    public SuccessResponse<?> isCorrectPassword(@Valid @RequestBody UserPwCheckRequest request, Authentication authentication) {
         User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(), User.class);
-        userService.checkPw(request.getPassword(), user.getPassword());
-        return Response.success();
+        final var isCorrect = userService.isCorrectPassword(request.getPassword(), user.getPassword());
+        return new SuccessResponse<>(isCorrect);
     }
 }

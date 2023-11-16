@@ -1,140 +1,111 @@
-import axios from 'axios';
-import { API_BASE_URL } from './urls';
-import { Session } from 'openvidu-browser';
+import instance from './instance';
 
-interface User {
-  childId: String;
-  name: String;
-  gender: String;
-  school: String;
-  grade: Number;
+interface ApiResponse {
+  onSuccess: () => void;
+  onError: () => void;
 }
 
-export const getUserInfo = async (userId: String, userToken: String) => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/children/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    });
+interface UserData {
+  childId: number;
+  gender: string;
+  grade: number;
+  name: string;
+  school: string;
+}
 
-    console.log('유저 정보 가져오기 성공!');
-    console.log(response);
-    return response.data.result;
+interface InvitationSessionData {
+  childId: number;
+  friendId: number;
+  sessionId?: string;
+}
+interface SessionData {
+  sessionId: string;
+  guideScript: number[];
+  timeline: string[];
+}
+
+interface GetUserParams {
+  childId: number;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface GetTokenParams {
+  userData: UserData;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface InvitationSessionParams {
+  invitationSessionData: InvitationSessionData;
+  onSuccess: (data: any) => void;
+  onError: () => void;
+}
+
+interface SessionParams extends ApiResponse {
+  sessionData: SessionData;
+}
+
+interface DestryInvitationSessionParams extends ApiResponse {
+  sessionId: string;
+}
+
+export const getUserInfo = async ({ childId, onSuccess, onError }: GetUserParams) => {
+  try {
+    const response = await instance.get(`/children/${childId}`);
+    onSuccess(response.data.data);
   } catch (error) {
-    console.log('유저 정보 가져오기 실패ㅠ');
-    console.log(error);
-    throw error;
+    onError();
   }
 };
 
-export const getToken = async (userInfo: User, userToken: String) => {
-  console.log('토큰 가져오기');
-  console.log(userInfo);
-
+export const getToken = async ({ userData, onSuccess, onError }: GetTokenParams) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/meetings/random/start`,
-      userInfo,
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    console.log('토큰 가져오기 성공!');
-    console.log(response);
-    return response.data;
+    const response = await instance.post(`/meetings/random/start`, userData);
+    onSuccess(response.data.data);
   } catch (error) {
-    console.log('토큰 가져오기 실패ㅠ');
     console.log(error);
-    throw error;
+    onError();
   }
 };
 
-export const getFriendSessionToken = async (
-  childId: any,
-  userToken: String,
-  sessionId: String
-) => {
-  console.log('초대 토큰 가져오기');
-
+export const invite = async ({
+  invitationSessionData,
+  onSuccess,
+  onError,
+}: InvitationSessionParams) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/meetings/friend/start`,
-      {
-        childId,
-        sessionId,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
-
-    console.log('초대 토큰 가져오기 성공!');
-    console.log(response);
-    return response.data.token;
-  } catch (error) {
-    console.log('초대 토큰 가져오기 실패ㅠ');
-    console.log(error);
-    throw error;
+    const response = await instance.post(`/meetings/friend/start`, invitationSessionData);
+    onSuccess(response.data.data);
+  } catch (error: any) {
+    if (error.response.data.status === '404 NOT_FOUND') {
+      onError();
+    } else {
+      console.log('초대에 실패했습니다.', error);
+    }
   }
 };
 
-export const destroySession = async (
-  session: Session,
-  guideScript: string,
-  timeStamp: string,
-  userToken: any
-) => {
-  console.log('세션 파괴!!!!!!');
-  console.log(session.sessionId, guideScript, timeStamp);
-
+export const destroySession = async ({ sessionData, onSuccess, onError }: SessionParams) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/meetings/random/stop`,
-      {
-        sessionId: session.sessionId,
-        guideSeq: guideScript,
-        timeline: timeStamp,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      }
-    );
-
-    console.log(response);
+    await instance.post(`/meetings/random/stop`, sessionData);
+    onSuccess();
   } catch (error) {
     console.log(error);
+    onError();
   }
 };
 
-export const destroyFriendSession = async (
-  sessionId: string,
-  userToken: any
-) => {
-  console.log('친구 세션 녹화 종료');
-
+export const destroyInvitationSession = async ({
+  sessionId,
+  onSuccess,
+  onError,
+}: DestryInvitationSessionParams) => {
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/meetings/friend/stop`,
-      { sessionId: sessionId },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      }
-    );
-
-    console.log(response);
+    await instance.post(`/meetings/friend/stop`, { sessionId });
+    onSuccess();
   } catch (error) {
     console.log(error);
+    onError();
   }
 };

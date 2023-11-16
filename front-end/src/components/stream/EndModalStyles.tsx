@@ -29,6 +29,10 @@ export const ModalContent = styled.div`
   border-radius: 25px;
   align-items: center;
   background-image: url(${box});
+  @media (max-width: 481px) {
+    width: 80vw;
+    height: 48vw;
+  }
 `;
 
 export const Accept = styled.div`
@@ -50,6 +54,19 @@ export const Refuse = styled.div`
   cursor: pointer;
   &:hover {
     transform: scale(1.25);
+  }
+`;
+
+export const ProfileImg = styled.div`
+  background-size: 100% 100%;
+  width: 120px;
+  height: 120px;
+  background-color: #87cefa;
+  border-radius: 25px;
+  border: solid 2px;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
   }
 `;
 
