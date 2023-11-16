@@ -234,7 +234,7 @@ GitLab, Jira, Figma, Notion
 
 ### 🏗️ 아키텍쳐 구조도
 
-![eoulim_artchitecture.png](exec/아키텍처.png)
+![eoulim_artchitecture.png](exec/자율%20아키텍처.png)
 
 ### 🗃️ ERD
 
