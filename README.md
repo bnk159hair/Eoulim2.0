@@ -2,6 +2,7 @@
 
 ## 목차 🚩
 
+[0. UCC 및 소개영상](##-🎞-UCC-및-소개영상)
 [1. 주요 서비스](##-💡-주요-서비스)\
 [2. 개발 기간](##-📅-개발-기간)\
 [3. 서비스 시연](##-🎪-서비스-시연)\
@@ -37,6 +38,11 @@
     -   아이들의 흥미를 끄는 동물 가면 기능
     -   만났던 친구를 다시 만날 수 있는 초대 기능
     -   부모님의 걱정을 덜어주는 녹화 기능
+
+## UCC 및 기능 소개 영상 🎞
+
+-   [웹 버전 소개 영상 💻](https://drive.google.com/file/d/1IIx0d_rorvFW5X0CqHQwpK-YbDkQQlmi/view?usp=sharing)
+-   [모바일 버전 소개 영상 📱](https://drive.google.com/file/d/1sek_JLcS31JuHtbJJcuEgt2MBa28yvrc/view?usp=sharing)
 
 # 주요 서비스 소개 💡
 
